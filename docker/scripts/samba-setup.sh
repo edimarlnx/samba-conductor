@@ -53,10 +53,14 @@ provision_samba_domain() {
         --server-role="${SAMBA_SERVER_ROLE}" \
         --dns-backend=SAMBA_INTERNAL \
         --adminpass="${SAMBA_ADMIN_PASSWORD}" \
-        --option="dns forwarder = ${SAMBA_DNS_FORWARDER}"
+        --option="dns forwarder = ${SAMBA_DNS_FORWARDER}" \
+        --option="ad dc functional level = 2016"
+
+    # Raise domain and forest functional levels to 2016
+    samba-tool domain level raise --domain-level=2016 --forest-level=2016 || true
 
     touch "$SAMBA_PROVISIONED"
-    echo "[Samba] Provisioned successfully."
+    echo "[Samba] Provisioned at Windows Server 2016 functional level."
 }
 
 # -----------------------------------------------------------------------------
