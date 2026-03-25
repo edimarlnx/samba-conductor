@@ -1,12 +1,12 @@
 FROM zcloudws/meteor-build:3.4 as builder
 
-WORKDIR /build/source
+WORKDIR /app-source/source
 USER root
 
-RUN chown zcloud:zcloud -R /build
+RUN chown zcloud:zcloud -R /app-source
 
 USER zcloud
-COPY --chown=zcloud:zcloud . /build/source
+COPY --chown=zcloud:zcloud . /app-source/source
 
 ENV METEOR_DISABLE_OPTIMISTIC_CACHING=1
 
@@ -26,7 +26,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 USER zcloud
 
-COPY --from=builder /build/app-build/bundle /home/zcloud/app
+COPY --from=builder /app-source/app-build/bundle /home/zcloud/app
 
 #  --legacy-peer-deps because of react-error-boundary
 RUN cd /home/zcloud/app/programs/server && npm i  --no-audit --legacy-peer-deps
