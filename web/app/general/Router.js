@@ -8,6 +8,7 @@ import { Users } from '../users/Users';
 import { UserForm } from '../users/UserForm';
 import { Groups } from '../groups/Groups';
 import { GroupForm } from '../groups/GroupForm';
+import { Domain } from '../domain/Domain';
 import { NotFound } from './NotFound';
 import { AnonymousLayout } from '../layouts/AnonymousLayout';
 import { LoggedLayout } from '../layouts/LoggedLayout';
@@ -85,6 +86,14 @@ export function Router() {
         element={
           <AdminPage>
             <GroupForm />
+          </AdminPage>
+        }
+      />
+      <Route
+        path={RoutePaths.DOMAIN}
+        element={
+          <AdminPage>
+            <Domain />
           </AdminPage>
         }
       />

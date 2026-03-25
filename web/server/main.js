@@ -8,6 +8,7 @@ import '../app/auth/authMethods';
 import '../app/dashboard/dashboardMethods';
 import '../app/users/usersMethods';
 import '../app/groups/groupsMethods';
+import '../app/domain/domainMethods';
 
 import './rest';
 
