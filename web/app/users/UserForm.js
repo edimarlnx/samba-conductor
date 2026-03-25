@@ -34,6 +34,9 @@ export function UserForm() {
   const isEditing = !!editUsername;
 
   const [form, setForm] = useState(INITIAL_FORM);
+  const [groups, setGroups] = useState([]);
+  const [allGroups, setAllGroups] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState('');
   const [loading, setLoading] = useState(isEditing);
   const [submitting, setSubmitting] = useState(false);
 
@@ -42,7 +45,11 @@ export function UserForm() {
 
     async function fetchUser() {
       try {
-        const user = await Meteor.callAsync('samba.users.get', { username: editUsername });
+        const [user, groupList] = await Promise.all([
+          Meteor.callAsync('samba.users.get', { username: editUsername }),
+          Meteor.callAsync('samba.groups.list'),
+        ]);
+
         if (user) {
           setForm((prev) => ({
             ...prev,
@@ -57,7 +64,16 @@ export function UserForm() {
             physicalDeliveryOffice: user.physicalDeliveryOffice || '',
             initials: user.initials || '',
           }));
+
+          // Extract group names from memberOf DNs
+          const userGroups = (user.memberOf || []).map((dn) => {
+            const match = dn.match(/^CN=([^,]+)/);
+            return match ? match[1] : dn;
+          });
+          setGroups(userGroups);
         }
+
+        setAllGroups(groupList.map((g) => g.name));
       } catch (error) {
         openAlert(error.reason || 'Failed to load user');
       } finally {
@@ -285,6 +301,97 @@ export function UserForm() {
           </Button>
         </div>
       </form>
+
+      {/* Group Membership - only when editing */}
+      {isEditing && (
+        <UserGroupsSection
+          username={editUsername}
+          groups={groups}
+          allGroups={allGroups}
+          selectedGroup={selectedGroup}
+          onSelectGroup={setSelectedGroup}
+          onGroupsChange={setGroups}
+          openAlert={openAlert}
+        />
+      )}
+    </div>
+  );
+}
+
+function UserGroupsSection({ username, groups, allGroups, selectedGroup, onSelectGroup, onGroupsChange, openAlert }) {
+  const availableGroups = allGroups.filter((g) => !groups.includes(g));
+
+  async function handleAddGroup() {
+    if (!selectedGroup) return;
+
+    try {
+      await Meteor.callAsync('samba.groups.addMember', {
+        groupName: selectedGroup,
+        memberName: username,
+      });
+      onGroupsChange((prev) => [...prev, selectedGroup]);
+      onSelectGroup('');
+    } catch (error) {
+      openAlert(error.reason || 'Failed to add to group');
+    }
+  }
+
+  async function handleRemoveGroup({ groupName }) {
+    try {
+      await Meteor.callAsync('samba.groups.removeMember', {
+        groupName,
+        memberName: username,
+      });
+      onGroupsChange((prev) => prev.filter((g) => g !== groupName));
+    } catch (error) {
+      openAlert(error.reason || 'Failed to remove from group');
+    }
+  }
+
+  return (
+    <div className="mt-8 max-w-2xl">
+      <div className="rounded-xl bg-gray-900 border border-gray-800 p-5">
+        <h3 className="text-sm font-semibold text-white mb-4">
+          Group Membership ({groups.length})
+        </h3>
+
+        {/* Add to group */}
+        <div className="flex gap-2 mb-4">
+          <select
+            value={selectedGroup}
+            onChange={(e) => onSelectGroup(e.target.value)}
+            className="flex-1 rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="">Select a group to add...</option>
+            {availableGroups.map((g) => (
+              <option key={g} value={g}>{g}</option>
+            ))}
+          </select>
+          <Button secondary onClick={handleAddGroup} type="button" disabled={!selectedGroup}>
+            Add
+          </Button>
+        </div>
+
+        {/* Current groups */}
+        <div className="rounded-lg border border-gray-800 divide-y divide-gray-800">
+          {groups.length === 0 ? (
+            <p className="p-4 text-sm text-gray-500">Not a member of any group</p>
+          ) : (
+            groups.map((groupName) => (
+              <div key={groupName} className="flex items-center justify-between px-4 py-2.5">
+                <span className="text-sm text-gray-300">{groupName}</span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveGroup({ groupName })}
+                  className="text-xs text-red-400 hover:text-red-300"
+                >
+                  Remove
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 }
