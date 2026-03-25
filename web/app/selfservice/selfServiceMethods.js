@@ -1,32 +1,27 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
-import { getUser } from '../samba/sambaUsers';
-import { updateUserAttributes } from '../samba/sambaUsers';
+import { getCredentials, storeCredentials } from '../auth/credentialStore';
+import { getUser, updateUserAttributes, resetPassword } from '../samba/sambaUsers';
 import { authenticateUser } from '../samba/sambaAuth';
-import { resetPassword } from '../samba/sambaUsers';
 import { SettingsCollection } from '../settings/SettingsCollection';
 import { SETTINGS_DEFAULTS } from '../settings/settingsDefaults';
 
 Meteor.methods({
-  // Get own profile from AD
+  // Get own profile from AD using own session credentials
   'selfService.getProfile': async function getOwnProfile() {
-    if (!this.userId) {
-      throw new Meteor.Error('not-authorized', 'You must be logged in');
-    }
+    const credentials = getCredentials({ userId: this.userId });
 
     const meteorUser = await Meteor.users.findOneAsync(this.userId);
     if (!meteorUser?.username) {
       throw new Meteor.Error('not-found', 'User not found');
     }
 
-    return getUser({ username: meteorUser.username });
+    return getUser({ username: meteorUser.username, credentials });
   },
 
-  // Update own profile - only fields allowed by admin settings
+  // Update own profile — only fields allowed by admin settings
   'selfService.updateProfile': async function updateOwnProfile({ fields }) {
-    if (!this.userId) {
-      throw new Meteor.Error('not-authorized', 'You must be logged in');
-    }
+    const credentials = getCredentials({ userId: this.userId });
     check(fields, Object);
 
     const meteorUser = await Meteor.users.findOneAsync(this.userId);
@@ -34,12 +29,9 @@ Meteor.methods({
       throw new Meteor.Error('not-found', 'User not found');
     }
 
-    // Get editable fields configuration
     const setting = await SettingsCollection.findOneAsync({ key: 'selfService.editableFields' });
     const editableFields = setting?.value || SETTINGS_DEFAULTS['selfService.editableFields'];
 
-    // Filter to only allowed fields
-    const allowedAttributes = {};
     const fieldToAdAttribute = {
       givenName: 'givenName',
       surname: 'sn',
@@ -51,6 +43,7 @@ Meteor.methods({
       physicalDeliveryOffice: 'physicalDeliveryOfficeName',
     };
 
+    const allowedAttributes = {};
     Object.entries(fields).forEach(([key, value]) => {
       if (editableFields[key]?.enabled && fieldToAdAttribute[key]) {
         allowedAttributes[fieldToAdAttribute[key]] = value;
@@ -64,6 +57,7 @@ Meteor.methods({
     await updateUserAttributes({
       username: meteorUser.username,
       attributes: allowedAttributes,
+      credentials,
     });
 
     return { success: true };
@@ -82,20 +76,26 @@ Meteor.methods({
       throw new Meteor.Error('not-found', 'User not found');
     }
 
-    // Verify current password via LDAP bind (skip if mustChangePassword)
-    if (!meteorUser.profile?.mustChangePassword) {
+    const mustChange = meteorUser.profile?.mustChangePassword;
+
+    // Verify current password via LDAP bind (skip if forced change)
+    if (!mustChange) {
       await authenticateUser({ username: meteorUser.username, password: currentPassword });
     }
 
-    // Set new password via samba-tool
-    await resetPassword({ username: meteorUser.username, newPassword });
+    // Use current password as credentials for samba-tool, or no credentials if forced change
+    const credentials = mustChange
+      ? undefined
+      : { username: meteorUser.username, password: currentPassword };
 
-    // Clear mustChangePassword flag
-    if (meteorUser.profile?.mustChangePassword) {
-      await Meteor.users.updateAsync(this.userId, {
-        $set: { 'profile.mustChangePassword': false },
-      });
-    }
+    await resetPassword({ username: meteorUser.username, newPassword, credentials });
+
+    // Clear mustChangePassword flag and store new credentials in session
+    await Meteor.users.updateAsync(this.userId, {
+      $set: { 'profile.mustChangePassword': false },
+    });
+
+    storeCredentials({ userId: this.userId, username: meteorUser.username, password: newPassword });
 
     return { success: true };
   },

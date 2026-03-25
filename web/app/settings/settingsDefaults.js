@@ -10,4 +10,9 @@ export const SETTINGS_DEFAULTS = {
     department: { enabled: false, label: 'Department' },
     physicalDeliveryOffice: { enabled: false, label: 'Office' },
   },
+  'sync.account': {
+    configured: false,
+    username: '',
+    encryptedPassword: null,
+  },
 };

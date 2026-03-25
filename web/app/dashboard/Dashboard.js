@@ -8,20 +8,25 @@ import { Loading } from '../components/Loading';
 export function Dashboard() {
   const navigate = useNavigate();
   const [summary, setSummary] = useState(null);
+  const [syncConfigured, setSyncConfigured] = useState(true);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchSummary() {
+    async function fetchData() {
       try {
-        const result = await Meteor.callAsync('dashboard.getSummary');
+        const [result, syncAccount] = await Promise.all([
+          Meteor.callAsync('dashboard.getSummary'),
+          Meteor.callAsync('settings.get', { key: 'sync.account' }).catch(() => null),
+        ]);
         setSummary(result);
+        setSyncConfigured(syncAccount?.configured !== false);
       } catch (error) {
         console.error('[Dashboard] Error:', error);
       } finally {
         setLoading(false);
       }
     }
-    fetchSummary();
+    fetchData();
   }, []);
 
   if (loading) {
@@ -42,6 +47,22 @@ export function Dashboard() {
           {summary?.domain?.realm || 'Active Directory overview'}
         </p>
       </div>
+
+      {/* Sync Account Warning */}
+      {!syncConfigured && (
+        <div className="mb-6 rounded-xl bg-yellow-900/30 border border-yellow-800 px-5 py-4">
+          <h3 className="text-sm font-semibold text-yellow-300">Sync Account Not Configured</h3>
+          <p className="mt-1 text-sm text-yellow-400/80">
+            Create a dedicated AD user (e.g., <code>svc-conductor</code>) for automated synchronization, then configure it in{' '}
+            <button
+              onClick={() => navigate(RoutePaths.ADMIN_SETTINGS)}
+              className="underline hover:text-yellow-300"
+            >
+              Settings
+            </button>.
+          </p>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">

@@ -1,19 +1,18 @@
 import { Meteor } from 'meteor/meteor';
+import { getCredentials } from '../auth/credentialStore';
 import { getDomainInfo } from '../samba/sambaDomain';
 import { listUsers } from '../samba/sambaUsers';
 import { listGroups } from '../samba/sambaGroups';
 
 Meteor.methods({
   'dashboard.getSummary': async function getDashboardSummary() {
-    if (!this.userId) {
-      throw new Meteor.Error('not-authorized', 'You must be logged in');
-    }
+    const credentials = getCredentials({ userId: this.userId });
 
     try {
       const [domainInfo, users, groups] = await Promise.all([
-        getDomainInfo(),
-        listUsers().catch(() => []),
-        listGroups().catch(() => []),
+        getDomainInfo({ credentials }),
+        listUsers({ credentials }).catch(() => []),
+        listGroups({ credentials }).catch(() => []),
       ]);
 
       return {
@@ -24,9 +23,9 @@ Meteor.methods({
         disabledUsersCount: users.filter((u) => !u.enabled).length,
       };
     } catch (error) {
-      console.error('[Dashboard] Failed to get summary:', error);
+      if (error.error === 'session-expired') throw error;
 
-      // Return fallback data when samba is not available
+      console.error('[Dashboard] Failed to get summary:', error);
       return {
         domain: { realm: 'Not connected', baseDn: '', error: error.message },
         usersCount: 0,

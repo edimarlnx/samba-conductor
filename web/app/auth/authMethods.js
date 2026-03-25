@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
 import { check } from 'meteor/check';
 import { authenticateUser } from '../samba/sambaAuth';
+import { storeCredentials, clearCredentials } from './credentialStore';
 
 const DOMAIN_ADMINS_CN = 'CN=Domain Admins';
 
@@ -30,7 +31,6 @@ Accounts.registerLoginHandler('samba', async function sambaLoginHandler({ sambaU
 
   const isAdmin = checkIsAdmin({ memberOf });
 
-  // Find or create the Meteor user linked to this AD account
   let user = await Meteor.users.findOneAsync({ username: sambaUsername });
 
   const profile = {
@@ -55,5 +55,20 @@ Accounts.registerLoginHandler('samba', async function sambaLoginHandler({ sambaU
     user = await Meteor.users.findOneAsync(userId);
   }
 
+  // Store encrypted credentials in server memory for this session
+  // Skip storing if password is expired (user must change it first)
+  if (!adUser.expired) {
+    storeCredentials({ userId: user._id, username: sambaUsername, password: sambaPassword });
+  }
+
   return { userId: user._id };
+});
+
+// Clear credentials on logout
+Meteor.methods({
+  'auth.logout': function authLogout() {
+    if (this.userId) {
+      clearCredentials({ userId: this.userId });
+    }
+  },
 });

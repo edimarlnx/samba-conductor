@@ -2,11 +2,11 @@ import { runSambaTool } from './sambaExec';
 import { getSambaConfig } from './sambaConfig';
 
 // Returns domain information from samba-tool
-export async function getDomainInfo() {
+export async function getDomainInfo({ credentials }) {
   const { realm, baseDn } = getSambaConfig();
 
   try {
-    const { stdout } = await runSambaTool({ args: ['domain', 'info', realm] });
+    const { stdout } = await runSambaTool({ args: ['domain', 'info', realm], credentials });
     const info = parseDomainInfo({ output: stdout });
 
     return {
@@ -15,7 +15,6 @@ export async function getDomainInfo() {
       baseDn,
     };
   } catch (error) {
-    // Return basic config info if samba-tool is not available
     return {
       realm,
       baseDn,
@@ -24,6 +23,16 @@ export async function getDomainInfo() {
       netbios: realm.split('.')[0],
       error: error.message,
     };
+  }
+}
+
+// Returns domain functional level
+export async function getDomainLevel({ credentials }) {
+  try {
+    const { stdout } = await runSambaTool({ args: ['domain', 'level', 'show'], credentials });
+    return parseDomainInfo({ output: stdout });
+  } catch (error) {
+    return { error: error.message };
   }
 }
 
@@ -41,14 +50,4 @@ function parseDomainInfo({ output }) {
   });
 
   return info;
-}
-
-// Returns domain functional level
-export async function getDomainLevel() {
-  try {
-    const { stdout } = await runSambaTool({ args: ['domain', 'level', 'show'] });
-    return parseDomainInfo({ output: stdout });
-  } catch (error) {
-    return { error: error.message };
-  }
 }

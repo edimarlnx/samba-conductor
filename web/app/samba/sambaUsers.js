@@ -1,14 +1,14 @@
 import { getSambaConfig } from './sambaConfig';
-import { createLdapClient, ldapBindAsAdmin, ldapSearch, ldapDisconnect } from './sambaLdap';
+import { createLdapClient, ldapBindWithCredentials, ldapSearch, ldapDisconnect } from './sambaLdap';
 import { runSambaTool } from './sambaExec';
 
 // Lists all AD users with their attributes
-export async function listUsers() {
+export async function listUsers({ credentials }) {
   const client = createLdapClient();
   const { baseDn } = getSambaConfig();
 
   try {
-    await ldapBindAsAdmin({ client });
+    await ldapBindWithCredentials({ client, credentials });
 
     const users = await ldapSearch({
       client,
@@ -44,12 +44,12 @@ export async function listUsers() {
 }
 
 // Gets a single AD user by username
-export async function getUser({ username }) {
+export async function getUser({ username, credentials }) {
   const client = createLdapClient();
   const { baseDn } = getSambaConfig();
 
   try {
-    await ldapBindAsAdmin({ client });
+    await ldapBindWithCredentials({ client, credentials });
 
     const users = await ldapSearch({
       client,
@@ -108,7 +108,7 @@ export async function createUser({
   username, password, givenName, surname, initials, mail,
   company, department, description, telephoneNumber,
   physicalDeliveryOffice, userou, mustChangeAtNextLogin,
-  unixHome, loginShell, uidNumber, gidNumber,
+  unixHome, loginShell, uidNumber, gidNumber, credentials,
 }) {
   const args = ['user', 'create', username, password, '--use-username-as-cn'];
 
@@ -137,39 +137,41 @@ export async function createUser({
     args.push('--must-change-at-next-login');
   }
 
-  return runSambaTool({ args });
+  return runSambaTool({ args, credentials });
 }
 
 // Deletes an AD user
-export async function deleteUser({ username }) {
-  return runSambaTool({ args: ['user', 'delete', username] });
+export async function deleteUser({ username, credentials }) {
+  return runSambaTool({ args: ['user', 'delete', username], credentials });
 }
 
 // Enables an AD user
-export async function enableUser({ username }) {
-  return runSambaTool({ args: ['user', 'enable', username] });
+export async function enableUser({ username, credentials }) {
+  return runSambaTool({ args: ['user', 'enable', username], credentials });
 }
 
 // Disables an AD user
-export async function disableUser({ username }) {
-  return runSambaTool({ args: ['user', 'disable', username] });
+export async function disableUser({ username, credentials }) {
+  return runSambaTool({ args: ['user', 'disable', username], credentials });
 }
 
 // Resets an AD user password
-export async function resetPassword({ username, newPassword }) {
+export async function resetPassword({ username, newPassword, credentials }) {
   return runSambaTool({
     args: ['user', 'setpassword', username, `--newpassword=${newPassword}`],
+    credentials,
   });
 }
 
 // Updates specific AD user attributes via samba-tool
-export async function updateUserAttributes({ username, attributes }) {
+export async function updateUserAttributes({ username, attributes, credentials }) {
   const results = [];
 
   for (const [attr, value] of Object.entries(attributes)) {
     if (value !== undefined && value !== null) {
       const result = await runSambaTool({
         args: ['user', 'setattr', username, attr, String(value)],
+        credentials,
       });
       results.push(result);
     }
@@ -181,6 +183,5 @@ export async function updateUserAttributes({ username, attributes }) {
 // Checks if user account is disabled via userAccountControl flag
 function isAccountDisabled({ userAccountControl }) {
   const uac = parseInt(userAccountControl, 10);
-  // Bit 2 (0x0002) = ACCOUNTDISABLE
   return (uac & 0x0002) !== 0;
 }

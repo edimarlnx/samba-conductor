@@ -17,6 +17,7 @@ export function AdminLayout({ children }) {
   const navigate = useNavigate();
 
   function handleLogout() {
+    Meteor.callAsync('auth.logout').catch(() => {});
     Meteor.logout(() => {
       navigate(RoutePaths.LOGIN);
     });

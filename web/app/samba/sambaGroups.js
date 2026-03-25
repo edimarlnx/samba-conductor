@@ -1,14 +1,14 @@
 import { getSambaConfig } from './sambaConfig';
-import { createLdapClient, ldapBindAsAdmin, ldapSearch, ldapDisconnect } from './sambaLdap';
+import { createLdapClient, ldapBindWithCredentials, ldapSearch, ldapDisconnect } from './sambaLdap';
 import { runSambaTool, parseListOutput } from './sambaExec';
 
 // Lists all AD groups with attributes
-export async function listGroups() {
+export async function listGroups({ credentials }) {
   const client = createLdapClient();
   const { baseDn } = getSambaConfig();
 
   try {
-    await ldapBindAsAdmin({ client });
+    await ldapBindWithCredentials({ client, credentials });
 
     const groups = await ldapSearch({
       client,
@@ -46,12 +46,12 @@ export async function listGroups() {
 }
 
 // Gets a single AD group with its members
-export async function getGroup({ groupName }) {
+export async function getGroup({ groupName, credentials }) {
   const client = createLdapClient();
   const { baseDn } = getSambaConfig();
 
   try {
-    await ldapBindAsAdmin({ client });
+    await ldapBindWithCredentials({ client, credentials });
 
     const groups = await ldapSearch({
       client,
@@ -93,31 +93,29 @@ export async function getGroup({ groupName }) {
 }
 
 // Creates a new AD group
-export async function createGroup({ groupName, description }) {
+export async function createGroup({ groupName, description, credentials }) {
   const args = ['group', 'add', groupName];
-
   if (description) args.push('--description', description);
-
-  return runSambaTool({ args });
+  return runSambaTool({ args, credentials });
 }
 
 // Deletes an AD group
-export async function deleteGroup({ groupName }) {
-  return runSambaTool({ args: ['group', 'delete', groupName] });
+export async function deleteGroup({ groupName, credentials }) {
+  return runSambaTool({ args: ['group', 'delete', groupName], credentials });
 }
 
 // Adds a member to an AD group
-export async function addGroupMember({ groupName, memberName }) {
-  return runSambaTool({ args: ['group', 'addmembers', groupName, memberName] });
+export async function addGroupMember({ groupName, memberName, credentials }) {
+  return runSambaTool({ args: ['group', 'addmembers', groupName, memberName], credentials });
 }
 
 // Removes a member from an AD group
-export async function removeGroupMember({ groupName, memberName }) {
-  return runSambaTool({ args: ['group', 'removemembers', groupName, memberName] });
+export async function removeGroupMember({ groupName, memberName, credentials }) {
+  return runSambaTool({ args: ['group', 'removemembers', groupName, memberName], credentials });
 }
 
 // Lists members of an AD group
-export async function listGroupMembers({ groupName }) {
-  const { stdout } = await runSambaTool({ args: ['group', 'listmembers', groupName] });
+export async function listGroupMembers({ groupName, credentials }) {
+  const { stdout } = await runSambaTool({ args: ['group', 'listmembers', groupName], credentials });
   return parseListOutput({ output: stdout });
 }

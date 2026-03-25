@@ -1,5 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
+import { getCredentials } from '../auth/credentialStore';
 import {
   listUsers,
   getUser,
@@ -12,18 +13,14 @@ import {
 
 Meteor.methods({
   'samba.users.list': async function listADUsers() {
-    if (!this.userId) {
-      throw new Meteor.Error('not-authorized', 'You must be logged in');
-    }
-    return listUsers();
+    const credentials = getCredentials({ userId: this.userId });
+    return listUsers({ credentials });
   },
 
   'samba.users.get': async function getADUser({ username }) {
-    if (!this.userId) {
-      throw new Meteor.Error('not-authorized', 'You must be logged in');
-    }
+    const credentials = getCredentials({ userId: this.userId });
     check(username, String);
-    return getUser({ username });
+    return getUser({ username, credentials });
   },
 
   'samba.users.create': async function createADUser({
@@ -32,9 +29,7 @@ Meteor.methods({
     physicalDeliveryOffice, userou, mustChangeAtNextLogin,
     unixHome, loginShell, uidNumber, gidNumber,
   }) {
-    if (!this.userId) {
-      throw new Meteor.Error('not-authorized', 'You must be logged in');
-    }
+    const credentials = getCredentials({ userId: this.userId });
     check(username, String);
     check(password, String);
 
@@ -59,49 +54,37 @@ Meteor.methods({
       username, password, givenName, surname, initials, mail,
       company, department, description, telephoneNumber,
       physicalDeliveryOffice, userou, mustChangeAtNextLogin,
-      unixHome, loginShell, uidNumber, gidNumber,
+      unixHome, loginShell, uidNumber, gidNumber, credentials,
     });
     return { success: true };
   },
 
   'samba.users.delete': async function deleteADUser({ username }) {
-    if (!this.userId) {
-      throw new Meteor.Error('not-authorized', 'You must be logged in');
-    }
+    const credentials = getCredentials({ userId: this.userId });
     check(username, String);
-
-    await deleteUser({ username });
+    await deleteUser({ username, credentials });
     return { success: true };
   },
 
   'samba.users.enable': async function enableADUser({ username }) {
-    if (!this.userId) {
-      throw new Meteor.Error('not-authorized', 'You must be logged in');
-    }
+    const credentials = getCredentials({ userId: this.userId });
     check(username, String);
-
-    await enableUser({ username });
+    await enableUser({ username, credentials });
     return { success: true };
   },
 
   'samba.users.disable': async function disableADUser({ username }) {
-    if (!this.userId) {
-      throw new Meteor.Error('not-authorized', 'You must be logged in');
-    }
+    const credentials = getCredentials({ userId: this.userId });
     check(username, String);
-
-    await disableUser({ username });
+    await disableUser({ username, credentials });
     return { success: true };
   },
 
   'samba.users.resetPassword': async function resetADUserPassword({ username, newPassword }) {
-    if (!this.userId) {
-      throw new Meteor.Error('not-authorized', 'You must be logged in');
-    }
+    const credentials = getCredentials({ userId: this.userId });
     check(username, String);
     check(newPassword, String);
-
-    await resetPassword({ username, newPassword });
+    await resetPassword({ username, newPassword, credentials });
     return { success: true };
   },
 });

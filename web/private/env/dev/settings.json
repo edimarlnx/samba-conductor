@@ -10,6 +10,6 @@
     "realm": "SAMDOM.EXAMPLE.COM",
     "tlsRejectUnauthorized": false,
     "dockerContainer": "samba-ad-dc",
-    "adminPassword": "P@ssw0rd123!"
+    "sessionTtlMinutes": 30
   }
 }

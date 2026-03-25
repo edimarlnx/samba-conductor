@@ -40,7 +40,7 @@ cat > /etc/samba-conductor.env <<ENVEOF
 export ROOT_URL="${ROOT_URL}"
 export PORT="${PORT}"
 export MONGO_URL="mongodb://127.0.0.1:27017/samba-conductor"
-export METEOR_SETTINGS='{"samba":{"ldapUrl":"ldaps://127.0.0.1:636","baseDn":"${BASE_DN}","realm":"${SAMBA_REALM}","tlsRejectUnauthorized":false,"adminPassword":"${SAMBA_ADMIN_PASSWORD}"},"public":{"appInfo":{"name":"Samba Conductor"}}}'
+export METEOR_SETTINGS='{"samba":{"ldapUrl":"ldaps://127.0.0.1:636","baseDn":"${BASE_DN}","realm":"${SAMBA_REALM}","tlsRejectUnauthorized":false,"sessionTtlMinutes":30},"public":{"appInfo":{"name":"Samba Conductor"}}}'
 ENVEOF
 
 echo "=== Samba Conductor All-in-One ==="

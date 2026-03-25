@@ -2,6 +2,8 @@ import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { SettingsCollection } from './SettingsCollection';
 import { SETTINGS_DEFAULTS } from './settingsDefaults';
+import { encryptForStorage, decryptFromStorage } from '../auth/credentialStore';
+import { authenticateUser } from '../samba/sambaAuth';
 
 // Checks if the current user is an admin
 function requireAdmin({ userId }) {
@@ -16,7 +18,7 @@ function requireAdmin({ userId }) {
 }
 
 Meteor.methods({
-  // Any logged-in user can read settings
+  // Any logged-in user can read settings (passwords are never returned)
   'settings.get': async function getSettings({ key }) {
     if (!this.userId) {
       throw new Meteor.Error('not-authorized', 'You must be logged in');
@@ -24,12 +26,17 @@ Meteor.methods({
     check(key, String);
 
     const setting = await SettingsCollection.findOneAsync({ key });
-    if (setting) {
-      return setting.value;
+    const value = setting?.value || SETTINGS_DEFAULTS[key] || null;
+
+    // Strip encrypted password from sync account before returning
+    if (key === 'sync.account' && value) {
+      return {
+        configured: value.configured || false,
+        username: value.username || '',
+      };
     }
 
-    // Return default if no record exists
-    return SETTINGS_DEFAULTS[key] || null;
+    return value;
   },
 
   // Only admins can write settings
@@ -41,4 +48,45 @@ Meteor.methods({
     await SettingsCollection.upsertAsync({ key }, { $set: { key, value } });
     return { success: true };
   },
+
+  // Configure sync account — validates credentials first, then stores encrypted
+  'settings.configureSyncAccount': async function configureSyncAccount({ username, password }) {
+    requireAdmin({ userId: this.userId });
+    check(username, String);
+    check(password, String);
+
+    // Validate credentials by attempting LDAP bind
+    await authenticateUser({ username, password });
+
+    // Encrypt password for persistent storage
+    const encryptedPassword = encryptForStorage({ text: password });
+
+    await SettingsCollection.upsertAsync(
+      { key: 'sync.account' },
+      {
+        $set: {
+          key: 'sync.account',
+          value: {
+            configured: true,
+            username,
+            encryptedPassword,
+          },
+        },
+      }
+    );
+
+    return { success: true };
+  },
 });
+
+// Utility for server-side sync jobs to get decrypted sync credentials
+export async function getSyncCredentials() {
+  const setting = await SettingsCollection.findOneAsync({ key: 'sync.account' });
+
+  if (!setting?.value?.configured || !setting.value.encryptedPassword) {
+    return null;
+  }
+
+  const password = decryptFromStorage(setting.value.encryptedPassword);
+  return { username: setting.value.username, password };
+}
