@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
-import { getCredentials } from '../auth/credentialStore';
+import { getReadCredentials, getWriteCredentials } from '../auth/credentialStore';
 import {
   listUsers,
   getUser,
@@ -12,24 +12,27 @@ import {
 } from '../samba/sambaUsers';
 
 Meteor.methods({
+  // READ — fallback to sync account
   'samba.users.list': async function listADUsers() {
-    const credentials = getCredentials({ userId: this.userId });
+    const credentials = await getReadCredentials({ userId: this.userId });
     return listUsers({ credentials });
   },
 
+  // READ — fallback to sync account
   'samba.users.get': async function getADUser({ username }) {
-    const credentials = getCredentials({ userId: this.userId });
+    const credentials = await getReadCredentials({ userId: this.userId });
     check(username, String);
     return getUser({ username, credentials });
   },
 
+  // WRITE — requires active session
   'samba.users.create': async function createADUser({
     username, password, givenName, surname, initials, mail,
     company, department, description, telephoneNumber,
     physicalDeliveryOffice, userou, mustChangeAtNextLogin,
     unixHome, loginShell, uidNumber, gidNumber,
   }) {
-    const credentials = getCredentials({ userId: this.userId });
+    const credentials = getWriteCredentials({ userId: this.userId });
     check(username, String);
     check(password, String);
 
@@ -59,29 +62,33 @@ Meteor.methods({
     return { success: true };
   },
 
+  // WRITE — requires active session
   'samba.users.delete': async function deleteADUser({ username }) {
-    const credentials = getCredentials({ userId: this.userId });
+    const credentials = getWriteCredentials({ userId: this.userId });
     check(username, String);
     await deleteUser({ username, credentials });
     return { success: true };
   },
 
+  // WRITE — requires active session
   'samba.users.enable': async function enableADUser({ username }) {
-    const credentials = getCredentials({ userId: this.userId });
+    const credentials = getWriteCredentials({ userId: this.userId });
     check(username, String);
     await enableUser({ username, credentials });
     return { success: true };
   },
 
+  // WRITE — requires active session
   'samba.users.disable': async function disableADUser({ username }) {
-    const credentials = getCredentials({ userId: this.userId });
+    const credentials = getWriteCredentials({ userId: this.userId });
     check(username, String);
     await disableUser({ username, credentials });
     return { success: true };
   },
 
+  // WRITE — requires active session
   'samba.users.resetPassword': async function resetADUserPassword({ username, newPassword }) {
-    const credentials = getCredentials({ userId: this.userId });
+    const credentials = getWriteCredentials({ userId: this.userId });
     check(username, String);
     check(newPassword, String);
     await resetPassword({ username, newPassword, credentials });

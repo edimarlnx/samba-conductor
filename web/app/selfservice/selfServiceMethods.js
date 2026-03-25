@@ -1,15 +1,15 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
-import { getCredentials, storeCredentials } from '../auth/credentialStore';
+import { getReadCredentials, getWriteCredentials, storeCredentials } from '../auth/credentialStore';
 import { getUser, updateUserAttributes, resetPassword } from '../samba/sambaUsers';
 import { authenticateUser } from '../samba/sambaAuth';
 import { SettingsCollection } from '../settings/SettingsCollection';
 import { SETTINGS_DEFAULTS } from '../settings/settingsDefaults';
 
 Meteor.methods({
-  // Get own profile from AD using own session credentials
+  // READ — fallback to sync account
   'selfService.getProfile': async function getOwnProfile() {
-    const credentials = getCredentials({ userId: this.userId });
+    const credentials = await getReadCredentials({ userId: this.userId });
 
     const meteorUser = await Meteor.users.findOneAsync(this.userId);
     if (!meteorUser?.username) {
@@ -19,9 +19,9 @@ Meteor.methods({
     return getUser({ username: meteorUser.username, credentials });
   },
 
-  // Update own profile — only fields allowed by admin settings
+  // WRITE — requires active session
   'selfService.updateProfile': async function updateOwnProfile({ fields }) {
-    const credentials = getCredentials({ userId: this.userId });
+    const credentials = getWriteCredentials({ userId: this.userId });
     check(fields, Object);
 
     const meteorUser = await Meteor.users.findOneAsync(this.userId);

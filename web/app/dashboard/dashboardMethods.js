@@ -1,12 +1,12 @@
 import { Meteor } from 'meteor/meteor';
-import { getCredentials } from '../auth/credentialStore';
+import { getReadCredentials } from '../auth/credentialStore';
 import { getDomainInfo } from '../samba/sambaDomain';
 import { listUsers } from '../samba/sambaUsers';
 import { listGroups } from '../samba/sambaGroups';
 
 Meteor.methods({
   'dashboard.getSummary': async function getDashboardSummary() {
-    const credentials = getCredentials({ userId: this.userId });
+    const credentials = await getReadCredentials({ userId: this.userId });
 
     try {
       const [domainInfo, users, groups] = await Promise.all([

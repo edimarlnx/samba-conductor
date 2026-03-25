@@ -88,6 +88,30 @@ export function clearCredentials({ userId }) {
   store.delete(userId);
 }
 
+// Gets credentials for READ operations — falls back to sync account if session expired
+// Import is deferred to avoid circular dependency
+export async function getReadCredentials({ userId }) {
+  if (hasValidCredentials({ userId })) {
+    return getCredentials({ userId });
+  }
+
+  // Fallback to sync account for read-only operations
+  const { getSyncCredentials } = require('../settings/settingsMethods');
+  const syncCreds = await getSyncCredentials();
+
+  if (syncCreds) {
+    return syncCreds;
+  }
+
+  // No fallback available — throw session expired
+  throw new Meteor.Error('session-expired', 'Your session has expired and no sync account is configured. Please log in again.');
+}
+
+// Gets credentials for WRITE operations — always requires active session (no fallback)
+export function getWriteCredentials({ userId }) {
+  return getCredentials({ userId });
+}
+
 // Auto-cleanup expired entries
 setInterval(() => {
   const now = Date.now();
