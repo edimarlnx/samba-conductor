@@ -60,8 +60,13 @@ export async function getUser({ username }) {
         'displayName',
         'givenName',
         'sn',
+        'initials',
         'mail',
+        'company',
+        'department',
         'description',
+        'telephoneNumber',
+        'physicalDeliveryOfficeName',
         'userAccountControl',
         'memberOf',
         'distinguishedName',
@@ -81,7 +86,12 @@ export async function getUser({ username }) {
       givenName: user.givenName || '',
       surname: user.sn || '',
       email: user.mail || '',
+      initials: user.initials || '',
+      company: user.company || '',
+      department: user.department || '',
       description: user.description || '',
+      telephoneNumber: user.telephoneNumber || '',
+      physicalDeliveryOffice: user.physicalDeliveryOfficeName || '',
       enabled: !isAccountDisabled({ userAccountControl: user.userAccountControl }),
       memberOf: Array.isArray(user.memberOf) ? user.memberOf : user.memberOf ? [user.memberOf] : [],
       dn: user.dn,
@@ -93,13 +103,39 @@ export async function getUser({ username }) {
   }
 }
 
-// Creates a new AD user
-export async function createUser({ username, password, givenName, surname, mail }) {
+// Creates a new AD user with all supported attributes
+export async function createUser({
+  username, password, givenName, surname, initials, mail,
+  company, department, description, telephoneNumber,
+  physicalDeliveryOffice, userou, mustChangeAtNextLogin,
+  unixHome, loginShell, uidNumber, gidNumber,
+}) {
   const args = ['user', 'create', username, password, '--use-username-as-cn'];
 
-  if (givenName) args.push('--given-name', givenName);
-  if (surname) args.push('--surname', surname);
-  if (mail) args.push('--mail-address', mail);
+  const optionalArgs = [
+    ['--given-name', givenName],
+    ['--surname', surname],
+    ['--initials', initials],
+    ['--mail-address', mail],
+    ['--company', company],
+    ['--department', department],
+    ['--description', description],
+    ['--telephone-number', telephoneNumber],
+    ['--physical-delivery-office', physicalDeliveryOffice],
+    ['--userou', userou],
+    ['--unix-home', unixHome],
+    ['--login-shell', loginShell],
+    ['--uid-number', uidNumber],
+    ['--gid-number', gidNumber],
+  ];
+
+  optionalArgs.forEach(([flag, value]) => {
+    if (value) args.push(flag, String(value));
+  });
+
+  if (mustChangeAtNextLogin) {
+    args.push('--must-change-at-next-login');
+  }
 
   return runSambaTool({ args });
 }

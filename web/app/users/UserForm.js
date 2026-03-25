@@ -6,19 +6,34 @@ import { RoutePaths } from '../general/RoutePaths';
 import { Button } from '../components/Button';
 import { Loading } from '../components/Loading';
 
+const INITIAL_FORM = {
+  username: '',
+  password: '',
+  givenName: '',
+  surname: '',
+  initials: '',
+  mail: '',
+  company: '',
+  department: '',
+  description: '',
+  telephoneNumber: '',
+  physicalDeliveryOffice: '',
+  userou: '',
+  mustChangeAtNextLogin: false,
+  // Unix/RFC2307 attributes
+  unixHome: '',
+  loginShell: '',
+  uidNumber: '',
+  gidNumber: '',
+};
+
 export function UserForm() {
   const navigate = useNavigate();
   const { username: editUsername } = useParams();
   const { openAlert } = useAlert();
   const isEditing = !!editUsername;
 
-  const [form, setForm] = useState({
-    username: '',
-    password: '',
-    givenName: '',
-    surname: '',
-    mail: '',
-  });
+  const [form, setForm] = useState(INITIAL_FORM);
   const [loading, setLoading] = useState(isEditing);
   const [submitting, setSubmitting] = useState(false);
 
@@ -29,13 +44,19 @@ export function UserForm() {
       try {
         const user = await Meteor.callAsync('samba.users.get', { username: editUsername });
         if (user) {
-          setForm({
+          setForm((prev) => ({
+            ...prev,
             username: user.username,
-            password: '',
             givenName: user.givenName || '',
             surname: user.surname || '',
             mail: user.email || '',
-          });
+            description: user.description || '',
+            company: user.company || '',
+            department: user.department || '',
+            telephoneNumber: user.telephoneNumber || '',
+            physicalDeliveryOffice: user.physicalDeliveryOffice || '',
+            initials: user.initials || '',
+          }));
         }
       } catch (error) {
         openAlert(error.reason || 'Failed to load user');
@@ -56,7 +77,6 @@ export function UserForm() {
 
     try {
       if (isEditing) {
-        // For editing, only reset password if provided
         if (form.password) {
           await Meteor.callAsync('samba.users.resetPassword', {
             username: editUsername,
@@ -70,7 +90,19 @@ export function UserForm() {
           password: form.password,
           givenName: form.givenName,
           surname: form.surname,
+          initials: form.initials,
           mail: form.mail,
+          company: form.company,
+          department: form.department,
+          description: form.description,
+          telephoneNumber: form.telephoneNumber,
+          physicalDeliveryOffice: form.physicalDeliveryOffice,
+          userou: form.userou,
+          mustChangeAtNextLogin: form.mustChangeAtNextLogin,
+          unixHome: form.unixHome,
+          loginShell: form.loginShell,
+          uidNumber: form.uidNumber,
+          gidNumber: form.gidNumber,
         });
         openAlert('User created successfully');
       }
@@ -98,47 +130,153 @@ export function UserForm() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="max-w-lg space-y-5">
-        <FormField
-          label="Username"
-          value={form.username}
-          onChange={(value) => handleChange({ field: 'username', value })}
-          required
-          disabled={isEditing}
-          placeholder="john.doe"
-        />
+      <form onSubmit={handleSubmit} className="max-w-2xl space-y-8">
+        {/* Account */}
+        <FormSection title="Account">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <FormField
+              label="Username"
+              value={form.username}
+              onChange={(value) => handleChange({ field: 'username', value })}
+              required
+              disabled={isEditing}
+              placeholder="john.doe"
+            />
+            <FormField
+              label={isEditing ? 'New Password (blank = keep current)' : 'Password'}
+              value={form.password}
+              onChange={(value) => handleChange({ field: 'password', value })}
+              type="password"
+              required={!isEditing}
+            />
+          </div>
+          {!isEditing && (
+            <div className="mt-3">
+              <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.mustChangeAtNextLogin}
+                  onChange={(e) => handleChange({ field: 'mustChangeAtNextLogin', value: e.target.checked })}
+                  className="rounded border-gray-600 bg-gray-800 text-blue-600 focus:ring-blue-500"
+                />
+                Must change password at next login
+              </label>
+            </div>
+          )}
+        </FormSection>
 
-        <FormField
-          label={isEditing ? 'New Password (leave blank to keep current)' : 'Password'}
-          value={form.password}
-          onChange={(value) => handleChange({ field: 'password', value })}
-          type="password"
-          required={!isEditing}
-        />
+        {/* Personal Information */}
+        <FormSection title="Personal Information">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <FormField
+              label="First Name"
+              value={form.givenName}
+              onChange={(value) => handleChange({ field: 'givenName', value })}
+              placeholder="John"
+            />
+            <FormField
+              label="Initials"
+              value={form.initials}
+              onChange={(value) => handleChange({ field: 'initials', value })}
+              placeholder="J.D."
+            />
+            <FormField
+              label="Last Name"
+              value={form.surname}
+              onChange={(value) => handleChange({ field: 'surname', value })}
+              placeholder="Doe"
+            />
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-4">
+            <FormField
+              label="Email"
+              value={form.mail}
+              onChange={(value) => handleChange({ field: 'mail', value })}
+              type="email"
+              placeholder="john.doe@example.com"
+            />
+            <FormField
+              label="Phone"
+              value={form.telephoneNumber}
+              onChange={(value) => handleChange({ field: 'telephoneNumber', value })}
+              placeholder="+55 11 99999-9999"
+            />
+          </div>
+          <div className="mt-4">
+            <FormField
+              label="Description"
+              value={form.description}
+              onChange={(value) => handleChange({ field: 'description', value })}
+              placeholder="User description"
+            />
+          </div>
+        </FormSection>
 
-        <FormField
-          label="First Name"
-          value={form.givenName}
-          onChange={(value) => handleChange({ field: 'givenName', value })}
-          placeholder="John"
-        />
+        {/* Organization */}
+        <FormSection title="Organization">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <FormField
+              label="Company"
+              value={form.company}
+              onChange={(value) => handleChange({ field: 'company', value })}
+              placeholder="Acme Corp"
+            />
+            <FormField
+              label="Department"
+              value={form.department}
+              onChange={(value) => handleChange({ field: 'department', value })}
+              placeholder="Engineering"
+            />
+            <FormField
+              label="Office"
+              value={form.physicalDeliveryOffice}
+              onChange={(value) => handleChange({ field: 'physicalDeliveryOffice', value })}
+              placeholder="Building A, Room 101"
+            />
+            {!isEditing && (
+              <FormField
+                label="Organizational Unit"
+                value={form.userou}
+                onChange={(value) => handleChange({ field: 'userou', value })}
+                placeholder="OU=Engineering"
+              />
+            )}
+          </div>
+        </FormSection>
 
-        <FormField
-          label="Last Name"
-          value={form.surname}
-          onChange={(value) => handleChange({ field: 'surname', value })}
-          placeholder="Doe"
-        />
+        {/* Unix/RFC2307 Attributes - only for creation */}
+        {!isEditing && (
+          <FormSection title="Unix Attributes (RFC2307)" collapsible>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                label="Home Directory"
+                value={form.unixHome}
+                onChange={(value) => handleChange({ field: 'unixHome', value })}
+                placeholder="/home/john.doe"
+              />
+              <FormField
+                label="Login Shell"
+                value={form.loginShell}
+                onChange={(value) => handleChange({ field: 'loginShell', value })}
+                placeholder="/bin/bash"
+              />
+              <FormField
+                label="UID Number"
+                value={form.uidNumber}
+                onChange={(value) => handleChange({ field: 'uidNumber', value })}
+                placeholder="10001"
+              />
+              <FormField
+                label="GID Number"
+                value={form.gidNumber}
+                onChange={(value) => handleChange({ field: 'gidNumber', value })}
+                placeholder="10000"
+              />
+            </div>
+          </FormSection>
+        )}
 
-        <FormField
-          label="Email"
-          value={form.mail}
-          onChange={(value) => handleChange({ field: 'mail', value })}
-          type="email"
-          placeholder="john.doe@example.com"
-        />
-
-        <div className="flex gap-3 pt-4">
+        <div className="flex gap-3 pt-2">
           <Button primary type="submit" disabled={submitting}>
             {submitting ? 'Saving...' : isEditing ? 'Save Changes' : 'Create User'}
           </Button>
@@ -151,10 +289,30 @@ export function UserForm() {
   );
 }
 
+function FormSection({ title, children, collapsible = false }) {
+  const [open, setOpen] = useState(!collapsible);
+
+  return (
+    <div className="rounded-xl bg-gray-900 border border-gray-800 p-5">
+      <button
+        type="button"
+        onClick={() => collapsible && setOpen((prev) => !prev)}
+        className={`text-sm font-semibold text-white mb-4 w-full text-left flex items-center justify-between ${collapsible ? 'cursor-pointer' : 'cursor-default'}`}
+      >
+        {title}
+        {collapsible && (
+          <span className="text-gray-500 text-xs">{open ? 'Hide' : 'Show'}</span>
+        )}
+      </button>
+      {open && children}
+    </div>
+  );
+}
+
 function FormField({ label, value, onChange, type = 'text', required = false, disabled = false, placeholder = '' }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-300 mb-1">
+      <label className="block text-xs font-medium text-gray-400 mb-1">
         {label}
       </label>
       <input
@@ -164,7 +322,7 @@ function FormField({ label, value, onChange, type = 'text', required = false, di
         required={required}
         disabled={disabled}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+        className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
       />
     </div>
   );

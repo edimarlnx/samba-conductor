@@ -26,17 +26,41 @@ Meteor.methods({
     return getUser({ username });
   },
 
-  'samba.users.create': async function createADUser({ username, password, givenName, surname, mail }) {
+  'samba.users.create': async function createADUser({
+    username, password, givenName, surname, initials, mail,
+    company, department, description, telephoneNumber,
+    physicalDeliveryOffice, userou, mustChangeAtNextLogin,
+    unixHome, loginShell, uidNumber, gidNumber,
+  }) {
     if (!this.userId) {
       throw new Meteor.Error('not-authorized', 'You must be logged in');
     }
     check(username, String);
     check(password, String);
-    check(givenName, Match.Maybe(String));
-    check(surname, Match.Maybe(String));
-    check(mail, Match.Maybe(String));
 
-    await createUser({ username, password, givenName, surname, mail });
+    const optionalString = Match.Maybe(String);
+    check(givenName, optionalString);
+    check(surname, optionalString);
+    check(initials, optionalString);
+    check(mail, optionalString);
+    check(company, optionalString);
+    check(department, optionalString);
+    check(description, optionalString);
+    check(telephoneNumber, optionalString);
+    check(physicalDeliveryOffice, optionalString);
+    check(userou, optionalString);
+    check(mustChangeAtNextLogin, Match.Maybe(Boolean));
+    check(unixHome, optionalString);
+    check(loginShell, optionalString);
+    check(uidNumber, optionalString);
+    check(gidNumber, optionalString);
+
+    await createUser({
+      username, password, givenName, surname, initials, mail,
+      company, department, description, telephoneNumber,
+      physicalDeliveryOffice, userou, mustChangeAtNextLogin,
+      unixHome, loginShell, uidNumber, gidNumber,
+    });
     return { success: true };
   },
 
