@@ -9,17 +9,20 @@ export function Dashboard() {
   const navigate = useNavigate();
   const [summary, setSummary] = useState(null);
   const [syncConfigured, setSyncConfigured] = useState(true);
+  const [drStatus, setDrStatus] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [result, syncAccount] = await Promise.all([
+        const [result, syncAccount, dr] = await Promise.all([
           Meteor.callAsync('dashboard.getSummary'),
           Meteor.callAsync('settings.get', { key: 'sync.account' }).catch(() => null),
+          Meteor.callAsync('dr.getStatus').catch(() => null),
         ]);
         setSummary(result);
         setSyncConfigured(syncAccount?.configured !== false);
+        setDrStatus(dr);
       } catch (error) {
         console.error('[Dashboard] Error:', error);
       } finally {
@@ -47,6 +50,31 @@ export function Dashboard() {
           {summary?.domain?.realm || 'Active Directory overview'}
         </p>
       </div>
+
+      {/* DR Key Warning */}
+      {drStatus && !drStatus.drKey?.configured && (
+        <div className="mb-6 rounded-xl bg-red-900/30 border border-red-800 px-5 py-4">
+          <h3 className="text-sm font-semibold text-red-300">DR Key Not Configured</h3>
+          <p className="mt-1 text-sm text-red-400/80">
+            Backup data cannot be encrypted without a DR key.{' '}
+            <button onClick={() => navigate(RoutePaths.ADMIN_DR)} className="underline hover:text-red-300">
+              Configure now
+            </button>
+          </p>
+        </div>
+      )}
+
+      {drStatus && drStatus.drKey?.configured && !drStatus.drKey?.unlocked && (
+        <div className="mb-6 rounded-xl bg-yellow-900/30 border border-yellow-800 px-5 py-4">
+          <h3 className="text-sm font-semibold text-yellow-300">DR Key Locked</h3>
+          <p className="mt-1 text-sm text-yellow-400/80">
+            The DR key needs to be unlocked for backups to work.{' '}
+            <button onClick={() => navigate(RoutePaths.ADMIN_DR)} className="underline hover:text-yellow-300">
+              Unlock now
+            </button>
+          </p>
+        </div>
+      )}
 
       {/* Sync Account Warning */}
       {!syncConfigured && (

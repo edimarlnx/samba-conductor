@@ -17,4 +17,5 @@ export const RoutePaths = {
   ADMIN_GROUP_EDIT: '/admin/groups/:groupName/edit',
   ADMIN_DOMAIN: '/admin/domain',
   ADMIN_SETTINGS: '/admin/settings',
+  ADMIN_DR: '/admin/dr',
 };

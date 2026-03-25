@@ -20,6 +20,7 @@ import { Groups } from '../groups/Groups';
 import { GroupForm } from '../groups/GroupForm';
 import { Domain } from '../domain/Domain';
 import { Settings } from '../settings/Settings';
+import { DrPage } from '../dr/DrPage';
 
 // Layouts
 import { AnonymousLayout } from '../layouts/AnonymousLayout';
@@ -107,6 +108,11 @@ export function Router() {
       <Route
         path={RoutePaths.ADMIN_SETTINGS}
         element={<AdminPage><Settings /></AdminPage>}
+      />
+
+      <Route
+        path={RoutePaths.ADMIN_DR}
+        element={<AdminPage><DrPage /></AdminPage>}
       />
 
       {/* 404 */}

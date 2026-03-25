@@ -3,11 +3,9 @@ import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { SettingsCollection } from './SettingsCollection';
 import { SETTINGS_DEFAULTS } from './settingsDefaults';
-import { encryptForStorage, decryptFromStorage } from '../auth/credentialStore';
 import { getCredentials } from '../auth/credentialStore';
+import { drEncrypt, drDecrypt } from '../auth/drKeyStore';
 import { createUser } from '../samba/sambaUsers';
-
-const DEFAULT_SYNC_USERNAME = 'svc-conductor';
 
 // Checks if the current user is an admin
 async function requireAdmin({ userId }) {
@@ -60,8 +58,8 @@ Meteor.methods({
     return { success: true };
   },
 
-  // Create sync account in AD with auto-generated password, save encrypted in MongoDB
-  // The admin never sees the password
+  // Create sync account in AD with auto-generated password
+  // Password encrypted with DR Key and saved in MongoDB — admin never sees it
   'settings.configureSyncAccount': async function configureSyncAccount({ username }) {
     await requireAdmin({ userId: this.userId });
     check(username, String);
@@ -69,7 +67,6 @@ Meteor.methods({
     const credentials = getCredentials({ userId: this.userId });
     const password = generatePassword();
 
-    // Create the AD user via samba-tool using admin's session credentials
     try {
       await createUser({
         username,
@@ -78,7 +75,6 @@ Meteor.methods({
         credentials,
       });
     } catch (error) {
-      // If user already exists, try to reset their password instead
       if (error.message?.includes('already exists')) {
         const { resetPassword } = require('../samba/sambaUsers');
         await resetPassword({ username, newPassword: password, credentials });
@@ -87,8 +83,8 @@ Meteor.methods({
       }
     }
 
-    // Encrypt and store the password
-    const encryptedPassword = encryptForStorage({ text: password });
+    // Encrypt with DR Key (persistent, survives restarts)
+    const encryptedPassword = drEncrypt({ text: password });
 
     await SettingsCollection.upsertAsync(
       { key: 'sync.account' },
@@ -107,7 +103,7 @@ Meteor.methods({
     return { success: true, username };
   },
 
-  // Reset sync account password (generates new password, admin never sees it)
+  // Reset sync account password
   'settings.resetSyncPassword': async function resetSyncPassword() {
     await requireAdmin({ userId: this.userId });
 
@@ -123,7 +119,7 @@ Meteor.methods({
     const { resetPassword } = require('../samba/sambaUsers');
     await resetPassword({ username, newPassword, credentials });
 
-    const encryptedPassword = encryptForStorage({ text: newPassword });
+    const encryptedPassword = drEncrypt({ text: newPassword });
 
     await SettingsCollection.updateAsync(
       { key: 'sync.account' },
@@ -142,6 +138,6 @@ export async function getSyncCredentials() {
     return null;
   }
 
-  const password = decryptFromStorage(setting.value.encryptedPassword);
+  const password = drDecrypt(setting.value.encryptedPassword);
   return { username: setting.value.username, password };
 }

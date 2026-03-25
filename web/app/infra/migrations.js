@@ -31,6 +31,18 @@ Migrations.add({
   },
 });
 
+Migrations.add({
+  version: 3,
+  name: 'Create indexes for adSnapshots collection',
+  async up() {
+    const { AdSnapshotCollection } = require('../dr/AdSnapshotCollection');
+    const rawCollection = AdSnapshotCollection.rawCollection();
+    await rawCollection.createIndex({ type: 1 }, { unique: true });
+    // eslint-disable-next-line no-console
+    console.log('[Migration] Created adSnapshots index on type');
+  },
+});
+
 Meteor.startup(() => {
   Migrations.migrateTo('latest');
 });

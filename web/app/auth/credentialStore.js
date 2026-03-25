@@ -88,25 +88,6 @@ export function clearCredentials({ userId }) {
   store.delete(userId);
 }
 
-// Encrypts a value for persistent storage (sync account)
-export function encryptForStorage({ text }) {
-  const { encrypted, iv, tag } = encrypt({ text });
-  return {
-    encrypted: encrypted.toString('base64'),
-    iv: iv.toString('base64'),
-    tag: tag.toString('base64'),
-  };
-}
-
-// Decrypts a value from persistent storage (sync account)
-export function decryptFromStorage({ encrypted, iv, tag }) {
-  return decrypt({
-    encrypted: Buffer.from(encrypted, 'base64'),
-    iv: Buffer.from(iv, 'base64'),
-    tag: Buffer.from(tag, 'base64'),
-  });
-}
-
 // Auto-cleanup expired entries
 setInterval(() => {
   const now = Date.now();

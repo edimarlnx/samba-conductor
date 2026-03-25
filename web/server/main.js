@@ -16,6 +16,9 @@ import '../app/selfservice/selfServiceMethods';
 // Settings methods
 import '../app/settings/settingsMethods';
 
+// Disaster Recovery
+import '../app/dr/drMethods';
+
 import './rest';
 
 Meteor.startup(() => {});
