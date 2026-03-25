@@ -1,9 +1,13 @@
+import crypto from 'crypto';
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { SettingsCollection } from './SettingsCollection';
 import { SETTINGS_DEFAULTS } from './settingsDefaults';
 import { encryptForStorage, decryptFromStorage } from '../auth/credentialStore';
-import { authenticateUser } from '../samba/sambaAuth';
+import { getCredentials } from '../auth/credentialStore';
+import { createUser } from '../samba/sambaUsers';
+
+const DEFAULT_SYNC_USERNAME = 'svc-conductor';
 
 // Checks if the current user is an admin
 function requireAdmin({ userId }) {
@@ -15,6 +19,13 @@ function requireAdmin({ userId }) {
   if (!user?.profile?.isAdmin) {
     throw new Meteor.Error('not-authorized', 'Admin access required');
   }
+}
+
+// Generates a strong random password (32 chars, mixed)
+function generatePassword() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*';
+  const bytes = crypto.randomBytes(32);
+  return Array.from(bytes).map((b) => chars[b % chars.length]).join('');
 }
 
 Meteor.methods({
@@ -49,16 +60,34 @@ Meteor.methods({
     return { success: true };
   },
 
-  // Configure sync account — validates credentials first, then stores encrypted
-  'settings.configureSyncAccount': async function configureSyncAccount({ username, password }) {
+  // Create sync account in AD with auto-generated password, save encrypted in MongoDB
+  // The admin never sees the password
+  'settings.configureSyncAccount': async function configureSyncAccount({ username }) {
     requireAdmin({ userId: this.userId });
     check(username, String);
-    check(password, String);
 
-    // Validate credentials by attempting LDAP bind
-    await authenticateUser({ username, password });
+    const credentials = getCredentials({ userId: this.userId });
+    const password = generatePassword();
 
-    // Encrypt password for persistent storage
+    // Create the AD user via samba-tool using admin's session credentials
+    try {
+      await createUser({
+        username,
+        password,
+        description: 'Samba Conductor sync service account',
+        credentials,
+      });
+    } catch (error) {
+      // If user already exists, try to reset their password instead
+      if (error.message?.includes('already exists')) {
+        const { resetPassword } = require('../samba/sambaUsers');
+        await resetPassword({ username, newPassword: password, credentials });
+      } else {
+        throw error;
+      }
+    }
+
+    // Encrypt and store the password
     const encryptedPassword = encryptForStorage({ text: password });
 
     await SettingsCollection.upsertAsync(
@@ -73,6 +102,32 @@ Meteor.methods({
           },
         },
       }
+    );
+
+    return { success: true, username };
+  },
+
+  // Reset sync account password (generates new password, admin never sees it)
+  'settings.resetSyncPassword': async function resetSyncPassword() {
+    requireAdmin({ userId: this.userId });
+
+    const setting = await SettingsCollection.findOneAsync({ key: 'sync.account' });
+    if (!setting?.value?.configured) {
+      throw new Meteor.Error('not-configured', 'Sync account is not configured');
+    }
+
+    const credentials = getCredentials({ userId: this.userId });
+    const newPassword = generatePassword();
+    const { username } = setting.value;
+
+    const { resetPassword } = require('../samba/sambaUsers');
+    await resetPassword({ username, newPassword, credentials });
+
+    const encryptedPassword = encryptForStorage({ text: newPassword });
+
+    await SettingsCollection.updateAsync(
+      { key: 'sync.account' },
+      { $set: { 'value.encryptedPassword': encryptedPassword } }
     );
 
     return { success: true };

@@ -8,10 +8,11 @@ export function Settings() {
   const { openAlert } = useAlert();
   const [fields, setFields] = useState({});
   const [syncAccount, setSyncAccount] = useState({ configured: false, username: '' });
-  const [syncForm, setSyncForm] = useState({ username: '', password: '' });
+  const [syncUsername, setSyncUsername] = useState('svc-conductor');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [savingSync, setSavingSync] = useState(false);
+  const [resettingSync, setResettingSync] = useState(false);
 
   useEffect(() => {
     async function fetchSettings() {
@@ -23,7 +24,7 @@ export function Settings() {
         setFields(fieldsResult || {});
         if (syncResult) {
           setSyncAccount(syncResult);
-          setSyncForm((prev) => ({ ...prev, username: syncResult.username || '' }));
+          if (syncResult.username) setSyncUsername(syncResult.username);
         }
       } catch (error) {
         openAlert(error.reason || 'Failed to load settings');
@@ -63,26 +64,35 @@ export function Settings() {
     }
   }
 
-  async function handleSaveSync(event) {
-    event.preventDefault();
-    if (!syncForm.username || !syncForm.password) {
-      openAlert('Username and password are required');
+  async function handleCreateSync() {
+    if (!syncUsername.trim()) {
+      openAlert('Username is required');
       return;
     }
 
     setSavingSync(true);
     try {
       await Meteor.callAsync('settings.configureSyncAccount', {
-        username: syncForm.username,
-        password: syncForm.password,
+        username: syncUsername.trim(),
       });
-      setSyncAccount({ configured: true, username: syncForm.username });
-      setSyncForm((prev) => ({ ...prev, password: '' }));
-      openAlert('Sync account configured and verified successfully');
+      setSyncAccount({ configured: true, username: syncUsername.trim() });
+      openAlert('Sync account created with auto-generated password');
     } catch (error) {
-      openAlert(error.reason || 'Failed to configure sync account. Check credentials.');
+      openAlert(error.reason || 'Failed to create sync account');
     } finally {
       setSavingSync(false);
+    }
+  }
+
+  async function handleResetSyncPassword() {
+    setResettingSync(true);
+    try {
+      await Meteor.callAsync('settings.resetSyncPassword');
+      openAlert('Sync account password has been reset');
+    } catch (error) {
+      openAlert(error.reason || 'Failed to reset sync password');
+    } finally {
+      setResettingSync(false);
     }
   }
 
@@ -144,41 +154,36 @@ export function Settings() {
         <div className="rounded-xl bg-gray-900 border border-gray-800 p-6">
           <h2 className="text-lg font-semibold text-white mb-2">Sync Account</h2>
           <p className="text-sm text-gray-400 mb-4">
-            Dedicated AD account for automated synchronization jobs.
-            Create a user like <code className="text-gray-300">svc-conductor</code> in Active Directory
-            with read permissions on the domain.
+            Dedicated AD account for automated synchronization.
+            A strong password is generated automatically and stored encrypted — no one sees it.
           </p>
 
-          {syncAccount.configured && (
-            <div className="mb-4 rounded-lg bg-green-900/30 border border-green-800 px-4 py-3 text-sm text-green-300">
-              Configured: <strong>{syncAccount.username}</strong>
+          {syncAccount.configured ? (
+            <div>
+              <div className="mb-4 rounded-lg bg-green-900/30 border border-green-800 px-4 py-3 text-sm text-green-300">
+                Active: <strong>{syncAccount.username}</strong>
+              </div>
+              <Button secondary onClick={handleResetSyncPassword} disabled={resettingSync}>
+                {resettingSync ? 'Resetting...' : 'Reset Password'}
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-400 mb-1">Username</label>
+                <input
+                  type="text"
+                  value={syncUsername}
+                  onChange={(e) => setSyncUsername(e.target.value)}
+                  placeholder="svc-conductor"
+                  className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+              <Button primary onClick={handleCreateSync} disabled={savingSync}>
+                {savingSync ? 'Creating...' : 'Create & Configure'}
+              </Button>
             </div>
           )}
-
-          <form onSubmit={handleSaveSync} className="space-y-3">
-            <div>
-              <label className="block text-xs font-medium text-gray-400 mb-1">Username</label>
-              <input
-                type="text"
-                value={syncForm.username}
-                onChange={(e) => setSyncForm((prev) => ({ ...prev, username: e.target.value }))}
-                placeholder="svc-conductor"
-                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-400 mb-1">Password</label>
-              <input
-                type="password"
-                value={syncForm.password}
-                onChange={(e) => setSyncForm((prev) => ({ ...prev, password: e.target.value }))}
-                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
-            <Button primary type="submit" disabled={savingSync}>
-              {savingSync ? 'Testing & Saving...' : 'Test & Save'}
-            </Button>
-          </form>
         </div>
       </div>
     </div>
