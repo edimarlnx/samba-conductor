@@ -9,6 +9,7 @@ SAMBA_DNS_FORWARDER=${SAMBA_DNS_FORWARDER:-"8.8.8.8"}
 SAMBA_SERVER_ROLE=${SAMBA_SERVER_ROLE:-"dc"}
 
 SAMBA_PROVISIONED="/var/lib/samba/.provisioned"
+TLS_DIR="/var/lib/samba/private/tls"
 
 provision_domain() {
     if [ -z "$SAMBA_ADMIN_PASSWORD" ]; then
@@ -35,6 +36,52 @@ provision_domain() {
 
     touch "$SAMBA_PROVISIONED"
     echo "Samba AD DC provisioned successfully."
+}
+
+generate_tls_certificate() {
+    # Generate self-signed TLS certificate for LDAPS
+    # Stored in a volume-backed path so it persists across restarts
+    if [ -f "${TLS_DIR}/cert.pem" ] && [ -f "${TLS_DIR}/key.pem" ]; then
+        echo "TLS certificate already exists, skipping generation."
+        return
+    fi
+
+    echo "Generating self-signed TLS certificate..."
+    mkdir -p "${TLS_DIR}"
+
+    SAMBA_REALM_LOWER=$(echo "${SAMBA_REALM}" | tr '[:upper:]' '[:lower:]')
+    HOSTNAME_FQDN="dc1.${SAMBA_REALM_LOWER}"
+
+    openssl req -x509 -nodes -newkey rsa:4096 \
+        -keyout "${TLS_DIR}/key.pem" \
+        -out "${TLS_DIR}/cert.pem" \
+        -days 3650 \
+        -subj "/CN=${HOSTNAME_FQDN}/O=${SAMBA_DOMAIN}/C=BR" \
+        -addext "subjectAltName=DNS:${HOSTNAME_FQDN},DNS:localhost,IP:127.0.0.1,IP:172.20.0.10"
+
+    # CA file is the same as cert for self-signed
+    cp "${TLS_DIR}/cert.pem" "${TLS_DIR}/ca.pem"
+
+    chmod 600 "${TLS_DIR}/key.pem"
+    chmod 644 "${TLS_DIR}/cert.pem" "${TLS_DIR}/ca.pem"
+
+    echo "TLS certificate generated: ${TLS_DIR}/cert.pem"
+}
+
+configure_tls() {
+    # Configure Samba to use TLS for LDAPS
+    if grep -q "tls certfile" /etc/samba/smb.conf; then
+        echo "TLS already configured in smb.conf."
+        return
+    fi
+
+    sed -i "/^\[global\]/a \\
+\\ttls enabled  = yes\\n\\
+\\ttls certfile = ${TLS_DIR}/cert.pem\\n\\
+\\ttls keyfile  = ${TLS_DIR}/key.pem\\n\\
+\\ttls cafile   = ${TLS_DIR}/ca.pem" /etc/samba/smb.conf
+
+    echo "Configured TLS in smb.conf."
 }
 
 # Provision only on first run
@@ -70,12 +117,9 @@ fi
 
 echo "Kerberos default_realm: $(grep default_realm /etc/krb5.conf | head -1)"
 
-# Allow simple LDAP binds without TLS (development only)
-# In production, configure TLS certificates and remove this setting
-if ! grep -q "ldap server require strong auth" /etc/samba/smb.conf; then
-    sed -i '/^\[global\]/a \\tldap server require strong auth = no' /etc/samba/smb.conf
-    echo "Configured: ldap server require strong auth = no"
-fi
+# Generate TLS certificate and configure Samba for LDAPS
+generate_tls_certificate
+configure_tls
 
 # Start services via supervisor
 exec /usr/bin/supervisord -c /etc/supervisord.conf

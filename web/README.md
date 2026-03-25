@@ -4,9 +4,19 @@ Modern web interface for managing Samba 4 Active Directory Domain Controller. Bu
 
 ## Prerequisites
 
-- Node.js 20+
-- Meteor 3.3+
-- Samba 4 AD DC running (see [Docker setup](../docker/README.md))
+- **Linux** (required — the app uses `docker exec` and `samba-tool` which are Linux-only)
+- **Node.js 20+**
+- **Meteor 3.3+**
+- **Docker** with the Samba container running (see [Docker setup](../docker/README.md))
+
+### How it works
+
+In development, the Meteor app runs on the host machine while Samba runs inside a Docker container. The app communicates with Samba in two ways:
+
+- **LDAP/LDAPS** — direct connection to `ldaps://localhost:636` for authentication and queries
+- **samba-tool** — executed inside the container via `docker exec samba-ad-dc samba-tool ...` for AD management operations (user/group CRUD)
+
+This is controlled by `"dockerContainer": "samba-ad-dc"` in `settings.json`. In production, when the app runs alongside Samba (same host or container), remove this setting so `samba-tool` runs locally.
 
 ## Getting Started
 

@@ -4,13 +4,22 @@ import { getSambaConfig } from './sambaConfig';
 
 // Creates a new LDAP client connection
 export function createLdapClient() {
-  const { ldapUrl } = getSambaConfig();
+  const { ldapUrl, tlsRejectUnauthorized } = getSambaConfig();
 
-  return ldap.createClient({
+  const options = {
     url: ldapUrl,
     connectTimeout: 10000,
     timeout: 30000,
-  });
+  };
+
+  // Configure TLS options for LDAPS connections
+  if (ldapUrl.startsWith('ldaps://')) {
+    options.tlsOptions = {
+      rejectUnauthorized: tlsRejectUnauthorized,
+    };
+  }
+
+  return ldap.createClient(options);
 }
 
 // Binds to LDAP with given credentials
@@ -70,4 +79,18 @@ export function ldapDisconnect({ client }) {
   if (client) {
     client.unbind(() => {});
   }
+}
+
+// Binds to LDAP as the domain administrator for server-side operations
+export async function ldapBindAsAdmin({ client }) {
+  const { realm, adminPassword } = getSambaConfig();
+
+  if (!adminPassword) {
+    throw new Meteor.Error(
+      'samba.config.missing',
+      'Admin password is required for LDAP operations. Set "adminPassword" in settings or SAMBA_ADMIN_PASSWORD env var.'
+    );
+  }
+
+  await ldapBind({ client, dn: `Administrator@${realm}`, password: adminPassword });
 }

@@ -1,17 +1,14 @@
 import { getSambaConfig } from './sambaConfig';
-import { createLdapClient, ldapBind, ldapSearch, ldapDisconnect } from './sambaLdap';
-import { runSambaTool, parseListOutput } from './sambaExec';
+import { createLdapClient, ldapBindAsAdmin, ldapSearch, ldapDisconnect } from './sambaLdap';
+import { runSambaTool } from './sambaExec';
 
 // Lists all AD users with their attributes
 export async function listUsers() {
-  const { stdout } = await runSambaTool({ args: ['user', 'list'] });
-  const usernames = parseListOutput({ output: stdout });
-
   const client = createLdapClient();
-  const { baseDn, realm } = getSambaConfig();
+  const { baseDn } = getSambaConfig();
 
   try {
-    await ldapBindAsAdmin({ client, baseDn, realm });
+    await ldapBindAsAdmin({ client });
 
     const users = await ldapSearch({
       client,
@@ -49,10 +46,10 @@ export async function listUsers() {
 // Gets a single AD user by username
 export async function getUser({ username }) {
   const client = createLdapClient();
-  const { baseDn, realm } = getSambaConfig();
+  const { baseDn } = getSambaConfig();
 
   try {
-    await ldapBindAsAdmin({ client, baseDn, realm });
+    await ldapBindAsAdmin({ client });
 
     const users = await ldapSearch({
       client,
@@ -134,20 +131,4 @@ function isAccountDisabled({ userAccountControl }) {
   const uac = parseInt(userAccountControl, 10);
   // Bit 2 (0x0002) = ACCOUNTDISABLE
   return (uac & 0x0002) !== 0;
-}
-
-// Binds to LDAP using machine account (assumes samba-tool is available on the DC)
-async function ldapBindAsAdmin({ client, baseDn, realm }) {
-  const adminDn = `CN=Administrator,CN=Users,${baseDn}`;
-  // When running on the DC itself, use samba-tool to get a kerberos ticket
-  // For development, we bind with the admin DN from settings
-  const settings = require('meteor/meteor').Meteor.settings?.samba;
-  const adminPassword = settings?.adminPassword || process.env.SAMBA_ADMIN_PASSWORD;
-
-  if (!adminPassword) {
-    // Try anonymous bind for read operations (if allowed by server policy)
-    return;
-  }
-
-  await ldapBind({ client, dn: `Administrator@${realm}`, password: adminPassword });
 }

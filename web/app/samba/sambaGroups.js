@@ -1,14 +1,14 @@
 import { getSambaConfig } from './sambaConfig';
-import { createLdapClient, ldapBind, ldapSearch, ldapDisconnect } from './sambaLdap';
+import { createLdapClient, ldapBindAsAdmin, ldapSearch, ldapDisconnect } from './sambaLdap';
 import { runSambaTool, parseListOutput } from './sambaExec';
 
 // Lists all AD groups with attributes
 export async function listGroups() {
   const client = createLdapClient();
-  const { baseDn, realm } = getSambaConfig();
+  const { baseDn } = getSambaConfig();
 
   try {
-    await ldapBindAsAdmin({ client, baseDn, realm });
+    await ldapBindAsAdmin({ client });
 
     const groups = await ldapSearch({
       client,
@@ -48,10 +48,10 @@ export async function listGroups() {
 // Gets a single AD group with its members
 export async function getGroup({ groupName }) {
   const client = createLdapClient();
-  const { baseDn, realm } = getSambaConfig();
+  const { baseDn } = getSambaConfig();
 
   try {
-    await ldapBindAsAdmin({ client, baseDn, realm });
+    await ldapBindAsAdmin({ client });
 
     const groups = await ldapSearch({
       client,
@@ -120,16 +120,4 @@ export async function removeGroupMember({ groupName, memberName }) {
 export async function listGroupMembers({ groupName }) {
   const { stdout } = await runSambaTool({ args: ['group', 'listmembers', groupName] });
   return parseListOutput({ output: stdout });
-}
-
-// Binds to LDAP as admin
-async function ldapBindAsAdmin({ client, baseDn, realm }) {
-  const settings = require('meteor/meteor').Meteor.settings?.samba;
-  const adminPassword = settings?.adminPassword || process.env.SAMBA_ADMIN_PASSWORD;
-
-  if (!adminPassword) {
-    return;
-  }
-
-  await ldapBind({ client, dn: `Administrator@${realm}`, password: adminPassword });
 }

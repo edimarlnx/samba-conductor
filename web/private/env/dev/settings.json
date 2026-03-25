@@ -5,8 +5,11 @@
     }
   },
   "samba": {
-    "ldapUrl": "ldap://localhost:389",
+    "ldapUrl": "ldaps://localhost:636",
     "baseDn": "DC=samdom,DC=example,DC=com",
-    "realm": "SAMDOM.EXAMPLE.COM"
+    "realm": "SAMDOM.EXAMPLE.COM",
+    "tlsRejectUnauthorized": false,
+    "dockerContainer": "samba-ad-dc",
+    "adminPassword": "P@ssw0rd123!"
   }
 }

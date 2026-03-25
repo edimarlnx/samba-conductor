@@ -19,6 +19,7 @@ RUN microdnf install -y \
     ldb-tools \
     findutils \
     procps-ng \
+    openssl \
     && microdnf clean all \
     && rm -rf /var/cache/dnf
 
