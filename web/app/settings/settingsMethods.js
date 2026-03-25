@@ -10,12 +10,12 @@ import { createUser } from '../samba/sambaUsers';
 const DEFAULT_SYNC_USERNAME = 'svc-conductor';
 
 // Checks if the current user is an admin
-function requireAdmin({ userId }) {
+async function requireAdmin({ userId }) {
   if (!userId) {
     throw new Meteor.Error('not-authorized', 'You must be logged in');
   }
 
-  const user = Promise.await(Meteor.users.findOneAsync(userId));
+  const user = await Meteor.users.findOneAsync(userId);
   if (!user?.profile?.isAdmin) {
     throw new Meteor.Error('not-authorized', 'Admin access required');
   }
@@ -52,7 +52,7 @@ Meteor.methods({
 
   // Only admins can write settings
   'settings.set': async function setSettings({ key, value }) {
-    requireAdmin({ userId: this.userId });
+    await requireAdmin({ userId: this.userId });
     check(key, String);
     check(value, Object);
 
@@ -63,7 +63,7 @@ Meteor.methods({
   // Create sync account in AD with auto-generated password, save encrypted in MongoDB
   // The admin never sees the password
   'settings.configureSyncAccount': async function configureSyncAccount({ username }) {
-    requireAdmin({ userId: this.userId });
+    await requireAdmin({ userId: this.userId });
     check(username, String);
 
     const credentials = getCredentials({ userId: this.userId });
@@ -109,7 +109,7 @@ Meteor.methods({
 
   // Reset sync account password (generates new password, admin never sees it)
   'settings.resetSyncPassword': async function resetSyncPassword() {
-    requireAdmin({ userId: this.userId });
+    await requireAdmin({ userId: this.userId });
 
     const setting = await SettingsCollection.findOneAsync({ key: 'sync.account' });
     if (!setting?.value?.configured) {
