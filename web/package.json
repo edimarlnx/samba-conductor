@@ -2,7 +2,7 @@
   "name": "samba-conductor",
   "private": true,
   "scripts": {
-    "start": "meteor --settings private/env/dev/settings.json",
+    "start": "meteor --port 4080 --settings private/env/dev/settings.json",
     "quave-eslint": "eslint . --fix",
     "quave-prettier": "prettier --write \"**/*.js\"",
     "quave-check": "npm run quave-eslint && npm run quave-prettier",
