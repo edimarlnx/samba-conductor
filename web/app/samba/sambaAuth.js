@@ -3,7 +3,7 @@ import { getSambaConfig } from './sambaConfig';
 import { createLdapClient, ldapBind, ldapBindAsAdmin, ldapSearch, ldapDisconnect } from './sambaLdap';
 
 // Authenticates a user against Samba AD via LDAP bind
-// Returns user attributes on success, or { expired: true } if password is expired
+// Returns user attributes on success, or { expired: true } if password must be changed
 export async function authenticateUser({ username, password }) {
   const { realm, baseDn } = getSambaConfig();
   const upn = `${username}@${realm}`;
@@ -37,43 +37,73 @@ export async function authenticateUser({ username, password }) {
 
     return users[0];
   } catch (error) {
-    // Detect password expired error from AD
-    // AD error data 773 = user must reset password
-    // AD error data 532 = password expired
-    const errorMsg = error.message || '';
-    const isExpired = errorMsg.includes('data 773')
-      || errorMsg.includes('data 532')
-      || errorMsg.includes('PASSWORD_EXPIRED')
-      || errorMsg.includes('must change password');
+    // On InvalidCredentials (code 49), check if it's actually a must-change-password
+    // Samba over LDAPS doesn't include sub-error codes (data 773), so we check pwdLastSet
+    const isInvalidCreds = error.message?.includes('Invalid Credentials')
+      || error.message?.includes('data 773')
+      || error.message?.includes('data 532')
+      || error.message?.includes('PASSWORD_EXPIRED');
 
-    if (isExpired) {
-      // Fetch user attributes using admin bind so we can create the session
-      const adminClient = createLdapClient();
-      try {
-        await ldapBindAsAdmin({ client: adminClient });
-
-        const users = await ldapSearch({
-          client: adminClient,
-          baseDn,
-          filter: `(sAMAccountName=${ldapEscapeFilter({ value: username })})`,
-          attributes: ['sAMAccountName', 'displayName', 'memberOf', 'distinguishedName'],
-        });
-
-        return {
-          expired: true,
-          sAMAccountName: username,
-          displayName: users[0]?.displayName || username,
-          memberOf: users[0]?.memberOf || [],
-          dn: users[0]?.dn || '',
-        };
-      } finally {
-        ldapDisconnect({ client: adminClient });
+    if (isInvalidCreds) {
+      const expiredResult = await checkPasswordExpired({ username, baseDn });
+      if (expiredResult) {
+        return expiredResult;
       }
     }
 
     throw error;
   } finally {
     ldapDisconnect({ client });
+  }
+}
+
+// Checks if a user has pwdLastSet=0 (must change password) via admin bind
+// Returns expired user object if true, null otherwise
+async function checkPasswordExpired({ username, baseDn }) {
+  const adminClient = createLdapClient();
+
+  try {
+    await ldapBindAsAdmin({ client: adminClient });
+
+    const users = await ldapSearch({
+      client: adminClient,
+      baseDn,
+      filter: `(sAMAccountName=${ldapEscapeFilter({ value: username })})`,
+      attributes: [
+        'sAMAccountName',
+        'displayName',
+        'memberOf',
+        'distinguishedName',
+        'pwdLastSet',
+        'userAccountControl',
+      ],
+    });
+
+    if (users.length === 0) {
+      return null;
+    }
+
+    const user = users[0];
+
+    // pwdLastSet=0 means user must change password at next login
+    if (user.pwdLastSet === '0') {
+      return {
+        expired: true,
+        sAMAccountName: username,
+        displayName: user.displayName || username,
+        memberOf: user.memberOf || [],
+        dn: user.dn || '',
+      };
+    }
+
+    // Not expired — it was genuinely invalid credentials
+    return null;
+  } catch (adminError) {
+    // If admin bind fails, we can't check — treat as regular auth failure
+    console.error('[SambaAuth] Admin bind failed during expiry check:', adminError.message);
+    return null;
+  } finally {
+    ldapDisconnect({ client: adminClient });
   }
 }
 
