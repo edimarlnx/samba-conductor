@@ -62,7 +62,7 @@ export function GroupForm() {
         openAlert('Group created successfully');
       }
 
-      navigate(RoutePaths.GROUPS);
+      navigate(RoutePaths.ADMIN_GROUPS);
     } catch (error) {
       openAlert(error.reason || 'Operation failed');
     } finally {
@@ -146,7 +146,7 @@ export function GroupForm() {
             <Button primary type="submit" disabled={submitting}>
               {submitting ? 'Creating...' : 'Create Group'}
             </Button>
-            <Button secondary onClick={() => navigate(RoutePaths.GROUPS)} type="button">
+            <Button secondary onClick={() => navigate(RoutePaths.ADMIN_GROUPS)} type="button">
               Cancel
             </Button>
           </div>
@@ -200,7 +200,7 @@ export function GroupForm() {
           </div>
 
           <div className="flex gap-3 pt-6">
-            <Button secondary onClick={() => navigate(RoutePaths.GROUPS)} type="button">
+            <Button secondary onClick={() => navigate(RoutePaths.ADMIN_GROUPS)} type="button">
               Back to Groups
             </Button>
           </div>

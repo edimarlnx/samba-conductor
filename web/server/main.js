@@ -10,6 +10,12 @@ import '../app/users/usersMethods';
 import '../app/groups/groupsMethods';
 import '../app/domain/domainMethods';
 
+// Self-service methods
+import '../app/selfservice/selfServiceMethods';
+
+// Settings methods
+import '../app/settings/settingsMethods';
+
 import './rest';
 
 Meteor.startup(() => {});

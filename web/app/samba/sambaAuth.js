@@ -1,7 +1,9 @@
+import { Meteor } from 'meteor/meteor';
 import { getSambaConfig } from './sambaConfig';
-import { createLdapClient, ldapBind, ldapSearch, ldapDisconnect } from './sambaLdap';
+import { createLdapClient, ldapBind, ldapBindAsAdmin, ldapSearch, ldapDisconnect } from './sambaLdap';
 
 // Authenticates a user against Samba AD via LDAP bind
+// Returns user attributes on success, or { expired: true } if password is expired
 export async function authenticateUser({ username, password }) {
   const { realm, baseDn } = getSambaConfig();
   const upn = `${username}@${realm}`;
@@ -30,10 +32,46 @@ export async function authenticateUser({ username, password }) {
     });
 
     if (users.length === 0) {
-      throw new Error('User not found in directory after successful bind');
+      throw new Meteor.Error('samba.auth.failed', 'User not found in directory');
     }
 
     return users[0];
+  } catch (error) {
+    // Detect password expired error from AD
+    // AD error data 773 = user must reset password
+    // AD error data 532 = password expired
+    const errorMsg = error.message || '';
+    const isExpired = errorMsg.includes('data 773')
+      || errorMsg.includes('data 532')
+      || errorMsg.includes('PASSWORD_EXPIRED')
+      || errorMsg.includes('must change password');
+
+    if (isExpired) {
+      // Fetch user attributes using admin bind so we can create the session
+      const adminClient = createLdapClient();
+      try {
+        await ldapBindAsAdmin({ client: adminClient });
+
+        const users = await ldapSearch({
+          client: adminClient,
+          baseDn,
+          filter: `(sAMAccountName=${ldapEscapeFilter({ value: username })})`,
+          attributes: ['sAMAccountName', 'displayName', 'memberOf', 'distinguishedName'],
+        });
+
+        return {
+          expired: true,
+          sAMAccountName: username,
+          displayName: users[0]?.displayName || username,
+          memberOf: users[0]?.memberOf || [],
+          dn: users[0]?.dn || '',
+        };
+      } finally {
+        ldapDisconnect({ client: adminClient });
+      }
+    }
+
+    throw error;
   } finally {
     ldapDisconnect({ client });
   }

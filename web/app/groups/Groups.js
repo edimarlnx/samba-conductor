@@ -60,7 +60,7 @@ export function Groups() {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                navigate(RoutePaths.GROUP_EDIT.replace(':groupName', row.name));
+                navigate(RoutePaths.ADMIN_GROUP_EDIT.replace(':groupName', row.name));
               }}
               className="text-xs text-blue-400 hover:text-blue-300"
             >
@@ -92,7 +92,7 @@ export function Groups() {
           <h1 className="text-2xl font-bold text-white">Groups</h1>
           <p className="mt-1 text-sm text-gray-400">Manage Active Directory groups</p>
         </div>
-        <Button primary onClick={() => navigate(RoutePaths.GROUP_CREATE)}>
+        <Button primary onClick={() => navigate(RoutePaths.ADMIN_GROUP_CREATE)}>
           New Group
         </Button>
       </div>

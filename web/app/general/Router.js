@@ -2,29 +2,52 @@ import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 
 import { RoutePaths } from './RoutePaths';
+import { NotFound } from './NotFound';
+
+// Auth
 import { Login } from '../auth/Login';
+
+// Self-Service
+import { SelfServiceHome } from '../selfservice/SelfServiceHome';
+import { Profile } from '../selfservice/Profile';
+import { ChangePassword } from '../selfservice/ChangePassword';
+
+// Admin
 import { Dashboard } from '../dashboard/Dashboard';
 import { Users } from '../users/Users';
 import { UserForm } from '../users/UserForm';
 import { Groups } from '../groups/Groups';
 import { GroupForm } from '../groups/GroupForm';
 import { Domain } from '../domain/Domain';
-import { NotFound } from './NotFound';
+import { Settings } from '../settings/Settings';
+
+// Layouts
 import { AnonymousLayout } from '../layouts/AnonymousLayout';
 import { LoggedLayout } from '../layouts/LoggedLayout';
+import { AdminGuard } from '../layouts/AdminGuard';
 import { AdminLayout } from '../layouts/AdminLayout';
+import { SelfServiceLayout } from '../layouts/SelfServiceLayout';
+
+function SelfServicePage({ children }) {
+  return (
+    <LoggedLayout>
+      <SelfServiceLayout>{children}</SelfServiceLayout>
+    </LoggedLayout>
+  );
+}
 
 function AdminPage({ children }) {
   return (
-    <LoggedLayout>
+    <AdminGuard>
       <AdminLayout>{children}</AdminLayout>
-    </LoggedLayout>
+    </AdminGuard>
   );
 }
 
 export function Router() {
   return (
     <Routes>
+      {/* Authentication */}
       <Route
         path={RoutePaths.LOGIN}
         element={
@@ -33,77 +56,63 @@ export function Router() {
           </AnonymousLayout>
         }
       />
+
+      {/* Self-Service */}
       <Route
-        path={RoutePaths.DASHBOARD}
-        element={
-          <AdminPage>
-            <Dashboard />
-          </AdminPage>
-        }
+        path={RoutePaths.SELF_SERVICE}
+        element={<SelfServicePage><SelfServiceHome /></SelfServicePage>}
       />
       <Route
-        path={RoutePaths.USERS}
-        element={
-          <AdminPage>
-            <Users />
-          </AdminPage>
-        }
+        path={RoutePaths.PROFILE}
+        element={<SelfServicePage><Profile /></SelfServicePage>}
       />
       <Route
-        path={RoutePaths.USER_CREATE}
-        element={
-          <AdminPage>
-            <UserForm />
-          </AdminPage>
-        }
+        path={RoutePaths.CHANGE_PASSWORD}
+        element={<SelfServicePage><ChangePassword /></SelfServicePage>}
+      />
+
+      {/* Admin */}
+      <Route
+        path={RoutePaths.ADMIN_DASHBOARD}
+        element={<AdminPage><Dashboard /></AdminPage>}
       />
       <Route
-        path={RoutePaths.USER_EDIT}
-        element={
-          <AdminPage>
-            <UserForm />
-          </AdminPage>
-        }
+        path={RoutePaths.ADMIN_USERS}
+        element={<AdminPage><Users /></AdminPage>}
       />
       <Route
-        path={RoutePaths.GROUPS}
-        element={
-          <AdminPage>
-            <Groups />
-          </AdminPage>
-        }
+        path={RoutePaths.ADMIN_USER_CREATE}
+        element={<AdminPage><UserForm /></AdminPage>}
       />
       <Route
-        path={RoutePaths.GROUP_CREATE}
-        element={
-          <AdminPage>
-            <GroupForm />
-          </AdminPage>
-        }
+        path={RoutePaths.ADMIN_USER_EDIT}
+        element={<AdminPage><UserForm /></AdminPage>}
       />
       <Route
-        path={RoutePaths.GROUP_EDIT}
-        element={
-          <AdminPage>
-            <GroupForm />
-          </AdminPage>
-        }
+        path={RoutePaths.ADMIN_GROUPS}
+        element={<AdminPage><Groups /></AdminPage>}
       />
       <Route
-        path={RoutePaths.DOMAIN}
-        element={
-          <AdminPage>
-            <Domain />
-          </AdminPage>
-        }
+        path={RoutePaths.ADMIN_GROUP_CREATE}
+        element={<AdminPage><GroupForm /></AdminPage>}
       />
+      <Route
+        path={RoutePaths.ADMIN_GROUP_EDIT}
+        element={<AdminPage><GroupForm /></AdminPage>}
+      />
+      <Route
+        path={RoutePaths.ADMIN_DOMAIN}
+        element={<AdminPage><Domain /></AdminPage>}
+      />
+      <Route
+        path={RoutePaths.ADMIN_SETTINGS}
+        element={<AdminPage><Settings /></AdminPage>}
+      />
+
+      {/* 404 */}
       <Route
         path="*"
-        element={
-          <AdminPage>
-            <NotFound />
-          </AdminPage>
-        }
+        element={<SelfServicePage><NotFound /></SelfServicePage>}
       />
     </Routes>
   );

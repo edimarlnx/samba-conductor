@@ -12,7 +12,7 @@ export function Status() {
       <p className="text-gray-400">Service monitoring coming soon.</p>
       <Button
         secondary
-        onClick={() => navigate(RoutePaths.DASHBOARD)}
+        onClick={() => navigate(RoutePaths.ADMIN_DASHBOARD)}
         className="mt-6"
       >
         Back to Dashboard

@@ -162,6 +162,22 @@ export async function resetPassword({ username, newPassword }) {
   });
 }
 
+// Updates specific AD user attributes via samba-tool
+export async function updateUserAttributes({ username, attributes }) {
+  const results = [];
+
+  for (const [attr, value] of Object.entries(attributes)) {
+    if (value !== undefined && value !== null) {
+      const result = await runSambaTool({
+        args: ['user', 'setattr', username, attr, String(value)],
+      });
+      results.push(result);
+    }
+  }
+
+  return results;
+}
+
 // Checks if user account is disabled via userAccountControl flag
 function isAccountDisabled({ userAccountControl }) {
   const uac = parseInt(userAccountControl, 10);

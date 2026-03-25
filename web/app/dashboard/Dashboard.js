@@ -29,9 +29,9 @@ export function Dashboard() {
   }
 
   const quickActions = [
-    { label: 'Manage Users', path: RoutePaths.USERS, description: 'Create, edit and manage AD users' },
-    { label: 'Manage Groups', path: RoutePaths.GROUPS, description: 'Create, edit and manage AD groups' },
-    { label: 'Domain Info', path: RoutePaths.DOMAIN, description: 'View domain configuration and status' },
+    { label: 'Manage Users', path: RoutePaths.ADMIN_USERS, description: 'Create, edit and manage AD users' },
+    { label: 'Manage Groups', path: RoutePaths.ADMIN_GROUPS, description: 'Create, edit and manage AD groups' },
+    { label: 'Domain Info', path: RoutePaths.ADMIN_DOMAIN, description: 'View domain configuration and status' },
   ];
 
   return (

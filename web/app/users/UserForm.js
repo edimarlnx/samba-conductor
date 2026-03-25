@@ -123,7 +123,7 @@ export function UserForm() {
         openAlert('User created successfully');
       }
 
-      navigate(RoutePaths.USERS);
+      navigate(RoutePaths.ADMIN_USERS);
     } catch (error) {
       openAlert(error.reason || 'Operation failed');
     } finally {
@@ -296,7 +296,7 @@ export function UserForm() {
           <Button primary type="submit" disabled={submitting}>
             {submitting ? 'Saving...' : isEditing ? 'Save Changes' : 'Create User'}
           </Button>
-          <Button secondary onClick={() => navigate(RoutePaths.USERS)} type="button">
+          <Button secondary onClick={() => navigate(RoutePaths.ADMIN_USERS)} type="button">
             Cancel
           </Button>
         </div>

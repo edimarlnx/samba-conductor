@@ -1,5 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Migrations } from 'meteor/quave:migrations';
+import { SettingsCollection } from '../settings/SettingsCollection';
+import { SETTINGS_DEFAULTS } from '../settings/settingsDefaults';
 
 Migrations.config({
   log: true,
@@ -11,6 +13,21 @@ Migrations.add({
   up() {
     // eslint-disable-next-line no-console
     console.log("I'm a fake migration");
+  },
+});
+
+Migrations.add({
+  version: 2,
+  name: 'Insert default self-service settings',
+  async up() {
+    for (const [key, value] of Object.entries(SETTINGS_DEFAULTS)) {
+      const existing = await SettingsCollection.findOneAsync({ key });
+      if (!existing) {
+        await SettingsCollection.insertAsync({ key, value });
+        // eslint-disable-next-line no-console
+        console.log(`[Migration] Inserted default setting: ${key}`);
+      }
+    }
   },
 });
 

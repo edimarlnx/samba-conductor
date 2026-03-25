@@ -26,7 +26,13 @@ function InnerLayout({ children, onlyLogged, onlyAnonymous }) {
 
   if (onlyAnonymous) {
     if (loggedUser) {
-      return <Navigate to={RoutePaths.DASHBOARD} replace />;
+      if (loggedUser.profile?.mustChangePassword) {
+        return <Navigate to={RoutePaths.CHANGE_PASSWORD} replace />;
+      }
+      if (loggedUser.profile?.isAdmin) {
+        return <Navigate to={RoutePaths.ADMIN_DASHBOARD} replace />;
+      }
+      return <Navigate to={RoutePaths.SELF_SERVICE} replace />;
     }
     return <>{children}</>;
   }

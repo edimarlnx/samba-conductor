@@ -22,7 +22,7 @@ export function ErrorFallback({ error, resetErrorBoundary }) {
           <button
             onClick={() => {
               resetErrorBoundary();
-              navigate(RoutePaths.DASHBOARD);
+              navigate(RoutePaths.SELF_SERVICE);
             }}
             className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
           >

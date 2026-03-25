@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
 import { useNavigate } from 'react-router-dom';
 import { RoutePaths } from '../general/RoutePaths';
@@ -22,8 +23,17 @@ export function Login() {
         setLoading(false);
         if (err) {
           setError(err.reason || 'Authentication failed');
+          return;
+        }
+
+        // Redirect based on user profile
+        const user = Meteor.user();
+        if (user?.profile?.mustChangePassword) {
+          navigate(RoutePaths.CHANGE_PASSWORD);
+        } else if (user?.profile?.isAdmin) {
+          navigate(RoutePaths.ADMIN_DASHBOARD);
         } else {
-          navigate(RoutePaths.DASHBOARD);
+          navigate(RoutePaths.SELF_SERVICE);
         }
       },
     });
@@ -36,7 +46,7 @@ export function Login() {
           <div className="mb-8 text-center">
             <h1 className="text-2xl font-bold text-white">Samba Conductor</h1>
             <p className="mt-2 text-sm text-gray-400">
-              Sign in to manage your Active Directory
+              Sign in to your account
             </p>
           </div>
 
@@ -50,7 +60,7 @@ export function Login() {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="administrator"
+                placeholder="username"
                 required
                 autoFocus
                 className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"

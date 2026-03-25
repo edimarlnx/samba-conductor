@@ -12,10 +12,10 @@ export function NotFound() {
       <p className="mt-4 text-lg text-gray-400">Page not found</p>
       <Button
         primary
-        onClick={() => navigate(RoutePaths.DASHBOARD)}
+        onClick={() => navigate(RoutePaths.SELF_SERVICE)}
         className="mt-8"
       >
-        Go to Dashboard
+        Go Home
       </Button>
     </div>
   );

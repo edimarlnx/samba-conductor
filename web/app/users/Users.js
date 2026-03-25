@@ -79,7 +79,7 @@ export function Users() {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                navigate(RoutePaths.USER_EDIT.replace(':username', row.username));
+                navigate(RoutePaths.ADMIN_USER_EDIT.replace(':username', row.username));
               }}
               className="text-xs text-blue-400 hover:text-blue-300"
             >
@@ -120,7 +120,7 @@ export function Users() {
           <h1 className="text-2xl font-bold text-white">Users</h1>
           <p className="mt-1 text-sm text-gray-400">Manage Active Directory users</p>
         </div>
-        <Button primary onClick={() => navigate(RoutePaths.USER_CREATE)}>
+        <Button primary onClick={() => navigate(RoutePaths.ADMIN_USER_CREATE)}>
           New User
         </Button>
       </div>

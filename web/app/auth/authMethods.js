@@ -3,6 +3,14 @@ import { Accounts } from 'meteor/accounts-base';
 import { check } from 'meteor/check';
 import { authenticateUser } from '../samba/sambaAuth';
 
+const DOMAIN_ADMINS_CN = 'CN=Domain Admins';
+
+// Checks if user is member of Domain Admins group
+function checkIsAdmin({ memberOf }) {
+  const groups = Array.isArray(memberOf) ? memberOf : memberOf ? [memberOf] : [];
+  return groups.some((dn) => dn.includes(DOMAIN_ADMINS_CN));
+}
+
 // Custom login handler for Samba AD authentication
 Accounts.registerLoginHandler('samba', async function sambaLoginHandler({ sambaUsername, sambaPassword }) {
   if (!sambaUsername || !sambaPassword) {
@@ -14,6 +22,14 @@ Accounts.registerLoginHandler('samba', async function sambaLoginHandler({ sambaU
 
   const adUser = await authenticateUser({ username: sambaUsername, password: sambaPassword });
 
+  const memberOf = Array.isArray(adUser.memberOf)
+    ? adUser.memberOf
+    : adUser.memberOf
+      ? [adUser.memberOf]
+      : [];
+
+  const isAdmin = checkIsAdmin({ memberOf });
+
   // Find or create the Meteor user linked to this AD account
   let user = await Meteor.users.findOneAsync({ username: sambaUsername });
 
@@ -23,19 +39,15 @@ Accounts.registerLoginHandler('samba', async function sambaLoginHandler({ sambaU
     surname: adUser.sn || '',
     email: adUser.mail || '',
     dn: adUser.dn || adUser.distinguishedName || '',
-    memberOf: Array.isArray(adUser.memberOf)
-      ? adUser.memberOf
-      : adUser.memberOf
-        ? [adUser.memberOf]
-        : [],
+    memberOf,
+    isAdmin,
+    mustChangePassword: adUser.expired === true,
     lastSyncedAt: new Date(),
   };
 
   if (user) {
-    // Update existing user profile with latest AD data
     await Meteor.users.updateAsync(user._id, { $set: { profile } });
   } else {
-    // Create a new Meteor user for this AD account
     const userId = await Accounts.createUserAsync({
       username: sambaUsername,
       profile,
