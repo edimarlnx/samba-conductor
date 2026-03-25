@@ -1,0 +1,13 @@
+{
+  "public": {
+    "appInfo": {
+      "name": "Meteor Template by quave"
+    }
+  },
+  "packages": {
+    "quave:email-postmark": {
+      "from": "media@codeftw.dev",
+      "apiToken": "abc"
+    }
+  }
+}
