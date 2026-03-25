@@ -37,6 +37,7 @@ export function DrPage() {
       <div className="max-w-3xl space-y-8">
         <DrKeySection status={status} onUpdate={fetchStatus} openAlert={openAlert} />
         <SyncSection status={status} onUpdate={fetchStatus} openAlert={openAlert} />
+        <BackupS3Section status={status} onUpdate={fetchStatus} openAlert={openAlert} />
         <RestoreSection status={status} openAlert={openAlert} />
       </div>
     </div>
@@ -295,6 +296,231 @@ function SyncItem({ label, count, lastSync, formatDate }) {
 }
 
 // Restore section
+// S3 Backup configuration and manual trigger
+function BackupS3Section({ status, onUpdate, openAlert }) {
+  const [config, setConfig] = useState(null);
+  const [loadingConfig, setLoadingConfig] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [backingUp, setBackingUp] = useState(false);
+  const [form, setForm] = useState({
+    endpoint: '',
+    bucket: '',
+    region: 'us-east-1',
+    accessKeyId: '',
+    secretAccessKey: '',
+    prefix: 'samba-conductor/',
+    includeMongoDump: true,
+    includeSambaBackup: true,
+    retentionDays: 30,
+    scheduleHours: 6,
+    enabled: false,
+  });
+
+  useEffect(() => {
+    async function fetchConfig() {
+      try {
+        const result = await Meteor.callAsync('dr.getS3Config');
+        setConfig(result);
+        if (result) {
+          setForm((prev) => ({ ...prev, ...result, secretAccessKey: '' }));
+        }
+      } catch (error) {
+        // Config may not exist yet
+      } finally {
+        setLoadingConfig(false);
+      }
+    }
+    fetchConfig();
+  }, []);
+
+  function handleChange({ field, value }) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  async function handleSave() {
+    if (!form.bucket || !form.accessKeyId || !form.secretAccessKey) {
+      openAlert('Bucket, Access Key and Secret Key are required');
+      return;
+    }
+    setSaving(true);
+    try {
+      await Meteor.callAsync('dr.configureS3', form);
+      openAlert('S3 backup configured and connection tested successfully');
+      await onUpdate();
+    } catch (error) {
+      openAlert(error.reason || 'Failed to configure S3. Check credentials and endpoint.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleBackupNow() {
+    setBackingUp(true);
+    try {
+      const result = await Meteor.callAsync('dr.triggerBackup', {
+        includeMongo: form.includeMongoDump,
+        includeSamba: form.includeSambaBackup,
+      });
+      const uploaded = result.uploads?.length || 0;
+      const errors = result.errors?.length || 0;
+      openAlert(`Backup complete: ${uploaded} files uploaded${errors ? `, ${errors} errors` : ''}`);
+      await onUpdate();
+    } catch (error) {
+      openAlert(error.reason || 'Backup failed');
+    } finally {
+      setBackingUp(false);
+    }
+  }
+
+  if (loadingConfig) return null;
+
+  const lastRun = status?.backup?.lastRun;
+
+  return (
+    <div className="rounded-xl bg-gray-900 border border-gray-800 p-6">
+      <h2 className="text-lg font-semibold text-white mb-2">S3 Backup</h2>
+      <p className="text-sm text-gray-400 mb-4">
+        Upload MongoDB dumps and Samba domain backups to S3-compatible storage.
+      </p>
+
+      {lastRun && (
+        <div className={`mb-4 rounded-lg px-4 py-3 text-sm ${
+          lastRun.errors > 0
+            ? 'bg-yellow-900/30 border border-yellow-800 text-yellow-300'
+            : 'bg-green-900/30 border border-green-800 text-green-300'
+        }`}>
+          Last backup: {new Date(lastRun.timestamp).toLocaleString()} — {lastRun.uploads} files
+          {lastRun.errors > 0 && `, ${lastRun.errors} errors`}
+        </div>
+      )}
+
+      <div className="space-y-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1">S3 Endpoint (blank for AWS)</label>
+            <input
+              type="text"
+              value={form.endpoint}
+              onChange={(e) => handleChange({ field: 'endpoint', value: e.target.value })}
+              placeholder="https://s3.example.com"
+              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1">Bucket</label>
+            <input
+              type="text"
+              value={form.bucket}
+              onChange={(e) => handleChange({ field: 'bucket', value: e.target.value })}
+              placeholder="my-backups"
+              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1">Access Key ID</label>
+            <input
+              type="text"
+              value={form.accessKeyId}
+              onChange={(e) => handleChange({ field: 'accessKeyId', value: e.target.value })}
+              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1">Secret Access Key</label>
+            <input
+              type="password"
+              value={form.secretAccessKey}
+              onChange={(e) => handleChange({ field: 'secretAccessKey', value: e.target.value })}
+              placeholder={config?.configured ? '(unchanged)' : ''}
+              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1">Region</label>
+            <input
+              type="text"
+              value={form.region}
+              onChange={(e) => handleChange({ field: 'region', value: e.target.value })}
+              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1">Prefix</label>
+            <input
+              type="text"
+              value={form.prefix}
+              onChange={(e) => handleChange({ field: 'prefix', value: e.target.value })}
+              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1">Retention (days)</label>
+            <input
+              type="number"
+              value={form.retentionDays}
+              onChange={(e) => handleChange({ field: 'retentionDays', value: parseInt(e.target.value, 10) || 30 })}
+              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1">Schedule (every N hours)</label>
+            <input
+              type="number"
+              value={form.scheduleHours}
+              onChange={(e) => handleChange({ field: 'scheduleHours', value: parseInt(e.target.value, 10) || 6 })}
+              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-4 pt-1">
+          <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={form.includeMongoDump}
+              onChange={(e) => handleChange({ field: 'includeMongoDump', value: e.target.checked })}
+              className="rounded border-gray-600 bg-gray-800 text-blue-600 focus:ring-blue-500"
+            />
+            Include MongoDB dump
+          </label>
+          <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={form.includeSambaBackup}
+              onChange={(e) => handleChange({ field: 'includeSambaBackup', value: e.target.checked })}
+              className="rounded border-gray-600 bg-gray-800 text-blue-600 focus:ring-blue-500"
+            />
+            Include Samba domain backup
+          </label>
+          <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={form.enabled}
+              onChange={(e) => handleChange({ field: 'enabled', value: e.target.checked })}
+              className="rounded border-gray-600 bg-gray-800 text-blue-600 focus:ring-blue-500"
+            />
+            Enable scheduled backups
+          </label>
+        </div>
+
+        <div className="flex gap-3 pt-2">
+          <Button primary onClick={handleSave} disabled={saving}>
+            {saving ? 'Testing & Saving...' : 'Test & Save'}
+          </Button>
+          {config?.configured && (
+            <Button secondary onClick={handleBackupNow} disabled={backingUp || !status?.drKey?.unlocked}>
+              {backingUp ? 'Backing up...' : 'Backup Now'}
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function RestoreSection({ status, openAlert }) {
   const [preview, setPreview] = useState(null);
   const [loadingPreview, setLoadingPreview] = useState(false);

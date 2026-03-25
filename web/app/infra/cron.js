@@ -52,4 +52,46 @@ SyncedCron.add({
   },
 });
 
+// S3 Backup — configurable schedule, checks if enabled
+SyncedCron.add({
+  name: 'DR: S3 Backup',
+  schedule(parser) {
+    return parser.text('every 1 hour');
+  },
+  async job() {
+    const { SettingsCollection } = require('../settings/SettingsCollection');
+    const setting = await SettingsCollection.findOneAsync({ key: 'backup.s3' });
+    const config = setting?.value;
+
+    if (!config?.configured || !config?.enabled) {
+      return;
+    }
+
+    if (!isDrKeyUnlocked()) {
+      console.log('[Cron] S3 backup skipped: DR Key not unlocked');
+      return;
+    }
+
+    // Check if enough time has passed since last backup
+    const lastRun = await SettingsCollection.findOneAsync({ key: 'backup.lastRun' });
+    if (lastRun?.value?.timestamp) {
+      const hoursSinceLast = (Date.now() - new Date(lastRun.value.timestamp).getTime()) / (1000 * 60 * 60);
+      if (hoursSinceLast < (config.scheduleHours || 6)) {
+        return;
+      }
+    }
+
+    try {
+      const { runBackup } = require('../dr/drBackup');
+      const result = await runBackup({
+        includeMongo: config.includeMongoDump !== false,
+        includeSamba: config.includeSambaBackup !== false,
+      });
+      console.log(`[Cron] S3 backup completed: ${result.uploads.length} files uploaded`);
+    } catch (error) {
+      console.error('[Cron] S3 backup failed:', error.message);
+    }
+  },
+});
+
 SyncedCron.start();

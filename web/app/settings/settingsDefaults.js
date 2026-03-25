@@ -15,4 +15,21 @@ export const SETTINGS_DEFAULTS = {
     username: '',
     encryptedPassword: null,
   },
+  'backup.s3': {
+    configured: false,
+    endpoint: '',
+    bucket: '',
+    region: 'us-east-1',
+    accessKeyId: '',
+    encryptedSecretKey: null,
+    prefix: 'samba-conductor/',
+    // What to include in backups
+    includeMongoDump: true,
+    includeSambaBackup: true,
+    // Retention
+    retentionDays: 30,
+    // Schedule (cron-style)
+    enabled: false,
+    scheduleHours: 6,
+  },
 };
