@@ -2,47 +2,56 @@ import React from 'react';
 
 const buttonStyles = {
   primary: {
-    bg: 'bg-indigo-600',
-    hover: 'hover:bg-indigo-700',
+    bg: 'bg-blue-600',
+    hover: 'hover:bg-blue-700',
     text: 'text-white',
     border: 'border-transparent',
   },
   secondary: {
-    bg: 'bg-white',
-    hover: 'hover:bg-gray-50',
-    text: 'text-indigo-600',
-    border: 'border-indigo-600',
+    bg: 'bg-gray-800',
+    hover: 'hover:bg-gray-700',
+    text: 'text-gray-200',
+    border: 'border-gray-600',
   },
   tertiary: {
-    bg: 'bg-gray-200',
-    hover: 'hover:bg-gray-300',
-    text: 'text-gray-800',
-    border: 'border-gray-800',
+    bg: 'bg-transparent',
+    hover: 'hover:bg-gray-800',
+    text: 'text-gray-400',
+    border: 'border-transparent',
+  },
+  danger: {
+    bg: 'bg-red-600',
+    hover: 'hover:bg-red-700',
+    text: 'text-white',
+    border: 'border-transparent',
   },
 };
 
-export const Button = ({
+export function Button({
   primary = false,
   secondary = false,
   tertiary = false,
+  danger = false,
+  className = '',
   children,
   ...rest
-}) => {
-  const getButtonStyle = () => {
+}) {
+  function getButtonStyle() {
+    if (danger) return buttonStyles.danger;
     if (primary) return buttonStyles.primary;
     if (secondary) return buttonStyles.secondary;
     if (tertiary) return buttonStyles.tertiary;
     return buttonStyles.primary;
-  };
+  }
 
   const style = getButtonStyle();
 
   return (
     <button
-      className={`inline-flex items-center justify-center rounded-md border ${style.border} ${style.bg} ${style.hover} ${style.text} px-5 py-3 text-base font-medium`}
+      className={`inline-flex items-center justify-center rounded-lg border ${style.border} ${style.bg} ${style.hover} ${style.text} px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
       {...rest}
     >
       {children}
     </button>
   );
-};
+}

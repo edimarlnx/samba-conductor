@@ -1,13 +1,12 @@
 {
   "public": {
     "appInfo": {
-      "name": "Meteor Template by quave"
+      "name": "Samba Conductor"
     }
   },
-  "packages": {
-    "quave:email-postmark": {
-      "from": "media@codeftw.dev",
-      "apiToken": "abc"
-    }
+  "samba": {
+    "ldapUrl": "ldap://localhost:389",
+    "baseDn": "DC=samdom,DC=example,DC=com",
+    "realm": "SAMDOM.EXAMPLE.COM"
   }
 }

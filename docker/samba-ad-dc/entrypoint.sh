@@ -33,9 +33,6 @@ provision_domain() {
         --adminpass="${SAMBA_ADMIN_PASSWORD}" \
         --option="dns forwarder = ${SAMBA_DNS_FORWARDER}"
 
-    # Copy Kerberos configuration
-    cp /var/lib/samba/private/krb5.conf /etc/krb5.conf
-
     touch "$SAMBA_PROVISIONED"
     echo "Samba AD DC provisioned successfully."
 }
@@ -45,6 +42,39 @@ if [ ! -f "$SAMBA_PROVISIONED" ]; then
     provision_domain
 else
     echo "Samba AD DC already provisioned. Starting services..."
+fi
+
+# Always ensure krb5.conf is correct before starting
+# The provisioned krb5.conf may not persist across restarts since /etc is not a volume
+if [ -f /var/lib/samba/private/krb5.conf ]; then
+    cp /var/lib/samba/private/krb5.conf /etc/krb5.conf
+else
+    # Generate a minimal krb5.conf if the provisioned one is missing
+    SAMBA_REALM_LOWER=$(echo "${SAMBA_REALM}" | tr '[:upper:]' '[:lower:]')
+    cat > /etc/krb5.conf <<EOF
+[libdefaults]
+    default_realm = ${SAMBA_REALM}
+    dns_lookup_realm = false
+    dns_lookup_kdc = true
+
+[realms]
+    ${SAMBA_REALM} = {
+        default_domain = ${SAMBA_REALM_LOWER}
+    }
+
+[domain_realm]
+    .${SAMBA_REALM_LOWER} = ${SAMBA_REALM}
+    ${SAMBA_REALM_LOWER} = ${SAMBA_REALM}
+EOF
+fi
+
+echo "Kerberos default_realm: $(grep default_realm /etc/krb5.conf | head -1)"
+
+# Allow simple LDAP binds without TLS (development only)
+# In production, configure TLS certificates and remove this setting
+if ! grep -q "ldap server require strong auth" /etc/samba/smb.conf; then
+    sed -i '/^\[global\]/a \\tldap server require strong auth = no' /etc/samba/smb.conf
+    echo "Configured: ldap server require strong auth = no"
 fi
 
 # Start services via supervisor

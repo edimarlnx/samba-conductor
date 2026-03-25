@@ -2,56 +2,98 @@ import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 
 import { RoutePaths } from './RoutePaths';
-import { Home } from '../home/Home';
-import { Access } from '../access/Access';
+import { Login } from '../auth/Login';
+import { Dashboard } from '../dashboard/Dashboard';
+import { Users } from '../users/Users';
+import { UserForm } from '../users/UserForm';
+import { Groups } from '../groups/Groups';
+import { GroupForm } from '../groups/GroupForm';
 import { NotFound } from './NotFound';
-import { Private } from '../private/Private';
-import { Status } from '../status/Status';
-import { PublicLayout } from '../layouts/PublicLayout';
 import { AnonymousLayout } from '../layouts/AnonymousLayout';
 import { LoggedLayout } from '../layouts/LoggedLayout';
+import { AdminLayout } from '../layouts/AdminLayout';
+
+function AdminPage({ children }) {
+  return (
+    <LoggedLayout>
+      <AdminLayout>{children}</AdminLayout>
+    </LoggedLayout>
+  );
+}
 
 export function Router() {
   return (
     <Routes>
       <Route
-        path={RoutePaths.HOME}
-        element={
-          <PublicLayout>
-            <Home />
-          </PublicLayout>
-        }
-      />
-      <Route
-        path={RoutePaths.ACCESS}
+        path={RoutePaths.LOGIN}
         element={
           <AnonymousLayout>
-            <Access />
+            <Login />
           </AnonymousLayout>
         }
       />
       <Route
-        path={RoutePaths.PRIVATE}
+        path={RoutePaths.DASHBOARD}
         element={
-          <LoggedLayout>
-            <Private />
-          </LoggedLayout>
+          <AdminPage>
+            <Dashboard />
+          </AdminPage>
         }
       />
       <Route
-        path={RoutePaths.STATUS}
+        path={RoutePaths.USERS}
         element={
-          <PublicLayout>
-            <Status />
-          </PublicLayout>
+          <AdminPage>
+            <Users />
+          </AdminPage>
+        }
+      />
+      <Route
+        path={RoutePaths.USER_CREATE}
+        element={
+          <AdminPage>
+            <UserForm />
+          </AdminPage>
+        }
+      />
+      <Route
+        path={RoutePaths.USER_EDIT}
+        element={
+          <AdminPage>
+            <UserForm />
+          </AdminPage>
+        }
+      />
+      <Route
+        path={RoutePaths.GROUPS}
+        element={
+          <AdminPage>
+            <Groups />
+          </AdminPage>
+        }
+      />
+      <Route
+        path={RoutePaths.GROUP_CREATE}
+        element={
+          <AdminPage>
+            <GroupForm />
+          </AdminPage>
+        }
+      />
+      <Route
+        path={RoutePaths.GROUP_EDIT}
+        element={
+          <AdminPage>
+            <GroupForm />
+          </AdminPage>
         }
       />
       <Route
         path="*"
         element={
-          <PublicLayout>
+          <AdminPage>
             <NotFound />
-          </PublicLayout>
+          </AdminPage>
         }
       />
     </Routes>

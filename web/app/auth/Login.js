@@ -1,0 +1,92 @@
+import React, { useState } from 'react';
+import { Accounts } from 'meteor/accounts-base';
+import { useNavigate } from 'react-router-dom';
+import { RoutePaths } from '../general/RoutePaths';
+import { Button } from '../components/Button';
+
+export function Login() {
+  const navigate = useNavigate();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    setError('');
+    setLoading(true);
+
+    Accounts.callLoginMethod({
+      methodArguments: [{ sambaUsername: username, sambaPassword: password }],
+      userCallback(err) {
+        setLoading(false);
+        if (err) {
+          setError(err.reason || 'Authentication failed');
+        } else {
+          navigate(RoutePaths.DASHBOARD);
+        }
+      },
+    });
+  }
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-950 px-4">
+      <div className="w-full max-w-md">
+        <div className="rounded-xl bg-gray-900 p-8 shadow-2xl border border-gray-800">
+          <div className="mb-8 text-center">
+            <h1 className="text-2xl font-bold text-white">Samba Conductor</h1>
+            <p className="mt-2 text-sm text-gray-400">
+              Sign in to manage your Active Directory
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-1">
+                Username
+              </label>
+              <input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="administrator"
+                required
+                autoFocus
+                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+
+            {error && (
+              <div className="rounded-lg bg-red-900/50 border border-red-800 px-4 py-3 text-sm text-red-300">
+                {error}
+              </div>
+            )}
+
+            <Button primary type="submit" disabled={loading} className="w-full">
+              {loading ? 'Signing in...' : 'Sign in'}
+            </Button>
+          </form>
+        </div>
+
+        <p className="mt-6 text-center text-xs text-gray-600">
+          Samba 4 Active Directory Domain Controller
+        </p>
+      </div>
+    </div>
+  );
+}

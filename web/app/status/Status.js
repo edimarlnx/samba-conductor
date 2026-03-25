@@ -1,21 +1,22 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { ServerStatus } from '../components/ServerStatus';
+import { useNavigate } from 'react-router-dom';
 import { RoutePaths } from '../general/RoutePaths';
+import { Button } from '../components/Button';
 
 export function Status() {
+  const navigate = useNavigate();
+
   return (
     <div>
-      <div className="mb-6">
-        <Link
-          to={RoutePaths.HOME}
-          className="text-base font-medium text-indigo-700 hover:text-indigo-500"
-        >
-          &larr; Back to Home
-        </Link>
-      </div>
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">Server Status</h1>
-      <ServerStatus />
+      <h1 className="text-2xl font-bold text-white mb-4">Server Status</h1>
+      <p className="text-gray-400">Service monitoring coming soon.</p>
+      <Button
+        secondary
+        onClick={() => navigate(RoutePaths.DASHBOARD)}
+        className="mt-6"
+      >
+        Back to Dashboard
+      </Button>
     </div>
   );
 }

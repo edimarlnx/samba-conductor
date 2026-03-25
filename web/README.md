@@ -1,211 +1,102 @@
-# Meteor Template by Quave
+# Samba Conductor - Web UI
 
-[quave.dev](https://www.quave.dev)
+Modern web interface for managing Samba 4 Active Directory Domain Controller. Built with Meteor 3, React 19, and Tailwind CSS 4.
 
-A modern Meteor 3 application template showcasing Quave's best practices for building production-ready applications with React 19, Tailwind CSS 4, and MongoDB.
+## Prerequisites
 
-## What is it?
+- Node.js 20+
+- Meteor 3.3+
+- Samba 4 AD DC running (see [Docker setup](../docker/README.md))
 
-This template demonstrates how Quave builds Meteor applications. It includes a complete setup with authentication, routing, styling, monitoring, and development tooling - everything you need to start building your application.
+## Getting Started
 
-## Tech Stack
+### 1. Start the Samba container
 
-- **Framework**: Meteor 3.3
-- **Frontend**: React 19 with React Compiler
-- **Styling**: Tailwind CSS 4
-- **Database**: MongoDB
-- **Bundler**: Rspack (optional, for faster builds)
-- **Code Quality**: ESLint, Prettier, Lefthook
+```bash
+cd ../docker
+docker compose up -d
+```
+
+See the [Docker README](../docker/README.md) for default credentials and details.
+
+### 2. Install dependencies and start
+
+```bash
+cd web
+meteor npm install
+meteor npm start
+```
+
+### 3. Login
+
+Open `http://localhost:3000/login` and sign in with the AD administrator credentials:
+
+- **Username:** `Administrator`
+- **Password:** `P@ssw0rd123!`
+
+> These are the default development credentials from `docker-compose.yml`. See [Docker README](../docker/README.md) for details.
 
 ## Features
 
-### Authentication
-- Passwordless email authentication via [quave:accounts-passwordless-react](https://github.com/quavedev/accounts-passwordless-react)
-- Logged user state management via quave:logged-user-react
+- **Dashboard** — Domain overview with user/group counts and quick actions
+- **User Management** — Create, edit, enable/disable, and delete AD users
+- **Group Management** — Create, delete groups and manage members
+- **LDAP Authentication** — Login against Samba AD via LDAP bind
 
-### Routing
-- React Router setup with conditional layouts:
-  - `LoggedLayout` - Pages for authenticated users only
-  - `AnonymousLayout` - Pages for non-authenticated users only
-  - `PublicLayout` - Pages accessible to everyone
+## Tech Stack
 
-### Styling
-- Tailwind CSS 4 with PostCSS
-- Dark theme default
-- In-app alert system via quave:alert-react-tailwind
-
-### Database
-- MongoDB with [quave:collections](https://github.com/quavedev/collections)
-- SimpleSchema validation
-
-### Email
-- Postmark integration via [quave:email-postmark](https://github.com/quavedev/email-postmark)
-
-### Background Jobs
-- Synced cron jobs via [quave:synced-cron](https://github.com/quavedev/meteor-packages/tree/main/synced-cron)
-
-### Migrations
-- Database migrations via [quave:migrations](https://github.com/quavedev/meteor-packages/tree/main/migrations)
-
-### Monitoring & Observability
-- **Server Health Monitoring**: Real-time memory metrics with V8 heap statistics
-- **Prometheus Metrics**: Exposed at `/api/metrics` via prom-client
-- **Monti APM**: Performance monitoring with montiapm:agent
-
-### Development Tools
-- **Rspack**: Fast bundler with React Compiler support
-- **Claude Code**: AI-assisted development with specialized agents
-- **ESLint**: Code linting with @quave/eslint-config-quave
-- **Prettier**: Code formatting
-- **Lefthook**: Git hooks
-
-### Server Features
-- **Memory Leak Simulation**: Test memory behavior with controlled leak endpoints
-- **Sticky Session Management**: Handle load balancer session affinity
-- **Health Check API**: Monitor server status via `/api/check-reconnection`
-
-## Dependencies
-
-### NPM Packages
-- react, react-dom (v19)
-- react-router-dom
-- react-error-boundary
-- tailwindcss
-- simpl-schema
-- prom-client
-
-### Meteor Packages
-- react-meteor-data
-- quave:collections
-- quave:accounts-passwordless-react
-- quave:logged-user-react
-- quave:alert-react-tailwind
-- quave:synced-cron
-- quave:migrations
-- quave:email-postmark
-- montiapm:agent
-- rspack
-- zodern:types
-
-### Other Quave Packages (not included)
-- [quave:slingshot](https://github.com/quavedev/meteor-packages/tree/main/meteor-slingshot) - File uploads to AWS, CloudFlare, OCI
+- **Framework:** Meteor 3 (real-time reactivity via DDP)
+- **Frontend:** React 19 with React Compiler
+- **Styling:** Tailwind CSS 4 (dark theme)
+- **Database:** MongoDB (Meteor sessions only — AD data is fetched on-demand)
+- **Samba Integration:** `ldapjs` for LDAP operations, `samba-tool` for AD commands
 
 ## Project Structure
 
 ```
 app/
-├── access/           # Access control logic
-├── components/       # Reusable UI components
-├── general/          # App routing and core logic
-├── home/             # Home page features
-├── infra/            # Infrastructure (cron, migrations)
-├── layouts/          # Page layouts
-├── server/           # Server-side methods
-├── users/            # User management
-└── [domains]/        # Feature-specific modules
+├── auth/           # Login page and LDAP authentication handler
+├── components/     # Reusable UI (Button, DataTable, StatCard, ConfirmModal...)
+├── dashboard/      # Dashboard page and server methods
+├── general/        # Routing, App shell, 404
+├── groups/         # Group management (list, create, edit)
+├── infra/          # Cron jobs and migrations
+├── layouts/        # AdminLayout (sidebar), ConditionalLayout, etc.
+├── samba/          # Server-only Samba service layer (LDAP, samba-tool)
+├── status/         # Server status page
+└── users/          # User management (list, create, edit)
 
 server/
-├── health.js         # Server health monitoring
-├── metrics.js        # Prometheus metrics
-├── rest.js           # REST API endpoints
-└── main.js           # Server entry point
-
-.claude/
-├── agents/           # Specialized AI agents
-└── settings.json     # Claude Code configuration
+├── main.js         # Server entry point
+├── rest.js         # REST API endpoints
+├── health.js       # Server health monitoring
+└── metrics.js      # Prometheus metrics
 ```
 
-## Getting Started
+## Configuration
 
-### Prerequisites
-- Node.js 20+
-- Meteor 3.3+
+App settings are in `private/env/dev/settings.json`:
 
-### Installation
+```json
+{
+  "public": {
+    "appInfo": { "name": "Samba Conductor" }
+  },
+  "samba": {
+    "ldapUrl": "ldap://172.20.0.10:389",
+    "baseDn": "DC=samdom,DC=example,DC=com",
+    "realm": "SAMDOM.EXAMPLE.COM"
+  }
+}
+```
+
+## Development Commands
 
 ```bash
-# Clone the template
-git clone https://github.com/quavedev/meteor-template.git my-app
-cd my-app
-
-# Install dependencies
-meteor npm install
-
-# Start development server
-meteor npm start
+meteor npm start              # Start dev server
+meteor npm run quave-check    # ESLint + Prettier
 ```
-
-### Configuration
-
-#### App Settings
-Fill in `private/env/dev/settings.json` with your app configuration:
-- `public.appInfo` - Application metadata
-
-#### Email (Postmark)
-1. Sign up at [postmarkapp.com](https://postmarkapp.com/signup)
-2. Verify your domain
-3. Update settings with your API key and sender email
-
-#### Monti APM (Optional)
-1. Sign up at [montiapm.com](https://montiapm.com)
-2. Add your app ID and secret to settings
-
-## Development
-
-### Commands
-
-```bash
-# Start development server
-meteor npm start
-
-# Run code quality checks (ESLint + Prettier)
-meteor npm run quave-check
-
-# Individual tools
-meteor npm run quave-eslint
-meteor npm run quave-prettier
-```
-
-### Code Quality
-
-Always run `npm run quave-check` before committing. The template uses:
-- ESLint with @quave/eslint-config-quave
-- Prettier for formatting
-- React Compiler lint rules
-- Lefthook for pre-commit hooks
-
-### API Endpoints
-
-- `GET /api` - Basic health check
-- `GET /api/metrics` - Prometheus metrics
-- `GET /api/check-reconnection` - Server health status
-- `POST /api/clear-sticky-session` - Clear load balancer session
-- `POST /api/memory-leak/start` - Start memory leak simulation
-- `POST /api/memory-leak/stop` - Stop memory leak
-- `POST /api/memory-leak/cleanup` - Clean up leaked memory
-
-## Deployment
-
-### Docker
-
-The template includes a Dockerfile configured for Meteor 3.3. Build and deploy to any container platform.
-
-### zCloud
-
-See [quave.cloud](https://quave.cloud) for Meteor-optimized hosting with:
-- Automatic scaling
-- Sticky session support
-- MongoDB hosting
-
-## Updating
-
-Keep your project up-to-date with template changes by reviewing the [CHANGELOG](CHANGELOG.md).
 
 ## License
 
 MIT
-
-## Support
-
-- [Quave Website](https://www.quave.dev)
-- [GitHub Issues](https://github.com/quavedev/meteor-template/issues)

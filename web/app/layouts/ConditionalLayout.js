@@ -5,36 +5,33 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { RoutePaths } from '../general/RoutePaths';
 import { Loading } from '../components/Loading';
 import { ErrorFallback } from '../components/ErrorFallback';
-import { PageWithHeader } from './PageWithHeader';
-import { PageWithoutHeader } from './PageWithoutHeader';
 
 function InnerLayout({ children, onlyLogged, onlyAnonymous }) {
   const { loggedUser, isLoadingLoggedUser } = useLoggedUser();
 
   if (isLoadingLoggedUser) {
-    // you should return here your default skeleton layout
     return (
-      <PageWithHeader>
-        <Loading name="logged user" />
-      </PageWithHeader>
+      <div className="flex h-screen items-center justify-center bg-gray-950">
+        <Loading />
+      </div>
     );
   }
 
   if (onlyLogged) {
     if (!loggedUser) {
-      return <Navigate to={RoutePaths.ACCESS} replace />;
+      return <Navigate to={RoutePaths.LOGIN} replace />;
     }
-    return <PageWithHeader>{children}</PageWithHeader>;
+    return <>{children}</>;
   }
 
   if (onlyAnonymous) {
     if (loggedUser) {
-      return <Navigate to={RoutePaths.PRIVATE} replace />;
+      return <Navigate to={RoutePaths.DASHBOARD} replace />;
     }
-    return <PageWithoutHeader>{children}</PageWithoutHeader>;
+    return <>{children}</>;
   }
 
-  return <PageWithoutHeader>{children}</PageWithoutHeader>;
+  return <>{children}</>;
 }
 
 export function ConditionalLayout({ ...props }) {

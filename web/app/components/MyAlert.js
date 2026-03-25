@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-export const MyAlert = ({ message, isOpen, clear, autoCloseIn = 3_000 }) => {
+export function MyAlert({ message, isOpen, clear, autoCloseIn = 3_000 }) {
   useEffect(() => {
     if (autoCloseIn && isOpen) {
       const timer = setTimeout(() => {
@@ -16,13 +16,13 @@ export const MyAlert = ({ message, isOpen, clear, autoCloseIn = 3_000 }) => {
 
   return (
     <div className="fixed right-4 top-4 z-50">
-      <div className="max-w-sm rounded-lg bg-white p-4 shadow-lg">
+      <div className="max-w-sm rounded-lg bg-gray-800 border border-gray-700 p-4 shadow-lg">
         <div className="flex items-center justify-between">
-          <p className="text-gray-800">{message}</p>
+          <p className="text-gray-200">{message}</p>
           <button
             onClick={clear}
             aria-label="Clear message"
-            className="focus:outline-hidden ml-4 text-gray-500 hover:text-gray-700"
+            className="focus:outline-hidden ml-4 text-gray-400 hover:text-gray-200"
           >
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
               <path
@@ -36,4 +36,4 @@ export const MyAlert = ({ message, isOpen, clear, autoCloseIn = 3_000 }) => {
       </div>
     </div>
   );
-};
+}

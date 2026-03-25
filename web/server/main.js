@@ -1,16 +1,14 @@
 import { Meteor } from 'meteor/meteor';
-import { Accounts } from 'meteor/accounts-base';
 
 import '../app/infra/migrations';
 import '../app/infra/cron';
 
-import '../app/clicks/clicksMethods';
-import '../app/clicks/clicksPublishes';
-import '../app/server/serverStatusMethods';
+// Samba service methods
+import '../app/auth/authMethods';
+import '../app/dashboard/dashboardMethods';
+import '../app/users/usersMethods';
+import '../app/groups/groupsMethods';
 
 import './rest';
-
-Accounts.emailTemplates.siteName =
-  Meteor.settings?.public?.appInfo?.name || process.env.ROOT_URL;
 
 Meteor.startup(() => {});
