@@ -15,6 +15,17 @@ RUN meteor npm i --no-audit --legacy-peer-deps && meteor build --platforms web.b
 
 FROM zcloudws/meteor-node-mongodb-runtime:3.4-with-tools
 
+# Install Samba tools needed at runtime for AD management (samba-tool, ldap-utils)
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    samba-common-bin \
+    samba-dsdb-modules \
+    samba-vfs-modules \
+    ldap-utils \
+    krb5-user \
+    && rm -rf /var/lib/apt/lists/*
+USER zcloud
+
 COPY --from=builder /build/app-build/bundle /home/zcloud/app
 
 #  --legacy-peer-deps because of react-error-boundary
