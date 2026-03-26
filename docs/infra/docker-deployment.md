@@ -43,6 +43,18 @@ cd docker
 docker compose up -d
 ```
 
+### Start with Replica DC
+
+```bash
+cd docker
+docker compose --profile replica up -d
+```
+
+This starts two DCs (primary at `172.20.0.10`, replica at `172.20.0.11`) using Docker profiles. The replica joins the
+domain automatically via `SAMBA_JOIN_AS_DC=true`.
+
+See [DC Replication](dc-replication.md) for details.
+
 ### Start the Web App
 
 ```bash

@@ -9,9 +9,12 @@ This guide walks you through the initial setup of Samba Conductor.
 **Development (Samba + Meteor separately):**
 
 ```bash
-# Start Samba DC
+# Start Samba DC (primary only)
 cd docker
 docker compose up -d
+
+# Or with replica DC
+docker compose --profile replica up -d
 
 # Start the web app
 cd web

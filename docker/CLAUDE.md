@@ -40,5 +40,7 @@ docker/
 - Single `/data` volume — standard paths symlinked into it
 - Sensitive values via environment variables — never hardcoded
 - Samba provisioned at Windows Server 2016 functional level
-- Self-signed TLS certificate auto-generated on first start
+- Self-signed TLS certificate auto-generated per DC on first start
 - Shared scripts in `scripts/samba-setup.sh` used by both samba-ad-dc and all-in-one
+- Replica DC support via `SAMBA_JOIN_AS_DC=true` + `SAMBA_PRIMARY_DC=hostname`
+- Dev compose includes replica as optional profile (`--profile replica`)

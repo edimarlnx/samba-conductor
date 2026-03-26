@@ -27,9 +27,12 @@ remove this setting.
 ```bash
 cd ../docker
 docker compose up -d
+
+# Optional: start with replica DC
+docker compose --profile replica up -d
 ```
 
-See [Docker README](../docker/README.md) for default credentials.
+See [Docker README](../docker/README.md) for default credentials and replication setup.
 
 ### 2. Install dependencies and start
 

@@ -28,4 +28,5 @@ Active Directory Domain Controller managed by Samba Conductor.
 - [Joining Windows to the Domain](infra/join-windows.md) — Step-by-step guide for Windows machines
 - [Joining Linux to the Domain](infra/join-linux.md) — Step-by-step guide for Linux machines (SSSD/Winbind)
 - [LDAP Integration](infra/ldap-integration.md) — Connecting applications to Samba via LDAP/LDAPS
+- [DC Replication](infra/dc-replication.md) — Setting up a second DC for high availability
 - [Troubleshooting](infra/troubleshooting.md) — Common issues and solutions
