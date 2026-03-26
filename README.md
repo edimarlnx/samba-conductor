@@ -7,6 +7,7 @@
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/status-WIP-yellow" alt="Status: WIP">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
   <img src="https://img.shields.io/badge/Samba-4.22-orange" alt="Samba 4.22">
   <img src="https://img.shields.io/badge/Meteor-3.4-red" alt="Meteor 3.4">
@@ -26,6 +27,9 @@
 
 Samba Conductor is an open-source orchestration suite that provides a modern, responsive web interface for managing
 Samba 4 Active Directory. It simplifies AD administration through a clean UI with enterprise-grade security.
+
+> **Work in Progress:** This project is under active development and not yet ready for production use. APIs, features,
+> and data formats may change without notice. Contributions and feedback are welcome!
 
 > **Disclaimer:** This software is provided as-is. It is not affiliated with or endorsed by the Samba Team, Microsoft,
 > or any Active Directory vendor. Use in production environments is at your own risk. Always test thoroughly and
