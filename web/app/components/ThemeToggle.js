@@ -46,7 +46,7 @@ export function ThemeToggle({ className = '' }) {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-surface-card py-1 shadow-xl">
+          <div className="absolute right-0 bottom-full z-50 mb-1 w-36 rounded-lg border border-border bg-surface-card py-1 shadow-xl">
             {THEMES.map((t) => (
               <button
                 key={t.id}
