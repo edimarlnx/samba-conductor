@@ -14,6 +14,7 @@ samba-conductor/
 │   ├── scripts/      # Shared samba provisioning scripts
 │   ├── samba-ad-dc/  # Standalone Samba DC image
 │   └── all-in-one/   # Full stack image (Samba + Web + MongoDB)
+├── docs/             # Project documentation for end users
 └── CLAUDE.md         # This file
 ```
 
