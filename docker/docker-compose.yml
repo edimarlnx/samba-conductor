@@ -1,6 +1,12 @@
-# Development: standalone Samba AD DC
+# Development: Samba AD DC primary + replica
 # Used alongside "meteor npm start" on the host
+#
+# Usage:
+#   docker compose up -d              # Start primary only
+#   docker compose --profile replica up -d  # Start primary + replica
+
 services:
+  # Primary DC
   samba-ad-dc:
     build:
       context: .
@@ -30,12 +36,49 @@ services:
       - "3268:3268/tcp"
       - "3269:3269/tcp"
     volumes:
-      - samba-data:/data
+      - samba-dc1-data:/data
     dns:
       - 127.0.0.1
     networks:
       samba-net:
         ipv4_address: 172.20.0.10
+
+  # Replica DC (optional — start with: docker compose --profile replica up -d)
+  samba-ad-dc-replica:
+    build:
+      context: .
+      dockerfile: samba-ad-dc/Dockerfile
+    container_name: samba-dc2
+    hostname: dc2
+    domainname: samdom.example.com
+    restart: unless-stopped
+    privileged: true
+    profiles:
+      - replica
+    depends_on:
+      - samba-ad-dc
+    environment:
+      - SAMBA_REALM=SAMDOM.EXAMPLE.COM
+      - SAMBA_DOMAIN=SAMDOM
+      - SAMBA_ADMIN_PASSWORD=P@ssw0rd123!
+      - SAMBA_DNS_FORWARDER=8.8.8.8
+      - SAMBA_JOIN_AS_DC=true
+      - SAMBA_PRIMARY_DC=dc1.samdom.example.com
+    ports:
+      - "10053:53/tcp"
+      - "10053:53/udp"
+      - "10088:88/tcp"
+      - "10389:389/tcp"
+      - "10445:445/tcp"
+      - "10636:636/tcp"
+      - "13268:3268/tcp"
+    volumes:
+      - samba-dc2-data:/data
+    dns:
+      - 172.20.0.10
+    networks:
+      samba-net:
+        ipv4_address: 172.20.0.11
 
 networks:
   samba-net:
@@ -45,4 +88,5 @@ networks:
         - subnet: 172.20.0.0/24
 
 volumes:
-  samba-data:
+  samba-dc1-data:
+  samba-dc2-data:
