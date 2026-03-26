@@ -16,6 +16,7 @@ export function Users() {
   const [loading, setLoading] = useState(true);
     const [moveTarget, setMoveTarget] = useState(null);
     const [moveOuDn, setMoveOuDn] = useState('');
+    const [toggleTarget, setToggleTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   async function fetchUsers() {
@@ -91,7 +92,7 @@ export function Users() {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                handleToggleStatus({ username: row.username, enabled: row.enabled });
+                  setToggleTarget({username: row.username, enabled: row.enabled});
               }}
               className="text-xs text-yellow-400 hover:text-yellow-300"
             >
@@ -182,6 +183,22 @@ export function Users() {
                 </div>
             </div>
         )}
+
+        <ConfirmModal
+            isOpen={!!toggleTarget}
+            title={toggleTarget?.enabled ? 'Disable User' : 'Enable User'}
+            message={toggleTarget?.enabled
+                ? `Disable "${toggleTarget?.username}"? The user will not be able to log in.`
+                : `Enable "${toggleTarget?.username}"? The user will be able to log in again.`
+            }
+            confirmLabel={toggleTarget?.enabled ? 'Disable' : 'Enable'}
+            danger={toggleTarget?.enabled}
+            onConfirm={async () => {
+                await handleToggleStatus({username: toggleTarget.username, enabled: toggleTarget.enabled});
+                setToggleTarget(null);
+            }}
+            onCancel={() => setToggleTarget(null)}
+        />
 
       <ConfirmModal
         isOpen={!!deleteTarget}

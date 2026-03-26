@@ -5,6 +5,7 @@ import { useAlert } from 'meteor/quave:alert-react-tailwind';
 import { RoutePaths } from '../general/RoutePaths';
 import { Button } from '../components/Button';
 import { Loading } from '../components/Loading';
+import {OUPicker} from '../components/OUPicker';
 
 export function GroupForm() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export function GroupForm() {
   const [newMember, setNewMember] = useState('');
   const [loading, setLoading] = useState(isEditing);
   const [submitting, setSubmitting] = useState(false);
+    const [groupDn, setGroupDn] = useState('');
 
   useEffect(() => {
     if (!isEditing) return;
@@ -35,6 +37,7 @@ export function GroupForm() {
             return match ? match[1] : dn;
           });
           setMembers(memberNames);
+            setGroupDn(group.dn || '');
         }
       } catch (error) {
         openAlert(error.reason || 'Failed to load group');
@@ -153,6 +156,29 @@ export function GroupForm() {
         )}
       </form>
 
+        {/* Location — only when editing */}
+        {isEditing && groupDn && (
+            <div className="mt-6 w-full max-w-lg">
+                <div className="rounded-xl bg-surface-card border border-border p-5">
+                    <h3 className="text-sm font-semibold text-fg mb-3">Location (OU)</h3>
+                    <OUPicker
+                        value={extractParentDn({dn: groupDn})}
+                        onChange={async (newOuDn) => {
+                            if (!newOuDn) return;
+                            try {
+                                await Meteor.callAsync('samba.groups.move', {groupName: editGroupName, newOuDn});
+                                openAlert('Group moved successfully');
+                                const group = await Meteor.callAsync('samba.groups.get', {groupName: editGroupName});
+                                if (group) setGroupDn(group.dn || '');
+                            } catch (error) {
+                                openAlert(error.reason || 'Failed to move group');
+                            }
+                        }}
+                    />
+                </div>
+            </div>
+        )}
+
       {/* Members section - only when editing */}
       {isEditing && (
         <div className="mt-8 w-full max-w-lg">
@@ -208,4 +234,10 @@ export function GroupForm() {
       )}
     </div>
   );
+}
+
+function extractParentDn({dn}) {
+    if (!dn) return '';
+    const commaIndex = dn.indexOf(',');
+    return commaIndex > 0 ? dn.substring(commaIndex + 1) : '';
 }

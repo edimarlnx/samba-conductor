@@ -1,9 +1,16 @@
 import React, {useState, useEffect} from 'react';
 import {Meteor} from 'meteor/meteor';
 
-export function OUPicker({value, onChange, placeholder = 'Select OU (optional)', className = ''}) {
+export function OUPicker({
+                             value,
+                             onChange,
+                             placeholder = 'Select OU (optional)',
+                             className = '',
+                             showContainers = true
+                         }) {
     const [open, setOpen] = useState(false);
     const [tree, setTree] = useState([]);
+    const [baseDn, setBaseDn] = useState('');
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -12,8 +19,12 @@ export function OUPicker({value, onChange, placeholder = 'Select OU (optional)',
         async function fetchTree() {
             setLoading(true);
             try {
-                const result = await Meteor.callAsync('samba.ous.list');
-                setTree(result);
+                const [ouResult, domainInfo] = await Promise.all([
+                    Meteor.callAsync('samba.ous.list'),
+                    Meteor.callAsync('domain.getInfo').catch(() => ({})),
+                ]);
+                setTree(ouResult);
+                setBaseDn(domainInfo.baseDn || '');
             } catch (error) {
                 console.error('[OUPicker] Failed to load OUs:', error);
             } finally {
@@ -67,16 +78,40 @@ export function OUPicker({value, onChange, placeholder = 'Select OU (optional)',
                             <div className="px-3 py-4 text-center text-sm text-fg-muted">Loading...</div>
                         ) : (
                             <div className="py-1">
-                                {/* Root option (no OU = default container) */}
-                                <button
-                                    type="button"
-                                    onClick={handleClear}
-                                    className={`w-full text-left px-3 py-2 text-sm transition-colors hover:bg-surface-hover ${
-                                        !value ? 'text-accent font-medium' : 'text-fg-secondary'
-                                    }`}
-                                >
-                                    (Default — CN=Users)
-                                </button>
+                                {/* Default containers */}
+                                {showContainers && baseDn && (
+                                    <>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleSelect({dn: `CN=Users,${baseDn}`})}
+                                            className={`w-full text-left px-3 py-2 text-sm transition-colors hover:bg-surface-hover ${
+                                                value === `CN=Users,${baseDn}` || !value ? 'text-accent font-medium' : 'text-fg-secondary'
+                                            }`}
+                                        >
+                                            CN=Users (default)
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleSelect({dn: `CN=Computers,${baseDn}`})}
+                                            className={`w-full text-left px-3 py-2 text-sm transition-colors hover:bg-surface-hover ${
+                                                value === `CN=Computers,${baseDn}` ? 'text-accent font-medium' : 'text-fg-secondary'
+                                            }`}
+                                        >
+                                            CN=Computers (default)
+                                        </button>
+                                    </>
+                                )}
+                                {!showContainers && (
+                                    <button
+                                        type="button"
+                                        onClick={handleClear}
+                                        className={`w-full text-left px-3 py-2 text-sm transition-colors hover:bg-surface-hover ${
+                                            !value ? 'text-accent font-medium' : 'text-fg-secondary'
+                                        }`}
+                                    >
+                                        (None)
+                                    </button>
+                                )}
 
                                 {tree.length === 0 ? (
                                     <div className="px-3 py-2 text-xs text-fg-muted">No OUs found</div>
@@ -166,8 +201,15 @@ function OUPickerNode({ou, depth, selectedDn, onSelect}) {
     );
 }
 
-// Extracts a readable path from a DN like "OU=Sub,OU=Parent,DC=..." → "Parent / Sub"
+// Extracts a readable path from a DN
 function extractDisplayPath({dn}) {
+    if (!dn) return '';
+
+    // Handle CN= containers
+    const cnMatch = dn.match(/^CN=([^,]+)/i);
+    if (cnMatch) return `CN=${cnMatch[1]}`;
+
+    // Handle OU= hierarchy
     const parts = [];
     const regex = /OU=([^,]+)/gi;
     let match = regex.exec(dn);

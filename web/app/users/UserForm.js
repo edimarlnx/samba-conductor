@@ -6,6 +6,7 @@ import { RoutePaths } from '../general/RoutePaths';
 import { Button } from '../components/Button';
 import { Loading } from '../components/Loading';
 import {OUPicker} from '../components/OUPicker';
+import {ConfirmModal} from '../components/ConfirmModal';
 
 const INITIAL_FORM = {
   username: '',
@@ -40,6 +41,9 @@ export function UserForm() {
   const [selectedGroup, setSelectedGroup] = useState('');
   const [loading, setLoading] = useState(isEditing);
   const [submitting, setSubmitting] = useState(false);
+  const [userEnabled, setUserEnabled] = useState(true);
+  const [userDn, setUserDn] = useState('');
+  const [showToggleConfirm, setShowToggleConfirm] = useState(false);
 
   useEffect(() => {
     if (!isEditing) return;
@@ -65,6 +69,9 @@ export function UserForm() {
             physicalDeliveryOffice: user.physicalDeliveryOffice || '',
             initials: user.initials || '',
           }));
+
+          setUserEnabled(user.enabled);
+          setUserDn(user.dn || '');
 
           // Extract group names from memberOf DNs
           const userGroups = (user.memberOf || []).map((dn) => {
@@ -296,6 +303,47 @@ export function UserForm() {
           </FormSection>
         )}
 
+        {/* Location & Status — only when editing */}
+        {isEditing && (
+            <FormSection title="Location & Status">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-medium text-fg-secondary mb-1">
+                    Current Location (OU)
+                  </label>
+                  <OUPicker
+                      value={extractParentDn({dn: userDn})}
+                      onChange={async (newOuDn) => {
+                        if (!newOuDn) return;
+                        try {
+                          await Meteor.callAsync('samba.users.move', {username: editUsername, newOuDn});
+                          openAlert('User moved successfully');
+                          // Refresh user data
+                          const user = await Meteor.callAsync('samba.users.get', {username: editUsername});
+                          if (user) setUserDn(user.dn || '');
+                        } catch (error) {
+                          openAlert(error.reason || 'Failed to move user');
+                        }
+                      }}
+                  />
+                </div>
+                <div className="flex items-center justify-between rounded-lg bg-surface-input/50 px-4 py-3">
+                  <div>
+                    <p className="text-sm font-medium text-fg">Account Status</p>
+                    <p className="text-xs text-fg-muted">{userEnabled ? 'User can log in' : 'User cannot log in'}</p>
+                  </div>
+                  <Button
+                      danger={userEnabled}
+                      primary={!userEnabled}
+                      onClick={() => setShowToggleConfirm(true)}
+                  >
+                    {userEnabled ? 'Disable' : 'Enable'}
+                  </Button>
+                </div>
+              </div>
+            </FormSection>
+        )}
+
         <div className="flex gap-3 pt-2">
           <Button primary type="submit" disabled={submitting}>
             {submitting ? 'Saving...' : isEditing ? 'Save Changes' : 'Create User'}
@@ -305,6 +353,32 @@ export function UserForm() {
           </Button>
         </div>
       </form>
+
+      {/* Enable/Disable confirmation */}
+      {showToggleConfirm && (
+          <ConfirmModal
+              isOpen
+              title={userEnabled ? 'Disable User' : 'Enable User'}
+              message={userEnabled
+                  ? `Disable "${editUsername}"? The user will not be able to log in.`
+                  : `Enable "${editUsername}"? The user will be able to log in again.`
+              }
+              confirmLabel={userEnabled ? 'Disable' : 'Enable'}
+              danger={userEnabled}
+              onConfirm={async () => {
+                try {
+                  const method = userEnabled ? 'samba.users.disable' : 'samba.users.enable';
+                  await Meteor.callAsync(method, {username: editUsername});
+                  setUserEnabled(!userEnabled);
+                  setShowToggleConfirm(false);
+                  openAlert(userEnabled ? 'User disabled' : 'User enabled');
+                } catch (error) {
+                  openAlert(error.reason || 'Failed to change user status');
+                }
+              }}
+              onCancel={() => setShowToggleConfirm(false)}
+          />
+      )}
 
       {/* Group Membership - only when editing */}
       {isEditing && (
@@ -418,6 +492,15 @@ function FormSection({ title, children, collapsible = false }) {
       {open && children}
     </div>
   );
+}
+
+// Extracts the parent DN (container) from a user's DN
+// e.g., "CN=john,OU=Engineering,DC=..." → "OU=Engineering,DC=..."
+// e.g., "CN=john,CN=Users,DC=..." → "CN=Users,DC=..."
+function extractParentDn({dn}) {
+  if (!dn) return '';
+  const commaIndex = dn.indexOf(',');
+  return commaIndex > 0 ? dn.substring(commaIndex + 1) : '';
 }
 
 function FormField({ label, value, onChange, type = 'text', required = false, disabled = false, placeholder = '' }) {
