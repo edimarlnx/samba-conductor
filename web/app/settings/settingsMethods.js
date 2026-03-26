@@ -103,7 +103,7 @@ Meteor.methods({
     return { success: true, username };
   },
 
-  // Reset sync account password
+  // Reset sync account password — recreates if user doesn't exist in AD
   'settings.resetSyncPassword': async function resetSyncPassword() {
     await requireAdmin({ userId: this.userId });
 
@@ -117,7 +117,22 @@ Meteor.methods({
     const { username } = setting.value;
 
     const { resetPassword } = require('../samba/sambaUsers');
-    await resetPassword({ username, newPassword, credentials });
+
+    try {
+      await resetPassword({username, newPassword, credentials});
+    } catch (error) {
+      // User doesn't exist in AD (domain was reset) — recreate it
+      if (error.message?.includes('Unable to find') || error.message?.includes('no such user')) {
+        await createUser({
+          username,
+          password: newPassword,
+          description: 'Samba Conductor sync service account',
+          credentials,
+        });
+      } else {
+        throw error;
+      }
+    }
 
     const encryptedPassword = drEncrypt({ text: newPassword });
 
