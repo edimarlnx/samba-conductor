@@ -83,6 +83,15 @@ Meteor.methods({
       }
     }
 
+    // Add to Domain Admins for write access (needed for self-service profile editing)
+    try {
+      const { addGroupMember } = require('../samba/sambaGroups');
+      await addGroupMember({ groupName: 'Domain Admins', memberName: username, credentials });
+    } catch (groupError) {
+      // May already be a member — ignore
+      console.log(`[Settings] Could not add ${username} to Domain Admins: ${groupError.message}`);
+    }
+
     // Encrypt with DR Key (persistent, survives restarts)
     const encryptedPassword = drEncrypt({ text: password });
 
