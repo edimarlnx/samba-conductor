@@ -34,6 +34,18 @@ CN=OAuth-Users,CN=Users,DC=samdom,DC=example,DC=com
 
 When creating an OAuth client, select the realm it belongs to. Each client belongs to exactly one realm.
 
+## How Realms Work (Important)
+
+Realms do **not** change the OAuth2 URLs. All clients use the same endpoints:
+
+- `/oauth/authorize`
+- `/oauth/token`
+- `/oauth/userinfo`
+
+The realm is determined automatically by the `client_id` — when a client authenticates, the server looks up which
+realm it belongs to and applies that realm's access rules. This is transparent to the client application; no extra
+configuration is needed on the client side.
+
 ## Use Cases
 
 | Realm        | Purpose                     | AD Group                  |
