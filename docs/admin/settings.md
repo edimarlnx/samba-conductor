@@ -45,3 +45,18 @@ Once configured, the section shows a green status indicator with the active acco
 You can click **Reset Password** to generate a new random password for the sync account. This is useful if you suspect the account may have been compromised, or as part of routine credential rotation.
 
 > **Note:** The sync account password is stored encrypted and managed entirely by Samba Conductor. You do not need to know or enter the password manually.
+
+### Permissions
+
+The sync account needs **write access** to Active Directory for self-service profile editing to work. Add it to
+the `Domain Admins` group:
+
+```bash
+samba-tool group addmembers "Domain Admins" svc-conductor
+```
+
+Or via the Samba Conductor admin panel: **Groups** → edit `Domain Admins` → add `svc-conductor` as member.
+
+> **Production note:** For tighter security, consider creating a delegated OU permission instead of full Domain
+> Admin access. The sync account only needs write access to user attributes (mail, telephoneNumber, description,
+> etc.) on the OUs where self-service users are located.

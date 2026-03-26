@@ -3,6 +3,7 @@ import { check } from 'meteor/check';
 import { getReadCredentials, getWriteCredentials, storeCredentials } from '../auth/credentialStore';
 import { getUser, updateUserAttributes, resetPassword } from '../samba/sambaUsers';
 import { authenticateUser } from '../samba/sambaAuth';
+import { getSyncCredentials } from '../settings/settingsMethods';
 import { SettingsCollection } from '../settings/SettingsCollection';
 import { SETTINGS_DEFAULTS } from '../settings/settingsDefaults';
 
@@ -54,10 +55,17 @@ Meteor.methods({
       throw new Meteor.Error('no-fields', 'No editable fields provided');
     }
 
+    // Use sync account for LDAP modify — regular users don't have permission
+    // to modify their own attributes in Samba AD
+    const syncCredentials = await getSyncCredentials();
+    if (!syncCredentials) {
+      throw new Meteor.Error('sync-not-configured', 'Sync account is required for profile updates. Ask your admin to configure it in Settings.');
+    }
+
     await updateUserAttributes({
       username: meteorUser.username,
       attributes: allowedAttributes,
-      credentials,
+      credentials: syncCredentials,
     });
 
     return { success: true };
