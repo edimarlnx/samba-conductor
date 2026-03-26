@@ -101,6 +101,23 @@ export function UserForm() {
 
     try {
       if (isEditing) {
+        // Update AD attributes
+        await Meteor.callAsync('samba.users.updateAttributes', {
+          username: editUsername,
+          attributes: {
+            givenName: form.givenName,
+            surname: form.surname,
+            initials: form.initials,
+            mail: form.mail,
+            company: form.company,
+            department: form.department,
+            description: form.description,
+            telephoneNumber: form.telephoneNumber,
+            physicalDeliveryOffice: form.physicalDeliveryOffice,
+          },
+        });
+
+        // Reset password if provided
         if (form.password) {
           await Meteor.callAsync('samba.users.resetPassword', {
             username: editUsername,

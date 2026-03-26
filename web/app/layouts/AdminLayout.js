@@ -5,18 +5,39 @@ import { useLoggedUser } from 'meteor/quave:logged-user-react';
 import { RoutePaths } from '../general/RoutePaths';
 import { ThemeToggle } from '../components/ThemeToggle';
 
-const NAV_ITEMS = [
-  { path: RoutePaths.ADMIN_DASHBOARD, label: 'Dashboard', icon: DashboardIcon },
-  { path: RoutePaths.ADMIN_USERS, label: 'Users', icon: UsersIcon },
-  { path: RoutePaths.ADMIN_GROUPS, label: 'Groups', icon: GroupsIcon },
-  {path: RoutePaths.ADMIN_OUS, label: 'OUs', icon: OUsIcon},
-  {path: RoutePaths.ADMIN_COMPUTERS, label: 'Computers', icon: ComputersIcon},
-  {path: RoutePaths.ADMIN_SERVICE_ACCOUNTS, label: 'Service Accts', icon: ServiceAccountIcon},
-  {path: RoutePaths.ADMIN_DNS, label: 'DNS', icon: DnsIcon},
-  {path: RoutePaths.ADMIN_GPOS, label: 'GPOs', icon: GpoIcon},
-  { path: RoutePaths.ADMIN_DOMAIN, label: 'Domain', icon: DomainIcon },
-  { path: RoutePaths.ADMIN_SETTINGS, label: 'Settings', icon: SettingsIcon },
-  { path: RoutePaths.ADMIN_DR, label: 'Disaster Recovery', icon: DrIcon },
+const NAV_SECTIONS = [
+  {
+    items: [
+      {path: RoutePaths.ADMIN_DASHBOARD, label: 'Dashboard', icon: DashboardIcon},
+    ],
+  },
+  {
+    title: 'Active Directory',
+    items: [
+      {path: RoutePaths.ADMIN_USERS, label: 'Users', icon: UsersIcon},
+      {path: RoutePaths.ADMIN_GROUPS, label: 'Groups', icon: GroupsIcon},
+      {path: RoutePaths.ADMIN_OUS, label: 'OUs', icon: OUsIcon},
+      {path: RoutePaths.ADMIN_COMPUTERS, label: 'Computers', icon: ComputersIcon},
+      {path: RoutePaths.ADMIN_SERVICE_ACCOUNTS, label: 'Service Accts', icon: ServiceAccountIcon},
+      {path: RoutePaths.ADMIN_DNS, label: 'DNS', icon: DnsIcon},
+      {path: RoutePaths.ADMIN_GPOS, label: 'GPOs', icon: GpoIcon},
+      {path: RoutePaths.ADMIN_DOMAIN, label: 'Domain', icon: DomainIcon},
+    ],
+  },
+  {
+    title: 'OAuth Server',
+    items: [
+      {path: RoutePaths.ADMIN_OAUTH_CLIENTS, label: 'Clients', icon: OAuthIcon},
+      {path: RoutePaths.ADMIN_OAUTH_REALMS, label: 'Realms', icon: OAuthIcon},
+    ],
+  },
+  {
+    title: 'System',
+    items: [
+      {path: RoutePaths.ADMIN_SETTINGS, label: 'Settings', icon: SettingsIcon},
+      {path: RoutePaths.ADMIN_DR, label: 'Disaster Recovery', icon: DrIcon},
+    ],
+  },
 ];
 
 export function AdminLayout({ children }) {
@@ -66,25 +87,37 @@ export function AdminLayout({ children }) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 space-y-0.5 px-2 py-3 overflow-y-auto">
-          {NAV_ITEMS.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              end={item.path === RoutePaths.ADMIN_DASHBOARD}
-              onClick={handleNavClick}
-              data-e2e={`admin-sidebar-link-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-accent text-white'
-                    : 'text-fg-secondary hover:bg-surface-hover hover:text-fg'
-                }`
-              }
-            >
-              <item.icon />
-              {item.label}
-            </NavLink>
+        <nav className="flex-1 overflow-y-auto px-2 py-3">
+          {NAV_SECTIONS.map((section, sectionIndex) => (
+              <div key={section.title || sectionIndex}>
+                {section.title && (
+                    <div
+                        className={`px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-fg-muted ${sectionIndex > 0 ? 'mt-4 pt-3 border-t border-border' : ''}`}>
+                      {section.title}
+                    </div>
+                )}
+                <div className="space-y-0.5">
+                  {section.items.map((item) => (
+                      <NavLink
+                          key={item.path}
+                          to={item.path}
+                          end={item.path === RoutePaths.ADMIN_DASHBOARD}
+                          onClick={handleNavClick}
+                          data-e2e={`admin-sidebar-link-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+                          className={({isActive}) =>
+                              `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                                  isActive
+                                      ? 'bg-accent text-white'
+                                      : 'text-fg-secondary hover:bg-surface-hover hover:text-fg'
+                              }`
+                          }
+                      >
+                        <item.icon/>
+                        {item.label}
+                      </NavLink>
+                  ))}
+                </div>
+              </div>
           ))}
         </nav>
 
@@ -201,6 +234,15 @@ function OUsIcon() {
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round"
               d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"/>
+      </svg>
+  );
+}
+
+function OAuthIcon() {
+  return (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round"
+              d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
       </svg>
   );
 }

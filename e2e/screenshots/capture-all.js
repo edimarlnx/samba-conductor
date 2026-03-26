@@ -9,11 +9,13 @@ const TEMP_DIR = path.join(SCREENSHOT_DIR, '.tmp');
 
 // All screenshot definitions — add new pages here
 const SCREENSHOTS = [
+  // Auth
   { name: 'login-empty', group: 'auth', capture: captureLoginEmpty },
   { name: 'login', group: 'auth', capture: captureLoginFilled },
+
+  // Admin — lists
   { name: 'admin-dashboard', group: 'admin', capture: captureDashboard },
   { name: 'admin-users', group: 'admin', capture: captureUsers },
-  { name: 'admin-user-create', group: 'admin', capture: captureUserCreate },
   { name: 'admin-groups', group: 'admin', capture: captureGroups },
   { name: 'admin-ous', group: 'admin', capture: captureOUs },
   { name: 'admin-computers', group: 'admin', capture: captureComputers },
@@ -21,8 +23,24 @@ const SCREENSHOTS = [
   { name: 'admin-dns', group: 'admin', capture: captureDNS },
   { name: 'admin-gpos', group: 'admin', capture: captureGPOs },
   { name: 'admin-domain', group: 'admin', capture: captureDomain },
+  {name: 'admin-oauth-clients', group: 'admin', capture: captureOAuthClients},
+  {name: 'admin-oauth-realms', group: 'admin', capture: captureOAuthRealms},
   { name: 'admin-settings', group: 'admin', capture: captureSettings },
   { name: 'admin-dr', group: 'admin', capture: captureDR },
+
+  // Admin — forms/actions (modals and create pages)
+  {name: 'admin-user-create', group: 'admin', capture: captureUserCreate},
+  {name: 'admin-user-edit', group: 'admin', capture: captureUserEdit},
+  {name: 'admin-group-create', group: 'admin', capture: captureGroupCreate},
+  {name: 'admin-ou-create', group: 'admin', capture: captureOUCreate},
+  {name: 'admin-computer-create', group: 'admin', capture: captureComputerCreate},
+  {name: 'admin-service-account-create', group: 'admin', capture: captureServiceAccountCreate},
+  {name: 'admin-dns-add-record', group: 'admin', capture: captureDNSAddRecord},
+  {name: 'admin-gpo-create', group: 'admin', capture: captureGPOCreate},
+  {name: 'admin-oauth-client-create', group: 'admin', capture: captureOAuthClientCreate},
+  {name: 'admin-oauth-realm-create', group: 'admin', capture: captureOAuthRealmCreate},
+
+  // Self-Service
   { name: 'selfservice-home', group: 'selfservice', capture: captureSelfServiceHome },
   { name: 'selfservice-profile', group: 'selfservice', capture: captureSelfServiceProfile },
   { name: 'selfservice-change-password', group: 'selfservice', capture: captureSelfServiceChangePassword },
@@ -219,12 +237,111 @@ async function captureSettings({ page, ensureLoggedIn, tempPath }) {
   await page.screenshot({ path: tempPath, fullPage: false });
 }
 
+async function captureOAuthClients({page, ensureLoggedIn, tempPath}) {
+    await ensureLoggedIn();
+    await page.click('[data-e2e="admin-sidebar-link-clients"]');
+    await page.waitForTimeout(2000);
+    await page.screenshot({path: tempPath, fullPage: false});
+}
+
+async function captureOAuthRealms({page, ensureLoggedIn, tempPath}) {
+    await ensureLoggedIn();
+    await page.click('[data-e2e="admin-sidebar-link-realms"]');
+    await page.waitForTimeout(2000);
+    await page.screenshot({path: tempPath, fullPage: false});
+}
+
 async function captureDR({ page, ensureLoggedIn, tempPath }) {
   await ensureLoggedIn();
   await page.click('[data-e2e="admin-sidebar-link-disaster-recovery"]');
   await page.waitForTimeout(3000);
   await page.screenshot({ path: tempPath, fullPage: false });
 }
+
+// --- Form/Action captures (open modals or navigate to create pages) ---
+
+async function captureUserEdit({page, ensureLoggedIn, tempPath}) {
+  await ensureLoggedIn();
+  await page.goto(`${config.BASE_URL}/admin/users/Administrator/edit`);
+  await page.waitForTimeout(3000);
+  await page.screenshot({path: tempPath, fullPage: true});
+}
+
+async function captureGroupCreate({page, ensureLoggedIn, tempPath}) {
+  await ensureLoggedIn();
+  await page.goto(`${config.BASE_URL}/admin/groups/new`);
+  await page.waitForTimeout(2000);
+  await page.screenshot({path: tempPath, fullPage: false});
+}
+
+async function captureOUCreate({page, ensureLoggedIn, tempPath}) {
+  await ensureLoggedIn();
+  await page.click('[data-e2e="admin-sidebar-link-ous"]');
+  await page.waitForTimeout(2000);
+  await page.click('button:has-text("New OU")');
+  await page.waitForTimeout(500);
+  await page.screenshot({path: tempPath, fullPage: false});
+}
+
+async function captureComputerCreate({page, ensureLoggedIn, tempPath}) {
+  await ensureLoggedIn();
+  await page.goto(`${config.BASE_URL}/admin/computers`);
+  await page.waitForTimeout(2000);
+  await page.click('button:has-text("New Computer")');
+  await page.waitForTimeout(500);
+  await page.screenshot({path: tempPath, fullPage: false});
+}
+
+async function captureServiceAccountCreate({page, ensureLoggedIn, tempPath}) {
+  await ensureLoggedIn();
+  await page.goto(`${config.BASE_URL}/admin/service-accounts`);
+  await page.waitForTimeout(2000);
+  await page.click('button:has-text("New gMSA")');
+  await page.waitForTimeout(500);
+  await page.screenshot({path: tempPath, fullPage: false});
+}
+
+async function captureDNSAddRecord({page, ensureLoggedIn, tempPath}) {
+  await ensureLoggedIn();
+  await page.goto(`${config.BASE_URL}/admin/dns`);
+  await page.waitForTimeout(2000);
+  // Select first zone
+  const zoneBtn = page.locator('button.w-full.text-left').first();
+  await zoneBtn.click();
+  await page.waitForTimeout(1000);
+  await page.click('button:has-text("Add Record")');
+  await page.waitForTimeout(500);
+  await page.screenshot({path: tempPath, fullPage: false});
+}
+
+async function captureGPOCreate({page, ensureLoggedIn, tempPath}) {
+  await ensureLoggedIn();
+  await page.goto(`${config.BASE_URL}/admin/gpos`);
+  await page.waitForTimeout(2000);
+  await page.click('button:has-text("New GPO")');
+  await page.waitForTimeout(500);
+  await page.screenshot({path: tempPath, fullPage: false});
+}
+
+async function captureOAuthClientCreate({page, ensureLoggedIn, tempPath}) {
+  await ensureLoggedIn();
+  await page.goto(`${config.BASE_URL}/admin/oauth/clients`);
+  await page.waitForTimeout(2000);
+  await page.click('button:has-text("New Client")');
+  await page.waitForTimeout(500);
+  await page.screenshot({path: tempPath, fullPage: false});
+}
+
+async function captureOAuthRealmCreate({page, ensureLoggedIn, tempPath}) {
+  await ensureLoggedIn();
+  await page.goto(`${config.BASE_URL}/admin/oauth/realms`);
+  await page.waitForTimeout(2000);
+  await page.click('button:has-text("New Realm")');
+  await page.waitForTimeout(500);
+  await page.screenshot({path: tempPath, fullPage: false});
+}
+
+// --- Self-Service captures ---
 
 async function captureSelfServiceHome({ page, ensureLoggedIn, tempPath }) {
   await ensureLoggedIn();

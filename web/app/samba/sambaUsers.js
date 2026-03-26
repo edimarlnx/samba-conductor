@@ -1,5 +1,6 @@
 import { getSambaConfig } from './sambaConfig';
-import { createLdapClient, ldapBindWithCredentials, ldapSearch, ldapDisconnect } from './sambaLdap';
+import { createLdapClient, ldapBindWithCredentials, ldapSearch, ldapModify, ldapDisconnect } from './sambaLdap';
+import ldap from 'ldapjs';
 import { runSambaTool } from './sambaExec';
 
 // Lists all AD users with their attributes
@@ -169,20 +170,46 @@ export async function resetPassword({ username, newPassword, credentials }) {
 }
 
 // Updates specific AD user attributes via samba-tool
+// Updates AD user attributes via LDAP modify
 export async function updateUserAttributes({ username, attributes, credentials }) {
-  const results = [];
+  const client = createLdapClient();
+  const { baseDn } = getSambaConfig();
 
-  for (const [attr, value] of Object.entries(attributes)) {
-    if (value !== undefined && value !== null) {
-      const result = await runSambaTool({
-        args: ['user', 'setattr', username, attr, String(value)],
-        credentials,
-      });
-      results.push(result);
+  try {
+    await ldapBindWithCredentials({ client, credentials });
+
+    // Find the user's DN first
+    const users = await ldapSearch({
+      client,
+      baseDn,
+      filter: `(sAMAccountName=${username})`,
+      attributes: ['distinguishedName'],
+    });
+
+    if (users.length === 0) {
+      throw new Error(`User ${username} not found`);
     }
-  }
 
-  return results;
+    const userDn = users[0].dn;
+
+    // Build LDAP changes — only non-empty values
+    const changes = [];
+    Object.entries(attributes).forEach(([attr, value]) => {
+      const strValue = String(value || '').trim();
+      if (strValue) {
+        changes.push(new ldap.Change({
+          operation: 'replace',
+          modification: { type: attr, values: [strValue] },
+        }));
+      }
+    });
+
+    if (changes.length > 0) {
+      await ldapModify({ client, dn: userDn, changes });
+    }
+  } finally {
+    ldapDisconnect({ client });
+  }
 }
 
 // Checks if user account is disabled via userAccountControl flag

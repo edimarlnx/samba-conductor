@@ -43,6 +43,28 @@ Migrations.add({
   },
 });
 
+Migrations.add({
+    version: 4,
+    name: 'Create default OAuth realm',
+    async up() {
+        const {OAuthRealmsCollection} = require('../oauth/OAuthRealmsCollection');
+        const existing = await OAuthRealmsCollection.findOneAsync({name: 'default'});
+        if (!existing) {
+            await OAuthRealmsCollection.insertAsync({
+                name: 'default',
+                displayName: 'Default',
+                description: 'Default realm for all OAuth clients',
+                allowedScopes: ['openid', 'profile', 'email', 'groups', 'phone'],
+                defaultScopes: ['openid', 'profile'],
+                enabled: true,
+                createdAt: new Date(),
+            });
+            // eslint-disable-next-line no-console
+            console.log('[Migration] Created default OAuth realm');
+        }
+    },
+});
+
 Meteor.startup(() => {
   Migrations.migrateTo('latest');
 });

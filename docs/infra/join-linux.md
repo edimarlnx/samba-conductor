@@ -150,16 +150,16 @@ Edit `/etc/samba/smb.conf`:
 
 ```ini
 [global]
-   workgroup = SAMDOM
-   realm = SAMDOM.EXAMPLE.COM
-   security = ADS
-   idmap config * : backend = tdb
-   idmap config * : range = 10000-20000
-   idmap config SAMDOM : backend = rid
-   idmap config SAMDOM : range = 20001-30000
-   winbind use default domain = yes
-   winbind enum users = yes
-   winbind enum groups = yes
+workgroup = SAMDOM
+realm = SAMDOM.EXAMPLE.COM
+security = ADS
+idmap config * : backend = tdb
+idmap config * : range = 10000-20000
+idmap config SAMDOM : backend = rid
+idmap config SAMDOM : range = 20001-30000
+winbind use default domain = yes
+winbind enum users = yes
+winbind enum groups = yes
 ```
 
 ### Join

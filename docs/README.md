@@ -21,6 +21,8 @@ Active Directory Domain Controller managed by Samba Conductor.
 - [Disaster Recovery](admin/disaster-recovery.md) — Backup, sync, restore, and DR key management
 - [Security](admin/security.md) — Authentication, session management, and best practices
 - [Settings](admin/settings.md) — Self-service configuration and sync account
+- [OAuth Clients](admin/oauth-clients.md) — Registering and managing OAuth2 client applications
+- [OAuth Realms](admin/oauth-realms.md) — Logical grouping and access control for OAuth clients
 
 ## For Users
 
@@ -33,5 +35,10 @@ Active Directory Domain Controller managed by Samba Conductor.
 - [Joining Windows to the Domain](infra/join-windows.md) — Step-by-step guide for Windows machines
 - [Joining Linux to the Domain](infra/join-linux.md) — Step-by-step guide for Linux machines (SSSD/Winbind)
 - [LDAP Integration](infra/ldap-integration.md) — Connecting applications to Samba via LDAP/LDAPS
+- [OAuth2 Integration](infra/oauth-integration.md) — Connecting apps via OAuth2 (Grafana, Portainer, GitLab)
 - [DC Replication](infra/dc-replication.md) — Setting up a second DC for high availability
 - [Troubleshooting](infra/troubleshooting.md) — Common issues and solutions
+
+## Examples
+
+- [Grafana + OAuth2](examples/docker-compose.grafana.yml) — Docker Compose to test OAuth2 login with Grafana

@@ -19,6 +19,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - DNS zone and record management
 - Group Policy Object (GPO) management
 - Domain information and functional levels
+- OAuth2 Authorization Server (leaonline:oauth2-server) with LDAP-backed authentication
+- OAuth2 client management (create, edit, reset secret, delete)
+- OAuth2 realm system (logical grouping, AD group restrictions, per-realm scopes)
+- OAuth2 endpoints (/oauth/authorize, /oauth/token, /oauth/userinfo)
+- Admin sidebar organized by sections (Active Directory, OAuth Server, System)
 - Per-session encrypted credentials (AES-256-GCM, 30min TTL)
 - Sync account with auto-generated password
 - Disaster Recovery system (DR Key, AD sync, password hash backup)

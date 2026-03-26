@@ -38,13 +38,14 @@ export async function runSambaTool({ args, credentials, timeout = DEFAULT_TIMEOU
     return { stdout: stdout.trim(), stderr: stderr.trim() };
   } catch (error) {
     const message = error.stderr || error.message;
-    // Sanitize: never log credentials
+    // Sanitize: strip credentials from error messages (never expose -U user%pass)
+    const sanitizedMessage = message.replace(/-U\s+\S+/g, '-U ***');
     const sanitizedArgs = args.join(' ');
-    console.error(`[SambaTool] Command failed: samba-tool ${sanitizedArgs}`, message);
+    console.error(`[SambaTool] Command failed: samba-tool ${sanitizedArgs}`, sanitizedMessage);
 
     throw new Meteor.Error(
       'samba.exec.failed',
-      `samba-tool error: ${message}`
+        `samba-tool error: ${sanitizedMessage}`,
     );
   }
 }

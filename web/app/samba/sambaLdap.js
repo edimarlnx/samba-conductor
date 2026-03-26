@@ -80,6 +80,21 @@ export function ldapSearch({ client, baseDn, filter, scope = 'sub', attributes =
   });
 }
 
+// Modifies attributes of an LDAP entry
+export function ldapModify({ client, dn, changes }) {
+  return new Promise((resolve, reject) => {
+    client.modify(dn, changes, (error) => {
+      if (error) {
+        reject(
+          new Meteor.Error('samba.ldap.modify.failed', `LDAP modify failed: ${error.message}`),
+        );
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
 // Disconnects an LDAP client
 export function ldapDisconnect({ client }) {
   if (client) {

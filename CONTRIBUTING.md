@@ -40,12 +40,19 @@ contributors.
 ### Development Setup
 
 ```bash
+# Clone with submodules
+git clone --recurse-submodules https://github.com/edimarlnx/samba-conductor.git
+cd samba-conductor
+
+# Or if already cloned:
+git submodule update --init --recursive
+
 # Start Samba DC
 cd docker
 docker compose up -d
 
 # Start the web app
-cd web
+cd ../web
 meteor npm install
 meteor npm start
 ```

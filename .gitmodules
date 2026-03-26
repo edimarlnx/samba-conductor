@@ -1,0 +1,4 @@
+[submodule "web/packages/leaonline-oauth2-server"]
+	path = web/packages/leaonline-oauth2-server
+	url = https://github.com/edimarlnx/oauth2-server.git
+	branch = master

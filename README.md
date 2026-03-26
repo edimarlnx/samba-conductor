@@ -44,6 +44,7 @@ Samba 4 Active Directory. It simplifies AD administration through a clean UI wit
 - **DNS Management** — Zones and records management
 - **Group Policy (GPO)** — Create, link, and manage Group Policy Objects
 - **Service Accounts** — Group Managed Service Accounts (gMSA)
+- **OAuth2 Server** — Authorization Code flow for third-party app authentication (Grafana, Portainer, etc.)
 - **Self-Service Portal** — Users can change passwords and edit their profiles
 - **Disaster Recovery** — Encrypted AD backups to S3-compatible storage
 - **DC Replication** — Automatic replica DC setup via environment variables
@@ -83,15 +84,21 @@ Samba 4 Active Directory. It simplifies AD administration through a clean UI wit
 ## Quick Start
 
 ```bash
+# Clone with submodules
+git clone --recurse-submodules https://github.com/edimarlnx/samba-conductor.git
+cd samba-conductor
+
 # Start the Samba DC
 cd docker
 docker compose up -d
 
 # Start the web app
-cd web
+cd ../web
 meteor npm install
 meteor npm start
 ```
+
+> **Already cloned?** Run `git submodule update --init --recursive` to fetch the OAuth2 package.
 
 Open `http://localhost:4080` and login with `Administrator` / `P@ssw0rd123!`.
 
@@ -123,6 +130,8 @@ Full documentation is available in the [docs/](docs/README.md) directory:
 [DNS](docs/admin/dns-management.md) ·
 [GPOs](docs/admin/gpo-management.md) ·
 [DR & Backup](docs/admin/disaster-recovery.md) ·
+[OAuth Clients](docs/admin/oauth-clients.md) ·
+[OAuth Realms](docs/admin/oauth-realms.md) ·
 [Settings](docs/admin/settings.md)
 
 **For Users:**

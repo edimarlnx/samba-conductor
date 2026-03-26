@@ -28,6 +28,7 @@ Each subdirectory has its own `CLAUDE.md` with specific instructions.
 
 - **Self-Service Portal** (`/`) — Users can view profile, edit allowed fields, change expired passwords
 - **Admin Panel** (`/admin/*`) — Domain Admins only: user/group CRUD, domain info, settings, disaster recovery
+- **OAuth2 Server** — Authorization Code flow, client/realm management, LDAP-backed authentication for third-party apps
 - **Disaster Recovery** — AD sync to MongoDB, encrypted backups to S3, restore from snapshots
 - **Security** — Per-session encrypted credentials (no stored admin passwords), DR Key for backup encryption
 
