@@ -59,13 +59,17 @@ app/
 ├── infra/           # Cron jobs, migrations
 ├── layouts/         # AdminLayout, SelfServiceLayout, AdminGuard...
 ├── samba/           # Server-only: sambaAuth, sambaUsers, sambaGroups, sambaLdap, sambaExec, sambaConfig
+├── oauth/           # OAuth2 server (clients, realms, admin pages)
+├── ous/             # Organizational Units management
 ├── selfservice/     # Self-service portal (profile, change password)
+├── serviceaccounts/ # gMSA management
 ├── settings/        # Admin settings (editable fields, sync account)
 ├── status/          # Server status
 └── users/           # User management
 
 server/
 ├── main.js          # Server entry point (all method imports)
+├── oauth2.js        # OAuth2 server setup (leaonline:oauth2-server)
 ├── rest.js          # REST API endpoints
 ├── health.js        # Server health
 └── metrics.js       # Prometheus metrics
@@ -94,15 +98,25 @@ meteor npm install [package]  # Always prefix with meteor
 
 ## Routes
 
-| Route              | Area         | Access             |
-|--------------------|--------------|--------------------|
-| `/login`           | Auth         | Anonymous only     |
-| `/`                | Self-Service | Any logged user    |
-| `/profile`         | Self-Service | Any logged user    |
-| `/change-password` | Self-Service | Any logged user    |
-| `/admin`           | Admin        | Domain Admins only |
-| `/admin/users`     | Admin        | Domain Admins only |
-| `/admin/groups`    | Admin        | Domain Admins only |
-| `/admin/domain`    | Admin        | Domain Admins only |
-| `/admin/settings`  | Admin        | Domain Admins only |
-| `/admin/dr`        | Admin        | Domain Admins only |
+| Route                     | Area                     | Access             |
+|---------------------------|--------------------------|--------------------|
+| `/login`                  | Auth                     | Anonymous only     |
+| `/`                       | Self-Service             | Any logged user    |
+| `/profile`                | Self-Service             | Any logged user    |
+| `/change-password`        | Self-Service             | Any logged user    |
+| `/admin`                  | Admin — Dashboard        | Domain Admins only |
+| `/admin/users`            | Admin — AD               | Domain Admins only |
+| `/admin/groups`           | Admin — AD               | Domain Admins only |
+| `/admin/ous`              | Admin — AD               | Domain Admins only |
+| `/admin/computers`        | Admin — AD               | Domain Admins only |
+| `/admin/service-accounts` | Admin — AD               | Domain Admins only |
+| `/admin/dns`              | Admin — AD               | Domain Admins only |
+| `/admin/gpos`             | Admin — AD               | Domain Admins only |
+| `/admin/domain`           | Admin — AD               | Domain Admins only |
+| `/admin/oauth/clients`    | Admin — OAuth            | Domain Admins only |
+| `/admin/oauth/realms`     | Admin — OAuth            | Domain Admins only |
+| `/admin/settings`         | Admin — System           | Domain Admins only |
+| `/admin/dr`               | Admin — System           | Domain Admins only |
+| `/oauth/authorize`        | OAuth2 (server-rendered) | Public             |
+| `/oauth/token`            | OAuth2 API               | Client credentials |
+| `/oauth/userinfo`         | OAuth2 API               | Bearer token       |

@@ -21,6 +21,8 @@ Active Directory Domain Controller managed by Samba Conductor.
 - [Disaster Recovery](admin/disaster-recovery.md) — Backup, sync, restore, and DR key management
 - [Security](admin/security.md) — Authentication, session management, and best practices
 - [Settings](admin/settings.md) — Self-service configuration and sync account
+- [OAuth Clients](admin/oauth-clients.md) — Registering and managing OAuth2 client applications
+- [OAuth Realms](admin/oauth-realms.md) — Logical grouping and access control for OAuth clients
 
 ## For Users
 

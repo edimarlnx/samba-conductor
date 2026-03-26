@@ -21,6 +21,8 @@ const SCREENSHOTS = [
   { name: 'admin-dns', group: 'admin', capture: captureDNS },
   { name: 'admin-gpos', group: 'admin', capture: captureGPOs },
   { name: 'admin-domain', group: 'admin', capture: captureDomain },
+    {name: 'admin-oauth-clients', group: 'admin', capture: captureOAuthClients},
+    {name: 'admin-oauth-realms', group: 'admin', capture: captureOAuthRealms},
   { name: 'admin-settings', group: 'admin', capture: captureSettings },
   { name: 'admin-dr', group: 'admin', capture: captureDR },
   { name: 'selfservice-home', group: 'selfservice', capture: captureSelfServiceHome },
@@ -217,6 +219,20 @@ async function captureSettings({ page, ensureLoggedIn, tempPath }) {
   await page.click('[data-e2e="admin-sidebar-link-settings"]');
   await page.waitForSelector('[data-e2e="settings-btn-save-fields"]', { timeout: 10000 });
   await page.screenshot({ path: tempPath, fullPage: false });
+}
+
+async function captureOAuthClients({page, ensureLoggedIn, tempPath}) {
+    await ensureLoggedIn();
+    await page.click('[data-e2e="admin-sidebar-link-clients"]');
+    await page.waitForTimeout(2000);
+    await page.screenshot({path: tempPath, fullPage: false});
+}
+
+async function captureOAuthRealms({page, ensureLoggedIn, tempPath}) {
+    await ensureLoggedIn();
+    await page.click('[data-e2e="admin-sidebar-link-realms"]');
+    await page.waitForTimeout(2000);
+    await page.screenshot({path: tempPath, fullPage: false});
 }
 
 async function captureDR({ page, ensureLoggedIn, tempPath }) {
