@@ -41,7 +41,14 @@ working example.
 
 ### Option A: Docker Compose (recommended for testing)
 
-Create a `docker-compose.grafana.yml`:
+A ready-to-use example is available at [
+`docs/examples/docker-compose.grafana.yml`](../examples/docker-compose.grafana.yml).
+
+1. Edit the file and replace `REPLACE_WITH_YOUR_CLIENT_ID` and `REPLACE_WITH_YOUR_CLIENT_SECRET`
+2. Run: `docker compose -f docs/examples/docker-compose.grafana.yml up -d`
+3. Open `http://localhost:3001` and click "Sign in with Samba Conductor"
+
+The example file is fully commented. Below is the configuration explained:
 
 ```yaml
 services:

@@ -1,6 +1,7 @@
 # Service Accounts
 
-Manage Group Managed Service Accounts (gMSA) -- create gMSA entries, view their properties, and delete accounts that are no longer needed.
+Manage Group Managed Service Accounts (gMSA) -- create gMSA entries, view their properties, and delete accounts that are
+no longer needed.
 
 ![Service Accounts](../screenshots/admin-service-accounts.png)
 
@@ -29,21 +30,19 @@ Use the search bar to filter service accounts by any visible field.
 1. Click the **New gMSA** button in the top-right corner.
 2. In the modal, fill in the fields:
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| Account Name | Yes | The name for the service account (e.g., `svc-myapp`). |
-| DNS Hostname | Yes | The fully qualified DNS hostname associated with this account (e.g., `myapp.samdom.example.com`). |
-| Password Interval (days) | No | Number of days between automatic password rotations. Defaults to `30`. |
+| Field                    | Required | Description                                                                                       |
+|--------------------------|----------|---------------------------------------------------------------------------------------------------|
+| Account Name             | Yes      | The name for the service account (e.g., `svc-myapp`).                                             |
+| DNS Hostname             | Yes      | The fully qualified DNS hostname associated with this account (e.g., `myapp.samdom.example.com`). |
+| Password Interval (days) | No       | Number of days between automatic password rotations. Defaults to `30`.                            |
 
 3. Click **Create**.
-
 
 ### Viewing Service Account Details
 
 1. From the list, click **Details** in the Actions column.
 2. A detail panel opens below the table showing all available properties for the account as key-value pairs.
 3. Click **Close** to dismiss the detail panel.
-
 
 ### Deleting a Service Account
 

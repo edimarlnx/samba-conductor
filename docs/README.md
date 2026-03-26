@@ -38,3 +38,7 @@ Active Directory Domain Controller managed by Samba Conductor.
 - [OAuth2 Integration](infra/oauth-integration.md) — Connecting apps via OAuth2 (Grafana, Portainer, GitLab)
 - [DC Replication](infra/dc-replication.md) — Setting up a second DC for high availability
 - [Troubleshooting](infra/troubleshooting.md) — Common issues and solutions
+
+## Examples
+
+- [Grafana + OAuth2](examples/docker-compose.grafana.yml) — Docker Compose to test OAuth2 login with Grafana

@@ -108,25 +108,28 @@ for entry in conn.entries:
 const ldap = require('ldapjs');
 
 const client = ldap.createClient({
-  url: 'ldaps://dc1.samdom.example.com:636',
-  tlsOptions: { rejectUnauthorized: false } // for self-signed certs
+    url: 'ldaps://dc1.samdom.example.com:636',
+    tlsOptions: {rejectUnauthorized: false} // for self-signed certs
 });
 
 client.bind('svc-myapp@SAMDOM.EXAMPLE.COM', 'ServicePassword123!', (err) => {
-  if (err) { console.error('Bind failed:', err); return; }
+    if (err) {
+        console.error('Bind failed:', err);
+        return;
+    }
 
-  const opts = {
-    filter: '(&(objectClass=user)(objectCategory=person))',
-    scope: 'sub',
-    attributes: ['sAMAccountName', 'displayName', 'mail']
-  };
+    const opts = {
+        filter: '(&(objectClass=user)(objectCategory=person))',
+        scope: 'sub',
+        attributes: ['sAMAccountName', 'displayName', 'mail']
+    };
 
-  client.search('DC=samdom,DC=example,DC=com', opts, (err, res) => {
-    res.on('searchEntry', (entry) => {
-      console.log(JSON.stringify(entry.pojo));
+    client.search('DC=samdom,DC=example,DC=com', opts, (err, res) => {
+        res.on('searchEntry', (entry) => {
+            console.log(JSON.stringify(entry.pojo));
+        });
+        res.on('end', () => client.unbind());
     });
-    res.on('end', () => client.unbind());
-  });
 });
 ```
 

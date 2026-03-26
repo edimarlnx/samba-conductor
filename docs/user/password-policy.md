@@ -1,14 +1,17 @@
 # Password Policy
 
-This guide covers how password policies work in your organization's Active Directory domain and what to do when your password expires or needs to be changed.
+This guide covers how password policies work in your organization's Active Directory domain and what to do when your
+password expires or needs to be changed.
 
 ## How Password Policies Work
 
 Your organization enforces password rules through Active Directory Group Policy. These rules typically include:
 
 - **Minimum length** -- Passwords must meet a minimum character count (commonly 8 or more).
-- **Complexity requirements** -- Passwords usually must contain a mix of uppercase letters, lowercase letters, numbers, and special characters.
-- **Maximum age** -- Passwords expire after a set number of days (e.g., 90 days). You will need to change your password before it expires.
+- **Complexity requirements** -- Passwords usually must contain a mix of uppercase letters, lowercase letters, numbers,
+  and special characters.
+- **Maximum age** -- Passwords expire after a set number of days (e.g., 90 days). You will need to change your password
+  before it expires.
 - **Password history** -- You cannot reuse a certain number of previous passwords.
 
 The exact policy values are set by your domain administrators and may vary.
@@ -21,11 +24,13 @@ The exact policy values are set by your domain administrators and may vary.
 4. Enter and confirm your **new password**.
 5. Click **Change Password**.
 
-If your new password does not meet the domain's policy requirements, you will see an error message. Adjust your password and try again.
+If your new password does not meet the domain's policy requirements, you will see an error message. Adjust your password
+and try again.
 
 ## Expired Password
 
-If your password has expired, you may be prompted to change it at your next login. Follow the on-screen instructions to set a new password before you can continue.
+If your password has expired, you may be prompted to change it at your next login. Follow the on-screen instructions to
+set a new password before you can continue.
 
 ## Must Change Password at Next Login
 
@@ -44,4 +49,5 @@ An administrator may flag your account to require a password change at next logi
 
 ## Need Help?
 
-If you are locked out of your account or cannot change your password, contact your IT administrator. They can reset your password or unlock your account from the admin panel.
+If you are locked out of your account or cannot change your password, contact your IT administrator. They can reset your
+password or unlock your account from the admin panel.
