@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="../media/logo-dark-l.png" alt="Samba Conductor" width="200">
+</p>
+
 # Samba Conductor Documentation
 
 Welcome to the Samba Conductor documentation. These guides cover setup, administration, and usage of the Samba 4
@@ -12,6 +16,7 @@ Active Directory Domain Controller managed by Samba Conductor.
 - [Computer Management](admin/computer-management.md) — Domain-joining Windows and Linux machines
 - [DNS Management](admin/dns-management.md) — Zones, records, and name resolution
 - [Group Policy (GPO)](admin/gpo-management.md) — Creating and linking Group Policy Objects
+- [Domain Info](admin/domain-info.md) — Domain configuration, functional levels, DC status
 - [Service Accounts](admin/service-accounts.md) — Group Managed Service Accounts (gMSA)
 - [Disaster Recovery](admin/disaster-recovery.md) — Backup, sync, restore, and DR key management
 - [Security](admin/security.md) — Authentication, session management, and best practices

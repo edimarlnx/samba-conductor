@@ -47,6 +47,8 @@ Login with the default admin credentials:
 
 ### 3. Initial Setup Checklist
 
+![Admin Dashboard](../screenshots/admin-dashboard.png)
+
 After first login, you'll see warnings on the Dashboard. Complete these steps:
 
 #### Configure the DR Key
