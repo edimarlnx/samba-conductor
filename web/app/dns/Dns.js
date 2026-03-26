@@ -111,6 +111,7 @@ export function Dns() {
                             <button
                                 key={zone.name}
                                 onClick={() => handleSelectZone({zoneName: zone.name})}
+                                data-e2e="dns-btn-zone"
                                 className={`w-full text-left rounded-lg px-3 py-2 text-sm transition-colors ${
                                     selectedZone === zone.name
                                         ? 'bg-accent/20 text-accent'
@@ -130,7 +131,7 @@ export function Dns() {
                         <div>
                             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
                                 <h2 className="text-sm font-semibold text-fg">{selectedZone}</h2>
-                                <Button primary onClick={() => setShowAdd(true)}>
+                                <Button primary onClick={() => setShowAdd(true)} data-e2e="dns-btn-add-record">
                                     Add Record
                                 </Button>
                             </div>
@@ -166,6 +167,7 @@ export function Dns() {
                                                 <td className="px-3 py-2 text-right">
                                                     <button
                                                         onClick={() => setDeleteTarget(rec)}
+                                                        data-e2e="dns-btn-delete-record"
                                                         className="text-xs text-red-400 hover:text-red-300"
                                                     >
                                                         Delete
@@ -201,6 +203,7 @@ export function Dns() {
                                     onChange={(e) => setAddForm((prev) => ({...prev, name: e.target.value}))}
                                     placeholder="www"
                                     autoFocus
+                                    data-e2e="dns-add-input-name"
                                     className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                                 />
                             </div>
@@ -209,6 +212,7 @@ export function Dns() {
                                 <select
                                     value={addForm.recordType}
                                     onChange={(e) => setAddForm((prev) => ({...prev, recordType: e.target.value}))}
+                                    data-e2e="dns-add-select-type"
                                     className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                                 >
                                     {recordTypes.map((t) => (
@@ -223,14 +227,15 @@ export function Dns() {
                                     value={addForm.data}
                                     onChange={(e) => setAddForm((prev) => ({...prev, data: e.target.value}))}
                                     placeholder="192.168.1.10"
+                                    data-e2e="dns-add-input-data"
                                     className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                                 />
                             </div>
                         </div>
                         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                            <Button secondary onClick={() => setShowAdd(false)}>Cancel</Button>
+                            <Button secondary onClick={() => setShowAdd(false)} data-e2e="dns-add-btn-cancel">Cancel</Button>
                             <Button primary onClick={handleAddRecord}
-                                    disabled={adding || !addForm.name.trim() || !addForm.data.trim()}>
+                                    disabled={adding || !addForm.name.trim() || !addForm.data.trim()} data-e2e="dns-add-btn-submit">
                                 {adding ? 'Adding...' : 'Add Record'}
                             </Button>
                         </div>
@@ -246,6 +251,7 @@ export function Dns() {
                 danger
                 onConfirm={handleDeleteRecord}
                 onCancel={() => setDeleteTarget(null)}
+                data-e2e="dns-delete-record"
             />
         </div>
     );

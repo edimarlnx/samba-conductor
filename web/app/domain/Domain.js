@@ -66,7 +66,7 @@ export function Domain() {
 
       <div className="space-y-6">
         {sections.map((section) => (
-          <div key={section.title} className="rounded-xl bg-surface-card border border-border p-6">
+          <div key={section.title} className="rounded-xl bg-surface-card border border-border p-6" data-e2e={section.title === 'Domain' ? 'domain-section-info' : section.title === 'Functional Levels' ? 'domain-section-levels' : undefined}>
             <h2 className="text-lg font-semibold text-fg mb-4">{section.title}</h2>
             <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {section.fields

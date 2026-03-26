@@ -34,6 +34,7 @@ export function Button({
   danger = false,
   className = '',
   children,
+  'data-e2e': dataE2e,
   ...rest
 }) {
   function getButtonStyle() {
@@ -49,6 +50,7 @@ export function Button({
   return (
     <button
       className={`inline-flex items-center justify-center rounded-lg border ${style.border} ${style.bg} ${style.hover} ${style.text} min-h-[44px] px-4 py-3 text-sm font-medium sm:min-h-0 sm:py-2.5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      data-e2e={dataE2e}
       {...rest}
     >
       {children}

@@ -37,6 +37,7 @@ export function ThemeToggle({ className = '' }) {
     <div className="relative">
       <button
         onClick={() => setOpen((prev) => !prev)}
+        data-e2e="theme-btn-toggle"
         className={`rounded-lg p-2 transition-colors text-fg-muted hover:bg-surface-hover hover:text-fg ${className}`}
         title={`Theme: ${current.label}`}
       >
@@ -51,6 +52,7 @@ export function ThemeToggle({ className = '' }) {
               <button
                 key={t.id}
                 onClick={() => handleSelect({ themeId: t.id })}
+                data-e2e={`theme-btn-${t.id}`}
                 className={`flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors ${
                   theme === t.id
                     ? 'text-accent font-medium'

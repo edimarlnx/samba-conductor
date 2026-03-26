@@ -84,7 +84,7 @@ export function GPOs() {
                     <h1 className="text-2xl font-bold text-fg">Group Policy Objects</h1>
                     <p className="mt-1 text-sm text-fg-secondary">Manage domain GPOs and links</p>
                 </div>
-                <Button primary onClick={() => setShowCreate(true)}>
+                <Button primary onClick={() => setShowCreate(true)} data-e2e="gpos-btn-new">
                     New GPO
                 </Button>
             </div>
@@ -110,12 +110,14 @@ export function GPOs() {
                                             setLinkTarget(gpo);
                                             setLinkOuDn('');
                                         }}
+                                        data-e2e="gpos-btn-link"
                                         className="text-xs text-accent hover:text-accent-hover"
                                     >
                                         Link to OU
                                     </button>
                                     <button
                                         onClick={() => setDeleteTarget(gpo)}
+                                        data-e2e="gpos-btn-delete"
                                         className="text-xs text-red-400 hover:text-red-300"
                                     >
                                         Delete
@@ -146,12 +148,13 @@ export function GPOs() {
                                 onChange={(e) => setCreateName(e.target.value)}
                                 placeholder="Custom Policy"
                                 autoFocus
+                                data-e2e="gpos-create-input-name"
                                 className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                             />
                         </div>
                         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                            <Button secondary onClick={() => setShowCreate(false)}>Cancel</Button>
-                            <Button primary onClick={handleCreate} disabled={creating || !createName.trim()}>
+                            <Button secondary onClick={() => setShowCreate(false)} data-e2e="gpos-create-btn-cancel">Cancel</Button>
+                            <Button primary onClick={handleCreate} disabled={creating || !createName.trim()} data-e2e="gpos-create-btn-submit">
                                 {creating ? 'Creating...' : 'Create'}
                             </Button>
                         </div>
@@ -176,12 +179,13 @@ export function GPOs() {
                                 onChange={(e) => setLinkOuDn(e.target.value)}
                                 placeholder="OU=Engineering,DC=samdom,DC=example,DC=com"
                                 autoFocus
+                                data-e2e="gpos-link-input-dn"
                                 className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg font-mono placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                             />
                         </div>
                         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                            <Button secondary onClick={() => setLinkTarget(null)}>Cancel</Button>
-                            <Button primary onClick={handleLink} disabled={!linkOuDn.trim()}>Link</Button>
+                            <Button secondary onClick={() => setLinkTarget(null)} data-e2e="gpos-link-btn-cancel">Cancel</Button>
+                            <Button primary onClick={handleLink} disabled={!linkOuDn.trim()} data-e2e="gpos-link-btn-submit">Link</Button>
                         </div>
                     </div>
                 </div>
@@ -195,6 +199,7 @@ export function GPOs() {
                 danger
                 onConfirm={handleDelete}
                 onCancel={() => setDeleteTarget(null)}
+                data-e2e="gpos-delete"
             />
         </div>
     );

@@ -85,6 +85,7 @@ export function Users() {
                 e.stopPropagation();
                 navigate(RoutePaths.ADMIN_USER_EDIT.replace(':username', row.username));
               }}
+              data-e2e="users-link-edit"
               className="text-xs text-accent hover:text-accent-hover"
             >
               Edit
@@ -94,6 +95,7 @@ export function Users() {
                 e.stopPropagation();
                   setToggleTarget({username: row.username, enabled: row.enabled});
               }}
+              data-e2e="users-btn-toggle-status"
               className="text-xs text-yellow-400 hover:text-yellow-300"
             >
               {row.enabled ? 'Disable' : 'Enable'}
@@ -104,6 +106,7 @@ export function Users() {
                       setMoveTarget(row.username);
                       setMoveOuDn('');
                   }}
+                  data-e2e="users-btn-move"
                   className="text-xs text-fg-muted hover:text-fg-secondary"
               >
                   Move
@@ -113,6 +116,7 @@ export function Users() {
                 e.stopPropagation();
                 setDeleteTarget(row.username);
               }}
+              data-e2e="users-btn-delete"
               className="text-xs text-red-400 hover:text-red-300"
             >
               Delete
@@ -134,7 +138,7 @@ export function Users() {
           <h1 className="text-2xl font-bold text-fg">Users</h1>
           <p className="mt-1 text-sm text-fg-secondary">Manage Active Directory users</p>
         </div>
-        <Button primary onClick={() => navigate(RoutePaths.ADMIN_USER_CREATE)}>
+        <Button primary onClick={() => navigate(RoutePaths.ADMIN_USER_CREATE)} data-e2e="users-btn-new">
           New User
         </Button>
       </div>
@@ -143,6 +147,7 @@ export function Users() {
         columns={columns}
         data={users}
         searchPlaceholder="Search users..."
+        data-e2e="users-table"
       />
 
         {/* Move to OU modal */}
@@ -157,12 +162,14 @@ export function Users() {
                         value={moveOuDn}
                         onChange={(value) => setMoveOuDn(value)}
                         placeholder="Select destination OU"
+                        data-e2e="users-move-ou-picker"
                     />
                     <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                        <Button secondary onClick={() => setMoveTarget(null)}>Cancel</Button>
+                        <Button secondary onClick={() => setMoveTarget(null)} data-e2e="users-move-btn-cancel">Cancel</Button>
                         <Button
                             primary
                             disabled={!moveOuDn}
+                            data-e2e="users-move-btn-confirm"
                             onClick={async () => {
                                 try {
                                     await Meteor.callAsync('samba.users.move', {
@@ -208,6 +215,7 @@ export function Users() {
         danger
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
+        data-e2e="users-delete"
       />
     </div>
   );

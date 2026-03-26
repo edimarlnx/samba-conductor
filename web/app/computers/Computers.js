@@ -112,6 +112,7 @@ export function Computers() {
                                 e.stopPropagation();
                                 handleSelectComputer({computerName: row.name});
                             }}
+                            data-e2e="computers-btn-details"
                             className="text-xs text-accent hover:text-accent-hover"
                         >
                             Details
@@ -121,6 +122,7 @@ export function Computers() {
                                 e.stopPropagation();
                                 setDeleteTarget(row.name);
                             }}
+                            data-e2e="computers-btn-delete"
                             className="text-xs text-red-400 hover:text-red-300"
                         >
                             Delete
@@ -140,7 +142,7 @@ export function Computers() {
                     <h1 className="text-2xl font-bold text-fg">Computers</h1>
                     <p className="mt-1 text-sm text-fg-secondary">Manage domain-joined computer accounts</p>
                 </div>
-                <Button primary onClick={() => setShowCreate(true)}>
+                <Button primary onClick={() => setShowCreate(true)} data-e2e="computers-btn-new">
                     New Computer
                 </Button>
             </div>
@@ -149,6 +151,7 @@ export function Computers() {
                 columns={columns}
                 data={computers}
                 searchPlaceholder="Search computers..."
+                data-e2e="computers-table"
             />
 
             {/* Detail panel */}
@@ -157,6 +160,7 @@ export function Computers() {
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-lg font-semibold text-fg">{selected.name}</h2>
                         <button onClick={() => setSelected(null)}
+                                data-e2e="computers-detail-btn-close"
                                 className="text-sm text-fg-muted hover:text-fg">Close
                         </button>
                     </div>
@@ -211,6 +215,7 @@ export function Computers() {
                                     onChange={(e) => setCreateForm((prev) => ({...prev, name: e.target.value}))}
                                     placeholder="WORKSTATION01"
                                     autoFocus
+                                    data-e2e="computers-create-input-name"
                                     className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                                 />
                             </div>
@@ -221,6 +226,7 @@ export function Computers() {
                                     value={createForm.description}
                                     onChange={(e) => setCreateForm((prev) => ({...prev, description: e.target.value}))}
                                     placeholder="Optional"
+                                    data-e2e="computers-create-input-description"
                                     className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                                 />
                             </div>
@@ -230,12 +236,13 @@ export function Computers() {
                               <OUPicker
                                     value={createForm.computerOu}
                                     onChange={(value) => setCreateForm((prev) => ({...prev, computerOu: value}))}
+                                    data-e2e="computers-create-ou-picker"
                                 />
                             </div>
                         </div>
                         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                            <Button secondary onClick={() => setShowCreate(false)}>Cancel</Button>
-                            <Button primary onClick={handleCreate} disabled={creating || !createForm.name.trim()}>
+                            <Button secondary onClick={() => setShowCreate(false)} data-e2e="computers-create-btn-cancel">Cancel</Button>
+                            <Button primary onClick={handleCreate} disabled={creating || !createForm.name.trim()} data-e2e="computers-create-btn-submit">
                                 {creating ? 'Creating...' : 'Create'}
                             </Button>
                         </div>
@@ -251,6 +258,7 @@ export function Computers() {
                 danger
                 onConfirm={handleDelete}
                 onCancel={() => setDeleteTarget(null)}
+                data-e2e="computers-delete"
             />
         </div>
     );

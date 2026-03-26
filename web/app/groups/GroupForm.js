@@ -127,6 +127,7 @@ export function GroupForm() {
             required
             disabled={isEditing}
             placeholder="developers"
+            data-e2e="group-form-input-name"
             className="w-full rounded-lg border border-border bg-surface-input px-4 py-2.5 text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50"
           />
         </div>
@@ -140,16 +141,17 @@ export function GroupForm() {
             value={form.description}
             onChange={(e) => handleChange({ field: 'description', value: e.target.value })}
             placeholder="Group description"
+            data-e2e="group-form-input-description"
             className="w-full rounded-lg border border-border bg-surface-input px-4 py-2.5 text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
           />
         </div>
 
         {!isEditing && (
           <div className="flex gap-3 pt-4">
-            <Button primary type="submit" disabled={submitting}>
+            <Button primary type="submit" disabled={submitting} data-e2e="group-form-btn-submit">
               {submitting ? 'Creating...' : 'Create Group'}
             </Button>
-            <Button secondary onClick={() => navigate(RoutePaths.ADMIN_GROUPS)} type="button">
+            <Button secondary onClick={() => navigate(RoutePaths.ADMIN_GROUPS)} type="button" data-e2e="group-form-btn-cancel">
               Cancel
             </Button>
           </div>
@@ -193,6 +195,7 @@ export function GroupForm() {
               value={newMember}
               onChange={(e) => setNewMember(e.target.value)}
               placeholder="Username to add"
+              data-e2e="group-form-input-add-member"
               className="flex-1 rounded-lg border border-border bg-surface-input px-4 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -201,7 +204,7 @@ export function GroupForm() {
                 }
               }}
             />
-            <Button secondary onClick={handleAddMember} type="button">
+            <Button secondary onClick={handleAddMember} type="button" data-e2e="group-form-btn-add-member">
               Add
             </Button>
           </div>
@@ -216,6 +219,7 @@ export function GroupForm() {
                   <span className="text-sm text-fg-secondary">{member}</span>
                   <button
                     onClick={() => handleRemoveMember({ memberName: member })}
+                    data-e2e="group-form-btn-remove-member"
                     className="text-xs text-red-400 hover:text-red-300"
                   >
                     Remove
@@ -226,7 +230,7 @@ export function GroupForm() {
           </div>
 
           <div className="flex gap-3 pt-6">
-            <Button secondary onClick={() => navigate(RoutePaths.ADMIN_GROUPS)} type="button">
+            <Button secondary onClick={() => navigate(RoutePaths.ADMIN_GROUPS)} type="button" data-e2e="group-form-btn-cancel">
               Back to Groups
             </Button>
           </div>

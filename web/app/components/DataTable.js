@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export function DataTable({ columns, data, onRowClick, searchPlaceholder = 'Search...' }) {
+export function DataTable({ columns, data, onRowClick, searchPlaceholder = 'Search...', 'data-e2e': dataE2e = 'table' }) {
   const [search, setSearch] = useState('');
 
   const filteredData = data.filter((row) =>
@@ -19,6 +19,7 @@ export function DataTable({ columns, data, onRowClick, searchPlaceholder = 'Sear
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={searchPlaceholder}
+          data-e2e={`${dataE2e}-search`}
           className="w-full sm:max-w-sm rounded-lg border border-border bg-surface-input px-4 py-2.5 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
         />
       </div>

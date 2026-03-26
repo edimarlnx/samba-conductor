@@ -1,8 +1,8 @@
 import React from 'react';
 
-export function StatCard({ title, value, icon, description }) {
+export function StatCard({ title, value, icon, description, 'data-e2e': dataE2e }) {
   return (
-    <div className="rounded-xl bg-surface-card border border-border p-4 md:p-6">
+    <div className="rounded-xl bg-surface-card border border-border p-4 md:p-6" data-e2e={dataE2e}>
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-fg-muted">{title}</p>

@@ -165,6 +165,7 @@ export function UserForm() {
               required
               disabled={isEditing}
               placeholder="john.doe"
+              data-e2e="user-form-input-username"
             />
             <FormField
               label={isEditing ? 'New Password (blank = keep current)' : 'Password'}
@@ -172,6 +173,7 @@ export function UserForm() {
               onChange={(value) => handleChange({ field: 'password', value })}
               type="password"
               required={!isEditing}
+              data-e2e="user-form-input-password"
             />
           </div>
           {!isEditing && (
@@ -181,6 +183,7 @@ export function UserForm() {
                   type="checkbox"
                   checked={form.mustChangeAtNextLogin}
                   onChange={(e) => handleChange({ field: 'mustChangeAtNextLogin', value: e.target.checked })}
+                  data-e2e="user-form-checkbox-must-change"
                   className="rounded border-border bg-surface-input text-accent focus:ring-accent"
                 />
                 Must change password at next login
@@ -197,18 +200,21 @@ export function UserForm() {
               value={form.givenName}
               onChange={(value) => handleChange({ field: 'givenName', value })}
               placeholder="John"
+              data-e2e="user-form-input-first-name"
             />
             <FormField
               label="Initials"
               value={form.initials}
               onChange={(value) => handleChange({ field: 'initials', value })}
               placeholder="J.D."
+              data-e2e="user-form-input-initials"
             />
             <FormField
               label="Last Name"
               value={form.surname}
               onChange={(value) => handleChange({ field: 'surname', value })}
               placeholder="Doe"
+              data-e2e="user-form-input-last-name"
             />
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-4">
@@ -218,12 +224,14 @@ export function UserForm() {
               onChange={(value) => handleChange({ field: 'mail', value })}
               type="email"
               placeholder="john.doe@example.com"
+              data-e2e="user-form-input-email"
             />
             <FormField
               label="Phone"
               value={form.telephoneNumber}
               onChange={(value) => handleChange({ field: 'telephoneNumber', value })}
               placeholder="+55 11 99999-9999"
+              data-e2e="user-form-input-phone"
             />
           </div>
           <div className="mt-4">
@@ -232,6 +240,7 @@ export function UserForm() {
               value={form.description}
               onChange={(value) => handleChange({ field: 'description', value })}
               placeholder="User description"
+              data-e2e="user-form-input-description"
             />
           </div>
         </FormSection>
@@ -244,18 +253,21 @@ export function UserForm() {
               value={form.company}
               onChange={(value) => handleChange({ field: 'company', value })}
               placeholder="Acme Corp"
+              data-e2e="user-form-input-company"
             />
             <FormField
               label="Department"
               value={form.department}
               onChange={(value) => handleChange({ field: 'department', value })}
               placeholder="Engineering"
+              data-e2e="user-form-input-department"
             />
             <FormField
               label="Office"
               value={form.physicalDeliveryOffice}
               onChange={(value) => handleChange({ field: 'physicalDeliveryOffice', value })}
               placeholder="Building A, Room 101"
+              data-e2e="user-form-input-office"
             />
             {!isEditing && (
                 <div>
@@ -265,6 +277,7 @@ export function UserForm() {
                   <OUPicker
                       value={form.userou}
                       onChange={(value) => handleChange({field: 'userou', value})}
+                      data-e2e="user-form-ou-picker"
                   />
                 </div>
             )}
@@ -280,24 +293,28 @@ export function UserForm() {
                 value={form.unixHome}
                 onChange={(value) => handleChange({ field: 'unixHome', value })}
                 placeholder="/home/john.doe"
+                data-e2e="user-form-input-home-dir"
               />
               <FormField
                 label="Login Shell"
                 value={form.loginShell}
                 onChange={(value) => handleChange({ field: 'loginShell', value })}
                 placeholder="/bin/bash"
+                data-e2e="user-form-input-login-shell"
               />
               <FormField
                 label="UID Number"
                 value={form.uidNumber}
                 onChange={(value) => handleChange({ field: 'uidNumber', value })}
                 placeholder="10001"
+                data-e2e="user-form-input-uid"
               />
               <FormField
                 label="GID Number"
                 value={form.gidNumber}
                 onChange={(value) => handleChange({ field: 'gidNumber', value })}
                 placeholder="10000"
+                data-e2e="user-form-input-gid"
               />
             </div>
           </FormSection>
@@ -345,10 +362,10 @@ export function UserForm() {
         )}
 
         <div className="flex gap-3 pt-2">
-          <Button primary type="submit" disabled={submitting}>
+          <Button primary type="submit" disabled={submitting} data-e2e="user-form-btn-submit">
             {submitting ? 'Saving...' : isEditing ? 'Save Changes' : 'Create User'}
           </Button>
-          <Button secondary onClick={() => navigate(RoutePaths.ADMIN_USERS)} type="button">
+          <Button secondary onClick={() => navigate(RoutePaths.ADMIN_USERS)} type="button" data-e2e="user-form-btn-cancel">
             Cancel
           </Button>
         </div>
@@ -438,6 +455,7 @@ function UserGroupsSection({ username, groups, allGroups, selectedGroup, onSelec
           <select
             value={selectedGroup}
             onChange={(e) => onSelectGroup(e.target.value)}
+            data-e2e="user-form-select-group"
             className="flex-1 rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
           >
             <option value="">Select a group to add...</option>
@@ -445,7 +463,7 @@ function UserGroupsSection({ username, groups, allGroups, selectedGroup, onSelec
               <option key={g} value={g}>{g}</option>
             ))}
           </select>
-          <Button secondary onClick={handleAddGroup} type="button" disabled={!selectedGroup}>
+          <Button secondary onClick={handleAddGroup} type="button" disabled={!selectedGroup} data-e2e="user-form-btn-add-group">
             Add
           </Button>
         </div>
@@ -461,6 +479,7 @@ function UserGroupsSection({ username, groups, allGroups, selectedGroup, onSelec
                 <button
                   type="button"
                   onClick={() => handleRemoveGroup({ groupName })}
+                  data-e2e="user-form-btn-remove-group"
                   className="text-xs text-red-400 hover:text-red-300"
                 >
                   Remove
@@ -503,7 +522,7 @@ function extractParentDn({dn}) {
   return commaIndex > 0 ? dn.substring(commaIndex + 1) : '';
 }
 
-function FormField({ label, value, onChange, type = 'text', required = false, disabled = false, placeholder = '' }) {
+function FormField({ label, value, onChange, type = 'text', required = false, disabled = false, placeholder = '', 'data-e2e': dataE2e }) {
   return (
     <div>
       <label className="block text-xs font-medium text-fg-secondary mb-1">
@@ -516,6 +535,7 @@ function FormField({ label, value, onChange, type = 'text', required = false, di
         required={required}
         disabled={disabled}
         placeholder={placeholder}
+        data-e2e={dataE2e}
         className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50"
       />
     </div>

@@ -37,9 +37,9 @@ export function Dashboard() {
   }
 
   const quickActions = [
-    { label: 'Manage Users', path: RoutePaths.ADMIN_USERS, description: 'Create, edit and manage AD users' },
-    { label: 'Manage Groups', path: RoutePaths.ADMIN_GROUPS, description: 'Create, edit and manage AD groups' },
-    { label: 'Domain Info', path: RoutePaths.ADMIN_DOMAIN, description: 'View domain configuration and status' },
+    { label: 'Manage Users', path: RoutePaths.ADMIN_USERS, description: 'Create, edit and manage AD users', e2e: 'dashboard-btn-manage-users' },
+    { label: 'Manage Groups', path: RoutePaths.ADMIN_GROUPS, description: 'Create, edit and manage AD groups', e2e: 'dashboard-btn-manage-groups' },
+    { label: 'Domain Info', path: RoutePaths.ADMIN_DOMAIN, description: 'View domain configuration and status', e2e: 'dashboard-btn-domain-info' },
   ];
 
   return (
@@ -57,7 +57,7 @@ export function Dashboard() {
           <h3 className="text-sm font-semibold text-red-300">DR Key Not Configured</h3>
           <p className="mt-1 text-sm text-red-400/80">
             Backup data cannot be encrypted without a DR key.{' '}
-            <button onClick={() => navigate(RoutePaths.ADMIN_DR)} className="underline hover:text-red-300">
+            <button onClick={() => navigate(RoutePaths.ADMIN_DR)} data-e2e="dashboard-link-dr-key" className="underline hover:text-red-300">
               Configure now
             </button>
           </p>
@@ -69,7 +69,7 @@ export function Dashboard() {
           <h3 className="text-sm font-semibold text-yellow-300">DR Key Locked</h3>
           <p className="mt-1 text-sm text-yellow-400/80">
             The DR key needs to be unlocked for backups to work.{' '}
-            <button onClick={() => navigate(RoutePaths.ADMIN_DR)} className="underline hover:text-yellow-300">
+            <button onClick={() => navigate(RoutePaths.ADMIN_DR)} data-e2e="dashboard-link-dr-key" className="underline hover:text-yellow-300">
               Unlock now
             </button>
           </p>
@@ -84,6 +84,7 @@ export function Dashboard() {
             Create a dedicated AD user (e.g., <code>svc-conductor</code>) for automated synchronization, then configure it in{' '}
             <button
               onClick={() => navigate(RoutePaths.ADMIN_SETTINGS)}
+              data-e2e="dashboard-link-sync-account"
               className="underline hover:text-yellow-300"
             >
               Settings
@@ -98,23 +99,27 @@ export function Dashboard() {
           title="Total Users"
           value={summary?.usersCount ?? '-'}
           icon={<UsersStatIcon />}
+          data-e2e="dashboard-card-total-users"
         />
         <StatCard
           title="Active Users"
           value={summary?.enabledUsersCount ?? '-'}
           icon={<ActiveIcon />}
           description="Enabled accounts"
+          data-e2e="dashboard-card-active-users"
         />
         <StatCard
           title="Disabled Users"
           value={summary?.disabledUsersCount ?? '-'}
           icon={<DisabledIcon />}
           description="Disabled accounts"
+          data-e2e="dashboard-card-disabled-users"
         />
         <StatCard
           title="Groups"
           value={summary?.groupsCount ?? '-'}
           icon={<GroupsStatIcon />}
+          data-e2e="dashboard-card-groups"
         />
       </div>
 
@@ -126,6 +131,7 @@ export function Dashboard() {
             <button
               key={action.path}
               onClick={() => navigate(action.path)}
+              data-e2e={action.e2e}
               className="rounded-xl bg-surface-card border border-border p-5 text-left transition-colors hover:bg-surface-hover hover:border-border"
             >
               <h3 className="text-sm font-semibold text-fg">{action.label}</h3>

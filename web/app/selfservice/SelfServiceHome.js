@@ -47,6 +47,7 @@ export function SelfServiceHome() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mb-8">
         <button
           onClick={() => navigate(RoutePaths.PROFILE)}
+          data-e2e="selfservice-home-link-edit-profile"
           className="rounded-xl bg-surface-card border border-border p-5 text-left transition-colors hover:bg-surface-hover hover:border-border"
         >
           <h3 className="text-sm font-semibold text-fg">Edit Profile</h3>
@@ -54,6 +55,7 @@ export function SelfServiceHome() {
         </button>
         <button
           onClick={() => navigate(RoutePaths.CHANGE_PASSWORD)}
+          data-e2e="selfservice-home-link-change-password"
           className="rounded-xl bg-surface-card border border-border p-5 text-left transition-colors hover:bg-surface-hover hover:border-border"
         >
           <h3 className="text-sm font-semibold text-fg">Change Password</h3>
@@ -101,6 +103,7 @@ export function SelfServiceHome() {
         <div className="mt-6">
           <button
             onClick={() => navigate(RoutePaths.ADMIN_DASHBOARD)}
+            data-e2e="selfservice-home-link-admin"
             className="text-sm text-accent hover:text-accent-hover"
           >
             Go to Admin Panel &rarr;

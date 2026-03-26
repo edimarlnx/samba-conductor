@@ -101,6 +101,7 @@ export function Profile() {
                 value={fields[field.key] || ''}
                 onChange={(e) => handleChange({ field: field.key, value: e.target.value })}
                 disabled={!field.enabled}
+                data-e2e={`profile-input-${field.key}`}
                 className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50 disabled:cursor-not-allowed"
               />
               {!field.enabled && (
@@ -111,10 +112,10 @@ export function Profile() {
         </div>
 
         <div className="flex gap-3 mt-6">
-          <Button primary type="submit" disabled={submitting}>
+          <Button primary type="submit" disabled={submitting} data-e2e="profile-btn-save">
             {submitting ? 'Saving...' : 'Save Changes'}
           </Button>
-          <Button secondary onClick={() => navigate(RoutePaths.SELF_SERVICE)} type="button">
+          <Button secondary onClick={() => navigate(RoutePaths.SELF_SERVICE)} type="button" data-e2e="profile-btn-cancel">
             Cancel
           </Button>
         </div>

@@ -63,6 +63,7 @@ export function Login() {
                 placeholder="username"
                 required
                 autoFocus
+                data-e2e="login-input-username"
                 className="w-full rounded-lg border border-border bg-surface-input px-4 py-2.5 text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               />
             </div>
@@ -77,17 +78,18 @@ export function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                data-e2e="login-input-password"
                 className="w-full rounded-lg border border-border bg-surface-input px-4 py-2.5 text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               />
             </div>
 
             {error && (
-              <div className="rounded-lg bg-red-900/50 border border-red-800 px-4 py-3 text-sm text-red-300">
+              <div data-e2e="login-error" className="rounded-lg bg-red-900/50 border border-red-800 px-4 py-3 text-sm text-red-300">
                 {error}
               </div>
             )}
 
-            <Button primary type="submit" disabled={loading} className="w-full">
+            <Button primary type="submit" disabled={loading} className="w-full" data-e2e="login-btn-submit">
               {loading ? 'Signing in...' : 'Sign in'}
             </Button>
           </form>

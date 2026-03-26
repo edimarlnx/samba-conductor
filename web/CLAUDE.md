@@ -43,6 +43,7 @@
 - **Input validation** — Use `check()` for all Meteor method inputs
 - **Admin check** — Use `requireAdmin()` in admin-only methods
 - **DR Key** — Sensitive persistent data encrypted with PBKDF2-derived key
+- **E2E selectors** — All interactive elements must have `data-e2e` attributes. Convention: `data-e2e="<context>-<type>-<identifier>"` (e.g., `login-input-username`, `users-btn-new`). Types: `input`, `btn`, `link`, `select`, `toggle`, `checkbox`, `modal`, `search`, `card`
 
 ## Project Structure
 

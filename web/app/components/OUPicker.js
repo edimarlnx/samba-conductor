@@ -6,7 +6,8 @@ export function OUPicker({
                              onChange,
                              placeholder = 'Select OU (optional)',
                              className = '',
-                             showContainers = true
+                             showContainers = true,
+                             'data-e2e': dataE2e = 'ou-picker'
                          }) {
     const [open, setOpen] = useState(false);
     const [tree, setTree] = useState([]);
@@ -54,6 +55,7 @@ export function OUPicker({
             <button
                 type="button"
                 onClick={() => setOpen((prev) => !prev)}
+                data-e2e={`${dataE2e}-btn`}
                 className={`w-full text-left rounded-lg border border-border bg-surface-input px-3 py-2 text-sm transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent ${
                     value ? 'text-fg' : 'text-fg-muted'
                 } ${className}`}

@@ -49,3 +49,4 @@ Each subdirectory has its own `CLAUDE.md` with specific instructions.
 - Meteor 3.4: native async/await only — NO Fibers, NO Promise.await
 - Code comments in English
 - JavaScript only — no TypeScript
+- All interactive UI elements (inputs, buttons, links, selects, toggles, checkboxes, modals) must have `data-e2e` attributes for Playwright testing. Convention: `data-e2e="<context>-<type>-<identifier>"` (e.g., `login-input-username`, `users-btn-new`, `admin-sidebar-link-users`)

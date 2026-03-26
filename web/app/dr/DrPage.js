@@ -124,8 +124,8 @@ function DrKeySection({ status, onUpdate, openAlert }) {
           </p>
 
           <div className="flex gap-3">
-            <Button secondary onClick={() => setMode('provide')}>I have a key</Button>
-            <Button primary onClick={handleGenerate}>Generate a key</Button>
+            <Button secondary onClick={() => setMode('provide')} data-e2e="dr-btn-have-key">I have a key</Button>
+            <Button primary onClick={handleGenerate} data-e2e="dr-btn-generate-key">Generate a key</Button>
           </div>
         </div>
       )}
@@ -139,10 +139,11 @@ function DrKeySection({ status, onUpdate, openAlert }) {
             value={key}
             onChange={(e) => setKey(e.target.value)}
             placeholder="Enter your DR key..."
+            data-e2e="dr-input-key"
             className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm font-mono text-fg focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
           />
           <div className="flex gap-3">
-            <Button primary onClick={() => handleConfigure({ keyToUse: key })} disabled={submitting || key.length < 16}>
+            <Button primary onClick={() => handleConfigure({ keyToUse: key })} disabled={submitting || key.length < 16} data-e2e="dr-btn-configure-key">
               {submitting ? 'Configuring...' : 'Configure'}
             </Button>
             <Button secondary onClick={() => { setMode(null); setKey(''); }}>Cancel</Button>
@@ -165,7 +166,7 @@ function DrKeySection({ status, onUpdate, openAlert }) {
             <code className="flex-1 rounded-lg bg-surface-input border border-border px-4 py-3 text-sm font-mono text-green-400 break-all select-all">
               {generatedKey}
             </code>
-            <Button secondary onClick={handleCopyKey}>Copy</Button>
+            <Button secondary onClick={handleCopyKey} data-e2e="dr-btn-copy-key">Copy</Button>
           </div>
 
           <label className="flex items-center gap-2 text-sm text-fg-secondary cursor-pointer">
@@ -173,6 +174,7 @@ function DrKeySection({ status, onUpdate, openAlert }) {
               type="checkbox"
               checked={savedConfirm}
               onChange={(e) => setSavedConfirm(e.target.checked)}
+              data-e2e="dr-checkbox-saved-key"
               className="rounded border-border bg-surface-input text-accent focus:ring-accent"
             />
             I have saved this key in a secure location
@@ -183,6 +185,7 @@ function DrKeySection({ status, onUpdate, openAlert }) {
               primary
               onClick={() => handleConfigure({ keyToUse: generatedKey })}
               disabled={submitting || !savedConfirm}
+              data-e2e="dr-btn-configure-key"
             >
               {submitting ? 'Configuring...' : 'Configure'}
             </Button>
@@ -201,9 +204,10 @@ function DrKeySection({ status, onUpdate, openAlert }) {
             value={key}
             onChange={(e) => setKey(e.target.value)}
             placeholder="Enter your DR key to unlock..."
+            data-e2e="dr-input-unlock-key"
             className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm font-mono text-fg focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
           />
-          <Button primary onClick={handleUnlock} disabled={submitting || !key}>
+          <Button primary onClick={handleUnlock} disabled={submitting || !key} data-e2e="dr-btn-unlock">
             {submitting ? 'Unlocking...' : 'Unlock'}
           </Button>
           <p className="text-xs text-fg-muted">
@@ -263,7 +267,7 @@ function SyncSection({ status, onUpdate, openAlert }) {
       </div>
 
       <div className="flex gap-3">
-        <Button primary onClick={handleSync} disabled={syncing}>
+        <Button primary onClick={handleSync} disabled={syncing} data-e2e="dr-btn-sync-metadata">
           {syncing ? 'Syncing...' : 'Sync Metadata Now'}
         </Button>
         <Button
@@ -271,6 +275,7 @@ function SyncSection({ status, onUpdate, openAlert }) {
           onClick={handleHashSync}
           disabled={syncingHashes || !status?.drKey?.unlocked}
           title={!status?.drKey?.unlocked ? 'DR Key must be unlocked' : ''}
+          data-e2e="dr-btn-sync-hashes"
         >
           {syncingHashes ? 'Syncing...' : 'Sync Hashes Now'}
         </Button>
@@ -403,6 +408,7 @@ function BackupS3Section({ status, onUpdate, openAlert }) {
               value={form.endpoint}
               onChange={(e) => handleChange({ field: 'endpoint', value: e.target.value })}
               placeholder="https://s3.example.com"
+              data-e2e="dr-input-s3-endpoint"
               className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
@@ -413,6 +419,7 @@ function BackupS3Section({ status, onUpdate, openAlert }) {
               value={form.bucket}
               onChange={(e) => handleChange({ field: 'bucket', value: e.target.value })}
               placeholder="my-backups"
+              data-e2e="dr-input-s3-bucket"
               className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
@@ -422,6 +429,7 @@ function BackupS3Section({ status, onUpdate, openAlert }) {
               type="text"
               value={form.accessKeyId}
               onChange={(e) => handleChange({ field: 'accessKeyId', value: e.target.value })}
+              data-e2e="dr-input-s3-access-key"
               className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
@@ -432,6 +440,7 @@ function BackupS3Section({ status, onUpdate, openAlert }) {
               value={form.secretAccessKey}
               onChange={(e) => handleChange({ field: 'secretAccessKey', value: e.target.value })}
               placeholder={config?.configured ? '(unchanged)' : ''}
+              data-e2e="dr-input-s3-secret-key"
               className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
@@ -441,6 +450,7 @@ function BackupS3Section({ status, onUpdate, openAlert }) {
               type="text"
               value={form.region}
               onChange={(e) => handleChange({ field: 'region', value: e.target.value })}
+              data-e2e="dr-input-s3-region"
               className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
@@ -450,6 +460,7 @@ function BackupS3Section({ status, onUpdate, openAlert }) {
               type="text"
               value={form.prefix}
               onChange={(e) => handleChange({ field: 'prefix', value: e.target.value })}
+              data-e2e="dr-input-s3-prefix"
               className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
@@ -462,6 +473,7 @@ function BackupS3Section({ status, onUpdate, openAlert }) {
               type="number"
               value={form.retentionDays}
               onChange={(e) => handleChange({ field: 'retentionDays', value: parseInt(e.target.value, 10) || 30 })}
+              data-e2e="dr-input-s3-retention"
               className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
@@ -471,6 +483,7 @@ function BackupS3Section({ status, onUpdate, openAlert }) {
               type="number"
               value={form.scheduleHours}
               onChange={(e) => handleChange({ field: 'scheduleHours', value: parseInt(e.target.value, 10) || 6 })}
+              data-e2e="dr-input-s3-schedule"
               className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
@@ -482,6 +495,7 @@ function BackupS3Section({ status, onUpdate, openAlert }) {
               type="checkbox"
               checked={form.includeMongoDump}
               onChange={(e) => handleChange({ field: 'includeMongoDump', value: e.target.checked })}
+              data-e2e="dr-checkbox-include-mongo"
               className="rounded border-border bg-surface-input text-accent focus:ring-accent"
             />
             Include MongoDB dump
@@ -491,6 +505,7 @@ function BackupS3Section({ status, onUpdate, openAlert }) {
               type="checkbox"
               checked={form.includeSambaBackup}
               onChange={(e) => handleChange({ field: 'includeSambaBackup', value: e.target.checked })}
+              data-e2e="dr-checkbox-include-samba"
               className="rounded border-border bg-surface-input text-accent focus:ring-accent"
             />
             Include Samba domain backup
@@ -500,6 +515,7 @@ function BackupS3Section({ status, onUpdate, openAlert }) {
               type="checkbox"
               checked={form.enabled}
               onChange={(e) => handleChange({ field: 'enabled', value: e.target.checked })}
+              data-e2e="dr-checkbox-enable-schedule"
               className="rounded border-border bg-surface-input text-accent focus:ring-accent"
             />
             Enable scheduled backups
@@ -507,11 +523,11 @@ function BackupS3Section({ status, onUpdate, openAlert }) {
         </div>
 
         <div className="flex gap-3 pt-2">
-          <Button primary onClick={handleSave} disabled={saving}>
+          <Button primary onClick={handleSave} disabled={saving} data-e2e="dr-btn-test-save-s3">
             {saving ? 'Testing & Saving...' : 'Test & Save'}
           </Button>
           {config?.configured && (
-            <Button secondary onClick={handleBackupNow} disabled={backingUp || !status?.drKey?.unlocked}>
+            <Button secondary onClick={handleBackupNow} disabled={backingUp || !status?.drKey?.unlocked} data-e2e="dr-btn-backup-now">
               {backingUp ? 'Backing up...' : 'Backup Now'}
             </Button>
           )}
@@ -573,7 +589,7 @@ function RestoreSection({ status, openAlert }) {
       </p>
 
       {!preview && (
-        <Button secondary onClick={handleLoadPreview} disabled={loadingPreview}>
+        <Button secondary onClick={handleLoadPreview} disabled={loadingPreview} data-e2e="dr-btn-load-preview">
           {loadingPreview ? 'Loading...' : 'Load Restore Preview'}
         </Button>
       )}
@@ -600,7 +616,7 @@ function RestoreSection({ status, openAlert }) {
             </div>
           </div>
 
-          <Button danger onClick={() => setConfirmRestore(true)} disabled={restoring || preview.users.count === 0}>
+          <Button danger onClick={() => setConfirmRestore(true)} disabled={restoring || preview.users.count === 0} data-e2e="dr-btn-start-restore">
             {restoring ? 'Restoring...' : 'Start Restore'}
           </Button>
         </div>
@@ -626,6 +642,7 @@ function RestoreSection({ status, openAlert }) {
         danger
         onConfirm={handleRestore}
         onCancel={() => setConfirmRestore(false)}
+        data-e2e="dr-restore"
       />
     </div>
   );

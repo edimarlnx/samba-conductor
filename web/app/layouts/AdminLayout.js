@@ -58,6 +58,7 @@ export function AdminLayout({ children }) {
           <h1 className="text-base font-bold text-fg">Samba Conductor</h1>
           <button
             onClick={() => setSidebarOpen(false)}
+            data-e2e="admin-btn-close-sidebar"
             className="rounded-lg p-1.5 text-fg-muted hover:bg-surface-hover lg:hidden"
           >
             <CloseIcon />
@@ -72,6 +73,7 @@ export function AdminLayout({ children }) {
               to={item.path}
               end={item.path === RoutePaths.ADMIN_DASHBOARD}
               onClick={handleNavClick}
+              data-e2e={`admin-sidebar-link-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                   isActive
@@ -99,6 +101,7 @@ export function AdminLayout({ children }) {
               <ThemeToggle />
               <button
                 onClick={handleLogout}
+                data-e2e="admin-btn-logout"
                 className="rounded-lg p-2 text-fg-muted hover:bg-surface-hover hover:text-fg transition-colors"
                 title="Sign out"
               >
@@ -115,6 +118,7 @@ export function AdminLayout({ children }) {
         <header className="flex h-14 items-center gap-3 border-b border-border bg-surface-card px-4 lg:hidden">
           <button
             onClick={() => setSidebarOpen(true)}
+            data-e2e="admin-btn-hamburger"
             className="rounded-lg p-2 text-fg-muted hover:bg-surface-hover"
           >
             <HamburgerIcon />

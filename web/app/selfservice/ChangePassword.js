@@ -78,6 +78,7 @@ export function ChangePassword() {
                 value={form.currentPassword}
                 onChange={(e) => handleChange({ field: 'currentPassword', value: e.target.value })}
                 required
+                data-e2e="change-password-input-current"
                 className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               />
             </div>
@@ -92,6 +93,7 @@ export function ChangePassword() {
               value={form.newPassword}
               onChange={(e) => handleChange({ field: 'newPassword', value: e.target.value })}
               required
+              data-e2e="change-password-input-new"
               className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
@@ -105,17 +107,18 @@ export function ChangePassword() {
               value={form.confirmPassword}
               onChange={(e) => handleChange({ field: 'confirmPassword', value: e.target.value })}
               required
+              data-e2e="change-password-input-confirm"
               className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
         </div>
 
         <div className="flex gap-3 mt-6">
-          <Button primary type="submit" disabled={submitting}>
+          <Button primary type="submit" disabled={submitting} data-e2e="change-password-btn-submit">
             {submitting ? 'Changing...' : 'Change Password'}
           </Button>
           {!mustChange && (
-            <Button secondary onClick={() => navigate(RoutePaths.SELF_SERVICE)} type="button">
+            <Button secondary onClick={() => navigate(RoutePaths.SELF_SERVICE)} type="button" data-e2e="change-password-btn-cancel">
               Cancel
             </Button>
           )}

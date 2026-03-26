@@ -42,6 +42,7 @@ export function SelfServiceLayout({ children }) {
                     key={item.to}
                     to={item.to}
                     end={item.end}
+                    data-e2e={`selfservice-link-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
                     className={({ isActive }) =>
                       `rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                         isActive
@@ -62,6 +63,7 @@ export function SelfServiceLayout({ children }) {
             <ThemeToggle />
             <button
               onClick={handleLogout}
+              data-e2e="selfservice-btn-logout"
               className="rounded-lg px-3 py-2 text-sm text-fg-secondary hover:bg-surface-hover hover:text-fg transition-colors"
             >
               Sign out
@@ -71,6 +73,7 @@ export function SelfServiceLayout({ children }) {
             {!mustChangePassword && (
               <button
                 onClick={() => setMenuOpen((prev) => !prev)}
+                data-e2e="selfservice-btn-hamburger"
                 className="rounded-lg p-2 text-fg-muted hover:bg-surface-hover sm:hidden"
               >
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -91,6 +94,7 @@ export function SelfServiceLayout({ children }) {
                   to={item.to}
                   end={item.end}
                   onClick={() => setMenuOpen(false)}
+                  data-e2e={`selfservice-mobile-link-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
                   className={({ isActive }) =>
                     `rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                       isActive

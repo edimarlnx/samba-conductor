@@ -104,6 +104,7 @@ export function ServiceAccounts() {
                                 e.stopPropagation();
                                 handleViewDetails({accountName: row.name});
                             }}
+                            data-e2e="service-accounts-btn-details"
                             className="text-xs text-accent hover:text-accent-hover"
                         >
                             Details
@@ -113,6 +114,7 @@ export function ServiceAccounts() {
                                 e.stopPropagation();
                                 setDeleteTarget(row.name);
                             }}
+                            data-e2e="service-accounts-btn-delete"
                             className="text-xs text-red-400 hover:text-red-300"
                         >
                             Delete
@@ -132,12 +134,12 @@ export function ServiceAccounts() {
                     <h1 className="text-2xl font-bold text-fg">Service Accounts</h1>
                     <p className="mt-1 text-sm text-fg-secondary">Manage Group Managed Service Accounts (gMSA)</p>
                 </div>
-                <Button primary onClick={() => setShowCreate(true)}>
+                <Button primary onClick={() => setShowCreate(true)} data-e2e="service-accounts-btn-new">
                     New gMSA
                 </Button>
             </div>
 
-            <DataTable columns={columns} data={accounts} searchPlaceholder="Search service accounts..."/>
+            <DataTable columns={columns} data={accounts} searchPlaceholder="Search service accounts..." data-e2e="service-accounts-table"/>
 
             {/* Detail panel */}
             {selected && (
@@ -145,6 +147,7 @@ export function ServiceAccounts() {
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-lg font-semibold text-fg">{selected.name}</h2>
                         <button onClick={() => setSelected(null)}
+                                data-e2e="service-accounts-detail-btn-close"
                                 className="text-sm text-fg-muted hover:text-fg">Close
                         </button>
                     </div>
@@ -178,6 +181,7 @@ export function ServiceAccounts() {
                                     onChange={(e) => setCreateForm((prev) => ({...prev, name: e.target.value}))}
                                     placeholder="svc-myapp"
                                     autoFocus
+                                    data-e2e="service-accounts-create-input-name"
                                     className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                                 />
                             </div>
@@ -188,6 +192,7 @@ export function ServiceAccounts() {
                                     value={createForm.dnsHostName}
                                     onChange={(e) => setCreateForm((prev) => ({...prev, dnsHostName: e.target.value}))}
                                     placeholder="myapp.samdom.example.com"
+                                    data-e2e="service-accounts-create-input-dns-hostname"
                                     className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                                 />
                             </div>
@@ -201,14 +206,16 @@ export function ServiceAccounts() {
                                         ...prev,
                                         passwordInterval: e.target.value
                                     }))}
+                                    data-e2e="service-accounts-create-input-password-interval"
                                     className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                                 />
                             </div>
                         </div>
                         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                            <Button secondary onClick={() => setShowCreate(false)}>Cancel</Button>
+                            <Button secondary onClick={() => setShowCreate(false)} data-e2e="service-accounts-create-btn-cancel">Cancel</Button>
                             <Button primary onClick={handleCreate}
-                                    disabled={creating || !createForm.name.trim() || !createForm.dnsHostName.trim()}>
+                                    disabled={creating || !createForm.name.trim() || !createForm.dnsHostName.trim()}
+                                    data-e2e="service-accounts-create-btn-submit">
                                 {creating ? 'Creating...' : 'Create'}
                             </Button>
                         </div>
@@ -224,6 +231,7 @@ export function ServiceAccounts() {
                 danger
                 onConfirm={handleDelete}
                 onCancel={() => setDeleteTarget(null)}
+                data-e2e="service-accounts-delete"
             />
         </div>
     );

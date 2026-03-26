@@ -121,7 +121,7 @@ export function OUs() {
                     <h1 className="text-2xl font-bold text-fg">Organizational Units</h1>
                     <p className="mt-1 text-sm text-fg-secondary">Manage Active Directory organizational structure</p>
                 </div>
-                <Button primary onClick={() => setShowCreate(true)}>
+                <Button primary onClick={() => setShowCreate(true)} data-e2e="ous-btn-new">
                     New OU
                 </Button>
             </div>
@@ -211,6 +211,7 @@ export function OUs() {
                                     onChange={(e) => setCreateName(e.target.value)}
                                     placeholder="Engineering"
                                     autoFocus
+                                    data-e2e="ous-create-input-name"
                                     className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                                 />
                             </div>
@@ -221,13 +222,14 @@ export function OUs() {
                                     value={createDesc}
                                     onChange={(e) => setCreateDesc(e.target.value)}
                                     placeholder="Optional description"
+                                    data-e2e="ous-create-input-description"
                                     className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                                 />
                             </div>
                         </div>
                         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                            <Button secondary onClick={() => setShowCreate(false)}>Cancel</Button>
-                            <Button primary onClick={handleCreate} disabled={creating || !createName.trim()}>
+                            <Button secondary onClick={() => setShowCreate(false)} data-e2e="ous-create-btn-cancel">Cancel</Button>
+                            <Button primary onClick={handleCreate} disabled={creating || !createName.trim()} data-e2e="ous-create-btn-submit">
                                 {creating ? 'Creating...' : 'Create'}
                             </Button>
                         </div>
@@ -249,12 +251,13 @@ export function OUs() {
                                 value={renameName}
                                 onChange={(e) => setRenameName(e.target.value)}
                                 autoFocus
+                                data-e2e="ous-rename-input-name"
                                 className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                             />
                         </div>
                         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                            <Button secondary onClick={() => setRenameTarget(null)}>Cancel</Button>
-                            <Button primary onClick={handleRename} disabled={!renameName.trim()}>Rename</Button>
+                            <Button secondary onClick={() => setRenameTarget(null)} data-e2e="ous-rename-btn-cancel">Cancel</Button>
+                            <Button primary onClick={handleRename} disabled={!renameName.trim()} data-e2e="ous-rename-btn-submit">Rename</Button>
                         </div>
                     </div>
                 </div>
@@ -269,6 +272,7 @@ export function OUs() {
                 danger
                 onConfirm={handleDelete}
                 onCancel={() => setDeleteTarget(null)}
+                data-e2e="ous-delete"
             />
         </div>
     );
@@ -315,6 +319,7 @@ function OUTreeNode({ou, depth, selectedDn, onSelect, onRename, onDelete}) {
                 <span
                     className="flex-1 text-sm truncate"
                     onClick={() => onSelect({ou})}
+                    data-e2e="ous-tree-item"
                 >
           {ou.name}
         </span>
@@ -328,6 +333,7 @@ function OUTreeNode({ou, depth, selectedDn, onSelect, onRename, onDelete}) {
                         }}
                         className="p-1 text-xs text-fg-muted hover:text-accent"
                         title="Rename"
+                        data-e2e="ous-btn-rename"
                     >
                         <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                              strokeWidth={1.5}>
@@ -342,6 +348,7 @@ function OUTreeNode({ou, depth, selectedDn, onSelect, onRename, onDelete}) {
                         }}
                         className="p-1 text-xs text-fg-muted hover:text-red-400"
                         title="Delete"
+                        data-e2e="ous-btn-delete"
                     >
                         <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                              strokeWidth={1.5}>

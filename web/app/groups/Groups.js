@@ -65,6 +65,7 @@ export function Groups() {
                 e.stopPropagation();
                 navigate(RoutePaths.ADMIN_GROUP_EDIT.replace(':groupName', row.name));
               }}
+              data-e2e="groups-link-edit"
               className="text-xs text-accent hover:text-accent-hover"
             >
               Edit
@@ -75,6 +76,7 @@ export function Groups() {
                       setMoveTarget(row.name);
                       setMoveOuDn('');
                   }}
+                  data-e2e="groups-btn-move"
                   className="text-xs text-fg-muted hover:text-fg-secondary"
               >
                   Move
@@ -84,6 +86,7 @@ export function Groups() {
                 e.stopPropagation();
                 setDeleteTarget(row.name);
               }}
+              data-e2e="groups-btn-delete"
               className="text-xs text-red-400 hover:text-red-300"
             >
               Delete
@@ -105,7 +108,7 @@ export function Groups() {
           <h1 className="text-2xl font-bold text-fg">Groups</h1>
           <p className="mt-1 text-sm text-fg-secondary">Manage Active Directory groups</p>
         </div>
-        <Button primary onClick={() => navigate(RoutePaths.ADMIN_GROUP_CREATE)}>
+        <Button primary onClick={() => navigate(RoutePaths.ADMIN_GROUP_CREATE)} data-e2e="groups-btn-new">
           New Group
         </Button>
       </div>
@@ -114,6 +117,7 @@ export function Groups() {
         columns={columns}
         data={groups}
         searchPlaceholder="Search groups..."
+        data-e2e="groups-table"
       />
 
         {/* Move to OU modal */}
@@ -128,12 +132,14 @@ export function Groups() {
                         value={moveOuDn}
                         onChange={(value) => setMoveOuDn(value)}
                         placeholder="Select destination OU"
+                        data-e2e="groups-move-ou-picker"
                     />
                     <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                        <Button secondary onClick={() => setMoveTarget(null)}>Cancel</Button>
+                        <Button secondary onClick={() => setMoveTarget(null)} data-e2e="groups-move-btn-cancel">Cancel</Button>
                         <Button
                             primary
                             disabled={!moveOuDn}
+                            data-e2e="groups-move-btn-confirm"
                             onClick={async () => {
                                 try {
                                     await Meteor.callAsync('samba.groups.move', {
@@ -163,6 +169,7 @@ export function Groups() {
         danger
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
+        data-e2e="groups-delete"
       />
     </div>
   );
