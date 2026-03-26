@@ -18,6 +18,7 @@ import { Users } from '../users/Users';
 import { UserForm } from '../users/UserForm';
 import { Groups } from '../groups/Groups';
 import { GroupForm } from '../groups/GroupForm';
+import {OUs} from '../ous/OUs';
 import { Domain } from '../domain/Domain';
 import { Settings } from '../settings/Settings';
 import { DrPage } from '../dr/DrPage';
@@ -101,6 +102,10 @@ export function Router() {
         path={RoutePaths.ADMIN_GROUP_EDIT}
         element={<AdminPage><GroupForm /></AdminPage>}
       />
+        <Route
+            path={RoutePaths.ADMIN_OUS}
+            element={<AdminPage><OUs/></AdminPage>}
+        />
       <Route
         path={RoutePaths.ADMIN_DOMAIN}
         element={<AdminPage><Domain /></AdminPage>}
