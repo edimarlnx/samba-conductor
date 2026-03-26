@@ -262,7 +262,27 @@ gitlab_rails['omniauth_providers'] = [
 }
 ```
 
+## Requirements
+
+### Email is required
+
+Most OAuth2 clients (Grafana, Portainer, GitLab) require the `email` field in the userinfo response. Users
+authenticating via OAuth **must have the `mail` attribute set in Active Directory**.
+
+To set a user's email:
+
+1. Go to **Admin** > **Users** > edit the user
+2. Fill in the **Email** field
+3. Save
+
+Users without email will get an error like `required attribute email was not provided` when trying to log in via
+OAuth.
+
 ## Troubleshooting
+
+### "required attribute email was not provided"
+
+The AD user does not have the `mail` attribute set. Edit the user in Samba Conductor and add an email address.
 
 ### "Invalid redirect URI"
 

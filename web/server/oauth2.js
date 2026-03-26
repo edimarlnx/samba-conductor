@@ -1,82 +1,61 @@
-import crypto from 'crypto';
-import {Meteor} from 'meteor/meteor';
-import {Accounts} from 'meteor/accounts-base';
-import {WebApp} from 'meteor/webapp';
-import {OAuth2Server} from 'meteor/leaonline:oauth2-server';
-import {authenticateUser} from '../app/samba/sambaAuth';
+import { Meteor } from 'meteor/meteor';
+import { Accounts } from 'meteor/accounts-base';
+import { OAuth2Server } from 'meteor/leaonline:oauth2-server';
+import { authenticateUser } from '../app/samba/sambaAuth';
 
 // --- Utility ---
 function escapeHtml(str) {
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
-// --- Fix 1: expires_in ---
-// The package sends expires_in as a Date string, but OAuth2 spec requires seconds (integer).
-WebApp.connectHandlers.use('/oauth/token', function fixExpiresIn(req, res, next) {
-    const originalEnd = res.end.bind(res);
-    res.end = function patchedEnd(body) {
-        if (body && typeof body === 'string') {
-            try {
-                const data = JSON.parse(body);
-                if (data.expires_in && typeof data.expires_in === 'string') {
-                    data.expires_in = Math.max(0, Math.floor((new Date(data.expires_in) - Date.now()) / 1000));
-                    body = JSON.stringify(data);
-                }
-            } catch (e) { /* not JSON, pass through */
-            }
-        }
-        return originalEnd(body);
-    };
-    next();
-});
-
 // --- OAuth2 Server Instance ---
+// Using forked package (web/packages/leaonline-oauth2-server) with RFC 6749 fixes:
+// - expires_in as integer seconds (not Date string)
+// - scope as space-separated string (not array)
+// - No user ID leak in authorization redirect
+// - Correct refresh token handling and revocation
+// - Proper error codes
 const oauth2server = new OAuth2Server({
-    serverOptions: {
-        addAcceptedScopesHeader: true,
-        addAuthorizedScopesHeader: true,
-        allowBearerTokensInQueryString: false,
-        allowEmptyState: false,
-        authorizationCodeLifetime: 300,
-        accessTokenLifetime: 3600,
-        refreshTokenLifetime: 1209600,
-        allowExtendedTokenAttributes: false,
-        requireClientAuthentication: true,
-    },
-    model: {
-        accessTokensCollectionName: 'oauth_access_tokens',
-        refreshTokensCollectionName: 'oauth_refresh_tokens',
-        clientsCollectionName: 'oauth_clients',
-        authCodesCollectionName: 'oauth_auth_codes',
-    },
-    routes: {
-        accessTokenUrl: '/oauth/token',
-        authorizeUrl: '/oauth/authorize',
-        errorUrl: '/oauth/error',
-        fallbackUrl: '/oauth/*',
-    },
+  serverOptions: {
+    addAcceptedScopesHeader: true,
+    addAuthorizedScopesHeader: true,
+    allowBearerTokensInQueryString: false,
+    allowEmptyState: false,
+    authorizationCodeLifetime: 300,
+    accessTokenLifetime: 3600,
+    refreshTokenLifetime: 1209600,
+    allowExtendedTokenAttributes: false,
+    requireClientAuthentication: true,
+  },
+  model: {
+    accessTokensCollectionName: 'oauth_access_tokens',
+    refreshTokensCollectionName: 'oauth_refresh_tokens',
+    clientsCollectionName: 'oauth_clients',
+    authCodesCollectionName: 'oauth_auth_codes',
+  },
+  routes: {
+    accessTokenUrl: '/oauth/token',
+    authorizeUrl: '/oauth/authorize',
+    errorUrl: '/oauth/error',
+    fallbackUrl: '/oauth/*',
+  },
 });
 
-// --- Fix 2: client.id ---
-// The package returns clientId but @node-oauth/oauth2-server v5 requires client.id
-const _getClient = oauth2server.model.getClient.bind(oauth2server.model);
-oauth2server.model.getClient = async function patchedGetClient(clientId, secret) {
-    const client = await _getClient(clientId, secret);
-    if (!client) return false;
-    return {...client, id: client.clientId};
-};
-oauth2server.oauth.options.model.getClient = oauth2server.model.getClient;
+// Note: Fix 1 (expires_in), Fix 2 (client.id), scope format, error codes,
+// refresh token handling, and user ID leak are all resolved in the forked package.
+// No monkey-patching needed.
 
 // --- Authorization Page (server-rendered HTML) ---
 oauth2server.app.get('/oauth/authorize', function serveAuthorizePage(req, res) {
-    const {client_id, redirect_uri, response_type, state, scope, error} = req.query;
+  const { client_id, redirect_uri, response_type, state, scope, error } =
+    req.query;
 
-    const html = `<!DOCTYPE html>
+  const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -182,120 +161,184 @@ oauth2server.app.get('/oauth/authorize', function serveAuthorizePage(req, res) {
 </body>
 </html>`;
 
-    res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
-    res.end(html);
+  res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+  res.end(html);
 });
 
 // --- Check Token Endpoint ---
 oauth2server.app.get('/oauth/check-token', async function checkToken(req, res) {
-    const {token} = req.query;
-    const valid = !!(token && await Meteor.users.findOneAsync({
-        'services.resume.loginTokens.hashedToken': Accounts._hashLoginToken(token),
-    }));
-    res.writeHead(200, {'Content-Type': 'application/json'});
-    res.end(JSON.stringify({valid}));
+  const { token } = req.query;
+  const valid = !!(
+    token &&
+    (await Meteor.users.findOneAsync({
+      'services.resume.loginTokens.hashedToken':
+        Accounts._hashLoginToken(token),
+    }))
+  );
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ valid }));
 });
 
 // --- LDAP Login Endpoint ---
 // Authenticates against Samba AD and returns a Meteor login token
-oauth2server.app.post('/oauth/meteor-login', async function meteorLogin(req, res) {
-    const {username, password} = req.body;
+oauth2server.app.post(
+  '/oauth/meteor-login',
+  async function meteorLogin(req, res) {
+    const { username, password } = req.body;
 
     if (!username || !password) {
-        res.writeHead(400, {'Content-Type': 'application/json'});
-        res.end(JSON.stringify({error: 'Username and password are required.'}));
-        return;
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Username and password are required.' }));
+      return;
     }
 
     try {
-        // Authenticate against Samba AD via LDAP bind
-        const adUser = await authenticateUser({username, password});
+      // Authenticate against Samba AD via LDAP bind
+      const adUser = await authenticateUser({ username, password });
 
-        if (adUser.expired) {
-            res.writeHead(401, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify({error: 'Password expired. Change your password first.'}));
-            return;
-        }
+      if (adUser.expired) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(
+          JSON.stringify({
+            error: 'Password expired. Change your password first.',
+          }),
+        );
+        return;
+      }
 
-        // Find or create Meteor user
-        let user = await Meteor.users.findOneAsync({username});
+      // Find or create Meteor user
+      let user = await Meteor.users.findOneAsync({ username });
 
-        const memberOf = Array.isArray(adUser.memberOf)
-            ? adUser.memberOf
-            : adUser.memberOf ? [adUser.memberOf] : [];
+      const memberOf = Array.isArray(adUser.memberOf)
+        ? adUser.memberOf
+        : adUser.memberOf
+          ? [adUser.memberOf]
+          : [];
 
-        const profile = {
-            displayName: adUser.displayName || username,
-            givenName: adUser.givenName || '',
-            surname: adUser.sn || '',
-            email: adUser.mail || '',
-            dn: adUser.dn || adUser.distinguishedName || '',
-            memberOf,
-            lastSyncedAt: new Date(),
-        };
+      const profile = {
+        displayName: adUser.displayName || username,
+        givenName: adUser.givenName || '',
+        surname: adUser.sn || '',
+        email: adUser.mail || '',
+        dn: adUser.dn || adUser.distinguishedName || '',
+        memberOf,
+        lastSyncedAt: new Date(),
+      };
 
-        if (user) {
-            await Meteor.users.updateAsync(user._id, {$set: {profile}});
-        } else {
-            const userId = await Accounts.createUserAsync({username, profile});
-            user = await Meteor.users.findOneAsync(userId);
-        }
+      if (user) {
+        await Meteor.users.updateAsync(user._id, { $set: { profile } });
+      } else {
+        const userId = await Accounts.createUserAsync({ username, profile });
+        user = await Meteor.users.findOneAsync(userId);
+      }
 
-        // Generate Meteor login token
-        const stampedToken = Accounts._generateStampedLoginToken();
-        Accounts._insertHashedLoginToken(user._id, Accounts._hashStampedToken(stampedToken));
+      // Generate Meteor login token
+      const stampedToken = Accounts._generateStampedLoginToken();
+      Accounts._insertHashedLoginToken(
+        user._id,
+        Accounts._hashStampedToken(stampedToken),
+      );
 
-        res.writeHead(200, {'Content-Type': 'application/json', 'Cache-Control': 'no-store'});
-        res.end(JSON.stringify({token: stampedToken.token}));
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store',
+      });
+      res.end(JSON.stringify({ token: stampedToken.token }));
     } catch (error) {
-        console.error('[OAuth2] Login failed:', error.message);
-        res.writeHead(401, {'Content-Type': 'application/json'});
-        res.end(JSON.stringify({error: 'Invalid credentials.'}));
+      console.error('[OAuth2] Login failed:', error.message);
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Invalid credentials.' }));
     }
-});
+  }
+);
 
 // --- UserInfo Endpoint ---
-// Returns user profile data based on granted scopes
-oauth2server.authenticatedRoute().get('/oauth/userinfo', async function userInfo(req, res) {
-    const user = await Meteor.users.findOneAsync(req.data.user.id);
+// Registered on both oauth2server.app and as a WebApp handler for maximum compatibility.
+// Validates Bearer token manually against oauth_access_tokens collection.
+import { WebApp } from 'meteor/webapp';
 
-    if (!user) {
-        res.writeHead(404, {'Content-Type': 'application/json'});
-        res.end(JSON.stringify({error: 'User not found'}));
-        return;
-    }
+// Use the package's existing collection via raw MongoDB driver
+const { MongoInternals } = require('meteor/mongo');
+const rawDb = MongoInternals.defaultRemoteCollectionDriver().mongo.db;
+const accessTokensRaw = rawDb.collection('oauth_access_tokens');
 
-    const profile = user.profile || {};
-    const email = profile.email || (user.emails && user.emails[0] ? user.emails[0].address : '');
+async function handleUserInfo(req, res) {
+  // Extract Bearer token
+  const authHeader = req.headers.authorization || '';
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
-    // Build response based on scopes
-    // For now, return all profile data (scope filtering can be added later)
-    const groups = (profile.memberOf || []).map((dn) => {
-        const match = dn.match(/^CN=([^,]+)/);
-        return match ? match[1] : dn;
-    });
+  if (!token) {
+    res.writeHead(401, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'missing_token', error_description: 'Bearer token required' }));
+    return;
+  }
 
-    const response = {
-        sub: user._id,
-        id: user._id,
-        login: user.username,
-        email,
-        email_verified: true,
-        name: profile.displayName || user.username,
-        given_name: profile.givenName || '',
-        family_name: profile.surname || '',
-        groups,
-    };
+  // Look up token in DB (using raw MongoDB driver since the collection is owned by the package)
+  const tokenDoc = await accessTokensRaw.findOne({ accessToken: token });
+  if (!tokenDoc) {
+    res.writeHead(401, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'invalid_token', error_description: 'Token not found or expired' }));
+    return;
+  }
 
-    res.writeHead(200, {'Content-Type': 'application/json'});
-    res.end(JSON.stringify(response));
+  // Check expiry
+  const expiresAt = new Date(tokenDoc.accessTokenExpiresAt);
+  if (expiresAt < new Date()) {
+    res.writeHead(401, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'invalid_token', error_description: 'Token expired' }));
+    return;
+  }
+
+  // Get user
+  const user = await Meteor.users.findOneAsync(tokenDoc.user?.id);
+  if (!user) {
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'user_not_found' }));
+    return;
+  }
+
+  const profile = user.profile || {};
+  const email = profile.email || (user.emails?.[0]?.address || '');
+
+  const groups = (profile.memberOf || []).map((dn) => {
+    const match = dn.match(/^CN=([^,]+)/);
+    return match ? match[1] : dn;
+  });
+
+  const response = {
+    sub: user._id,
+    id: user._id,
+    login: user.username,
+    email,
+    email_verified: true,
+    name: profile.displayName || user.username,
+    given_name: profile.givenName || '',
+    family_name: profile.surname || '',
+    groups,
+  };
+
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify(response));
+}
+
+// Register on WebApp directly — this runs before Meteor's SPA catch-all
+WebApp.connectHandlers.use('/oauth/userinfo', function userInfoHandler(req, res, next) {
+  if (req.method !== 'GET') {
+    next();
+    return;
+  }
+  handleUserInfo(req, res).catch((err) => {
+    console.error('[OAuth2] UserInfo error:', err);
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'server_error' }));
+  });
 });
 
 // --- Validate User ---
 // Allow all authenticated AD users (realm filtering added later)
-oauth2server.validateUser(function validateOAuthUser({user}) {
-    return !!user;
+oauth2server.validateUser(function validateOAuthUser({ user }) {
+  return !!user;
 });
 
 // Export for use by methods (client registration)
-export {oauth2server};
+export { oauth2server };

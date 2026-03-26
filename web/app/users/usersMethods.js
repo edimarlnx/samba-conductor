@@ -104,4 +104,39 @@ Meteor.methods({
     await resetPassword({ username, newPassword, credentials });
     return { success: true };
   },
+
+  // WRITE — update AD attributes for a user
+  'samba.users.updateAttributes': async function updateADUserAttributes({ username, attributes }) {
+    const credentials = getWriteCredentials({ userId: this.userId });
+    check(username, String);
+    check(attributes, Object);
+
+    const { updateUserAttributes } = require('../samba/sambaUsers');
+
+    // Map form field names to AD attribute names
+    const adAttributes = {};
+    const fieldMap = {
+      givenName: 'givenName',
+      surname: 'sn',
+      initials: 'initials',
+      mail: 'mail',
+      company: 'company',
+      department: 'department',
+      description: 'description',
+      telephoneNumber: 'telephoneNumber',
+      physicalDeliveryOffice: 'physicalDeliveryOfficeName',
+    };
+
+    Object.entries(attributes).forEach(([key, value]) => {
+      if (fieldMap[key] && value !== undefined) {
+        adAttributes[fieldMap[key]] = value;
+      }
+    });
+
+    if (Object.keys(adAttributes).length > 0) {
+      await updateUserAttributes({ username, attributes: adAttributes, credentials });
+    }
+
+    return { success: true };
+  },
 });

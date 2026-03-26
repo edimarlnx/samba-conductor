@@ -34,9 +34,13 @@ docker compose --profile replica up -d
 
 See [Docker README](../docker/README.md) for default credentials and replication setup.
 
-### 2. Install dependencies and start
+### 2. Initialize submodules and install dependencies
 
 ```bash
+# From the project root — fetch the OAuth2 server package (git submodule)
+git submodule update --init --recursive
+
+# Install and start
 cd web
 meteor npm install
 meteor npm start

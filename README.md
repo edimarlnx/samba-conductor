@@ -84,15 +84,21 @@ Samba 4 Active Directory. It simplifies AD administration through a clean UI wit
 ## Quick Start
 
 ```bash
+# Clone with submodules
+git clone --recurse-submodules https://github.com/edimarlnx/samba-conductor.git
+cd samba-conductor
+
 # Start the Samba DC
 cd docker
 docker compose up -d
 
 # Start the web app
-cd web
+cd ../web
 meteor npm install
 meteor npm start
 ```
+
+> **Already cloned?** Run `git submodule update --init --recursive` to fetch the OAuth2 package.
 
 Open `http://localhost:4080` and login with `Administrator` / `P@ssw0rd123!`.
 

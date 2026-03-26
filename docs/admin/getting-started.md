@@ -9,6 +9,9 @@ This guide walks you through the initial setup of Samba Conductor.
 **Development (Samba + Meteor separately):**
 
 ```bash
+# Initialize submodules (required on first clone)
+git submodule update --init --recursive
+
 # Start Samba DC (primary only)
 cd docker
 docker compose up -d
@@ -17,7 +20,7 @@ docker compose up -d
 docker compose --profile replica up -d
 
 # Start the web app
-cd web
+cd ../web
 meteor npm install
 meteor npm start
 ```
