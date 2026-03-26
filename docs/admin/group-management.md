@@ -23,6 +23,8 @@ Use the search bar to filter groups by any visible field.
 
 ### Creating a Group
 
+![Group Creation Form](../screenshots/admin-group-create.png)
+
 1. Click the **New Group** button in the top-right corner.
 2. Fill in the form fields.
 3. Click **Create Group**.

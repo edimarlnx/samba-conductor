@@ -74,6 +74,8 @@ This section is collapsible and only available during user creation. Expand it b
 
 ### Editing a User
 
+![User Edit Form](../screenshots/admin-user-edit.png)
+
 1. From the user list, click **Edit** on the desired user row.
 2. Modify the available fields.
 3. Click **Save Changes**.

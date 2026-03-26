@@ -23,6 +23,8 @@ If no GPOs exist, a "No GPOs found" message is shown.
 
 ## Creating a GPO
 
+![GPO Creation](../screenshots/admin-gpo-create.png)
+
 1. Click the **New GPO** button in the top-right corner.
 2. In the modal dialog, enter a **Display Name** for the policy (e.g., "Custom Policy", "Password Settings").
 3. Click **Create**.

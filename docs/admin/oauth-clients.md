@@ -6,6 +6,8 @@ OAuth clients represent third-party applications that can authenticate users via
 
 ## Creating a Client
 
+![OAuth Client Creation](../screenshots/admin-oauth-client-create.png)
+
 1. Navigate to **Admin** > **OAuth Clients**
 2. Click **New Client**
 3. Fill in:

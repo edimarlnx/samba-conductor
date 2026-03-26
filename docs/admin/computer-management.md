@@ -24,6 +24,8 @@ Use the search bar to filter computers by any visible field.
 
 ### Creating a Computer Account
 
+![Computer Creation](../screenshots/admin-computer-create.png)
+
 Pre-creating a computer account allows you to configure a machine's domain membership before the computer is joined.
 
 1. Click the **New Computer** button in the top-right corner.

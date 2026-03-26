@@ -24,6 +24,8 @@ Use the search bar to filter service accounts by any visible field.
 
 ### Creating a gMSA
 
+![gMSA Creation](../screenshots/admin-service-account-create.png)
+
 1. Click the **New gMSA** button in the top-right corner.
 2. In the modal, fill in the fields:
 

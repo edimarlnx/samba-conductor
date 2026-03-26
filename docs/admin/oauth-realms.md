@@ -10,6 +10,8 @@ A "Default" realm is created automatically during initial setup. It allows all u
 
 ## Creating a Realm
 
+![OAuth Realm Creation](../screenshots/admin-oauth-realm-create.png)
+
 1. Navigate to **Admin** > **OAuth Realms**
 2. Click **New Realm**
 3. Fill in:

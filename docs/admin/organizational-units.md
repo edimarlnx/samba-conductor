@@ -40,6 +40,8 @@ If the OU is empty, a "No objects in this OU" message is displayed.
 
 ### Creating an OU
 
+![OU Creation](../screenshots/admin-ou-create.png)
+
 1. (Optional) Select a parent OU in the tree. If no OU is selected, the new OU will be created at the domain root.
 2. Click the **New OU** button in the top-right corner.
 3. In the modal, fill in the fields:

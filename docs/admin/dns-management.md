@@ -32,6 +32,8 @@ If the zone has no records, a "No records found" message is displayed.
 
 ## Adding a Record
 
+![Add DNS Record](../screenshots/admin-dns-add-record.png)
+
 1. Select a zone from the zone list.
 2. Click the **Add Record** button in the top-right corner of the records panel.
 3. Fill in the form fields:
