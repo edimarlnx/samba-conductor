@@ -15,6 +15,10 @@ samba-conductor/
 │   ├── samba-ad-dc/  # Standalone Samba DC image
 │   └── all-in-one/   # Full stack image (Samba + Web + MongoDB)
 ├── docs/             # Project documentation for end users
+│   └── screenshots/  # UI screenshots for documentation (generated via Playwright)
+├── e2e/              # Playwright E2E tests and screenshot capture
+│   ├── screenshots/  # Capture scripts (use data-e2e selectors)
+│   └── update-screenshots.sh  # Run to update docs screenshots (change detection)
 └── CLAUDE.md         # This file
 ```
 

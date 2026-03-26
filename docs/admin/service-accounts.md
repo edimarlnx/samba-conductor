@@ -2,7 +2,7 @@
 
 Manage Group Managed Service Accounts (gMSA) -- create gMSA entries, view their properties, and delete accounts that are no longer needed.
 
-<!-- screenshot: service-accounts-list -->
+![Service Accounts](../screenshots/admin-service-accounts.png)
 
 ## Accessing This Page
 
@@ -35,7 +35,6 @@ Use the search bar to filter service accounts by any visible field.
 
 3. Click **Create**.
 
-<!-- screenshot: service-accounts-create-modal -->
 
 ### Viewing Service Account Details
 
@@ -43,7 +42,6 @@ Use the search bar to filter service accounts by any visible field.
 2. A detail panel opens below the table showing all available properties for the account as key-value pairs.
 3. Click **Close** to dismiss the detail panel.
 
-<!-- screenshot: service-accounts-detail-panel -->
 
 ### Deleting a Service Account
 

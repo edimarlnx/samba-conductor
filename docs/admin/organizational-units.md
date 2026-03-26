@@ -2,7 +2,7 @@
 
 Manage the Active Directory organizational structure -- browse the OU hierarchy, view objects within each OU, and create, rename, or delete organizational units.
 
-<!-- screenshot: ous-page -->
+![Organizational Units](../screenshots/admin-ous.png)
 
 ## Accessing This Page
 
@@ -25,7 +25,6 @@ The OU tree shows all organizational units in a nested hierarchy. Each node disp
 - Click the **OU name** to select it and load its contents in the right panel.
 - The currently selected OU is highlighted.
 
-<!-- screenshot: ous-tree -->
 
 ### Viewing Objects in an OU
 
@@ -38,7 +37,6 @@ When you select an OU from the tree, the right panel lists all objects contained
 
 If the OU is empty, a "No objects in this OU" message is displayed.
 
-<!-- screenshot: ous-objects-panel -->
 
 ### Creating an OU
 
@@ -54,7 +52,6 @@ If the OU is empty, a "No objects in this OU" message is displayed.
 4. The modal displays the selected parent OU name (if any).
 5. Click **Create**.
 
-<!-- screenshot: ous-create-modal -->
 
 ### Renaming an OU
 
@@ -63,7 +60,6 @@ If the OU is empty, a "No objects in this OU" message is displayed.
 3. In the modal, enter the new name.
 4. Click **Rename**.
 
-<!-- screenshot: ous-rename-modal -->
 
 ### Deleting an OU
 

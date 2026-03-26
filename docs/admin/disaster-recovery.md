@@ -2,7 +2,7 @@
 
 Back up, synchronize, and restore Active Directory users and groups. This page provides tools for protecting your domain data and recovering from failures.
 
-<!-- screenshot: disaster-recovery-overview -->
+![Disaster Recovery](../screenshots/admin-dr.png)
 
 ## Accessing This Page
 
@@ -12,7 +12,6 @@ Navigate to **Admin** > **Disaster Recovery** or go to `/admin/dr`.
 
 The DR Key encrypts all backup data stored in MongoDB, including password hashes and sync account credentials. Without this key, backup data **cannot be recovered**.
 
-<!-- screenshot: dr-key-section -->
 
 ### Initial Setup
 
@@ -43,7 +42,6 @@ The DR Key is held in server memory only. After a server restart, the key is loc
 
 Samba Conductor maintains a local copy of your AD data in MongoDB for backup and disaster recovery purposes.
 
-<!-- screenshot: dr-sync-section -->
 
 ### Sync Items
 
@@ -70,7 +68,6 @@ The sync dashboard shows four categories:
 
 Upload MongoDB dumps and Samba domain backups to any S3-compatible storage (AWS S3, MinIO, Backblaze B2, etc.).
 
-<!-- screenshot: dr-s3-backup-section -->
 
 ### Configuration Fields
 
@@ -102,7 +99,6 @@ The last backup status is shown at the top of the section with timestamp, file c
 
 Recreate AD users and groups from the latest MongoDB snapshot. This is intended for use after provisioning a new, empty domain.
 
-<!-- screenshot: dr-restore-section -->
 
 ### Preview
 

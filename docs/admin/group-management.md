@@ -2,7 +2,7 @@
 
 Manage Active Directory groups -- create groups, manage their members, move groups between organizational units, and delete groups.
 
-<!-- screenshot: groups-list -->
+![Groups List](../screenshots/admin-groups.png)
 
 ## Accessing This Page
 
@@ -29,7 +29,6 @@ Use the search bar to filter groups by any visible field.
 
 **Route:** `/admin/groups/new`
 
-<!-- screenshot: group-form-create -->
 
 | Field | Required | Description |
 |-------|----------|-------------|
@@ -42,7 +41,6 @@ Use the search bar to filter groups by any visible field.
 
 **Route:** `/admin/groups/:groupName/edit`
 
-<!-- screenshot: group-form-edit -->
 
 The edit page shows the group's properties (name and description) at the top. The **Group Name** field is read-only when editing.
 
@@ -52,7 +50,6 @@ Below the properties, you will find the **Location (OU)** section and the **Memb
 
 Member management is available only when editing an existing group.
 
-<!-- screenshot: group-members -->
 
 **Adding a member:**
 1. Open the group's edit form.
@@ -78,8 +75,6 @@ You can move a group from two places:
 **From the edit form:**
 1. In the **Location (OU)** section, the current OU is displayed.
 2. Use the OU picker to select a new location. The move happens immediately upon selection.
-
-<!-- screenshot: group-move-ou -->
 
 ### Deleting a Group
 

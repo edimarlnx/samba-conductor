@@ -2,7 +2,7 @@
 
 Configure self-service portal options and the automated sync account.
 
-<!-- screenshot: settings-overview -->
+![Settings](../screenshots/admin-settings.png)
 
 ## Accessing This Page
 
@@ -12,7 +12,6 @@ Navigate to **Admin** > **Settings** or go to `/admin/settings`.
 
 This section controls which profile fields are available for users to edit in the self-service portal.
 
-<!-- screenshot: settings-editable-fields -->
 
 Each field has two controls:
 
@@ -29,7 +28,6 @@ After toggling fields or editing labels, click **Save Fields** to apply the chan
 
 The sync account is a dedicated Active Directory service account used by Samba Conductor for automated background operations (e.g., metadata synchronization, read-only queries when a user's session expires).
 
-<!-- screenshot: settings-sync-account -->
 
 ### Creating the Sync Account
 

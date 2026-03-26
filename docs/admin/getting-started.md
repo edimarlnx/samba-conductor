@@ -31,6 +31,8 @@ docker compose up -d
 
 ### 2. First Login
 
+![Login Page](../screenshots/login.png)
+
 Open the web UI:
 
 - Development: `http://localhost:4080`

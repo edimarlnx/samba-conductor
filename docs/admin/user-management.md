@@ -2,7 +2,7 @@
 
 Manage Active Directory user accounts -- create, edit, enable/disable, delete, and organize users across organizational units.
 
-<!-- screenshot: users-list -->
+![Users List](../screenshots/admin-users.png)
 
 ## Accessing This Page
 
@@ -22,7 +22,6 @@ The user list displays all Active Directory users in a searchable table with the
 
 Use the search bar at the top of the table to filter users by any visible field.
 
-<!-- screenshot: users-list-search -->
 
 ### Creating a User
 
@@ -32,7 +31,7 @@ Use the search bar at the top of the table to filter users by any visible field.
 
 **Route:** `/admin/users/new`
 
-<!-- screenshot: user-form-create -->
+![User Creation Form](../screenshots/admin-user-create.png)
 
 #### Account Section
 
@@ -81,7 +80,6 @@ This section is collapsible and only available during user creation. Expand it b
 
 **Route:** `/admin/users/:username/edit`
 
-<!-- screenshot: user-form-edit -->
 
 When editing, the **Username** field is read-only. The Unix Attributes section and the "Must change password at next login" checkbox are not available during editing.
 
@@ -104,7 +102,6 @@ You can toggle a user's account status from two places:
 
 Disabled users cannot log in to the domain.
 
-<!-- screenshot: user-toggle-status -->
 
 ### Moving a User to a Different OU
 
@@ -120,13 +117,11 @@ You can move a user from two places:
 1. In the **Location & Status** section, the current OU is displayed.
 2. Use the OU picker to select a new location. The move happens immediately upon selection.
 
-<!-- screenshot: user-move-ou -->
 
 ### Managing Group Membership
 
 Group membership management is available only on the edit form, below the main form.
 
-<!-- screenshot: user-groups -->
 
 **Adding a user to a group:**
 1. Open the user's edit form.

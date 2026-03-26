@@ -2,7 +2,7 @@
 
 Create, link, and delete Group Policy Objects for your Active Directory domain.
 
-<!-- screenshot: gpo-management-overview -->
+![GPO Management](../screenshots/admin-gpos.png)
 
 ## Accessing This Page
 
@@ -20,7 +20,6 @@ The page displays all existing GPOs as cards. Each card shows:
 
 If no GPOs exist, a "No GPOs found" message is shown.
 
-<!-- screenshot: gpo-list -->
 
 ## Creating a GPO
 
@@ -30,7 +29,6 @@ If no GPOs exist, a "No GPOs found" message is shown.
 
 The new GPO appears in the list. You can then link it to an Organizational Unit to apply it.
 
-<!-- screenshot: gpo-create-modal -->
 
 ## Linking a GPO to an OU
 
@@ -43,7 +41,6 @@ A success message confirms the GPO has been linked. The policy will take effect 
 
 > **Tip:** You can find OU distinguished names on the Users or Groups pages, or by inspecting the directory tree.
 
-<!-- screenshot: gpo-link-modal -->
 
 ## Deleting a GPO
 

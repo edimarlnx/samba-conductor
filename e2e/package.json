@@ -1,0 +1,15 @@
+{
+  "name": "samba-conductor-e2e",
+  "private": true,
+  "scripts": {
+    "screenshots": "node screenshots/capture-all.js",
+    "screenshots:update": "node screenshots/capture-all.js",
+    "screenshots:force": "node screenshots/capture-all.js --force",
+    "screenshots:admin": "node screenshots/capture-all.js admin",
+    "screenshots:selfservice": "node screenshots/capture-all.js selfservice",
+    "screenshots:auth": "node screenshots/capture-all.js auth"
+  },
+  "dependencies": {
+    "playwright": "^1.52.0"
+  }
+}

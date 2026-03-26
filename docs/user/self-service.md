@@ -14,6 +14,8 @@ Log in with your Active Directory credentials:
 
 ## My Account
 
+![My Account](../screenshots/selfservice-home.png)
+
 After login, you'll see your account overview:
 
 - **Profile information** — Your name, email, department, etc.
@@ -21,6 +23,8 @@ After login, you'll see your account overview:
 - **Quick actions** — Links to edit profile and change password
 
 ## Edit Profile
+
+![Edit Profile](../screenshots/selfservice-profile.png)
 
 1. Click **Edit Profile** on the home page, or navigate to it from the menu
 2. Fields you can edit are determined by your administrator
@@ -30,6 +34,8 @@ After login, you'll see your account overview:
 > Not all fields may be editable. Contact your administrator if you need to change a read-only field.
 
 ## Change Password
+
+![Change Password](../screenshots/selfservice-change-password.png)
 
 1. Click **Change Password** from the menu
 2. Enter your **current password**

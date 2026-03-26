@@ -2,7 +2,7 @@
 
 Manage domain-joined computer accounts -- view the list of computers, pre-create computer accounts, inspect detailed properties, and delete computer objects.
 
-<!-- screenshot: computers-list -->
+![Computers List](../screenshots/admin-computers.png)
 
 ## Accessing This Page
 
@@ -37,7 +37,6 @@ Pre-creating a computer account allows you to configure a machine's domain membe
 
 3. Click **Create**.
 
-<!-- screenshot: computers-create-modal -->
 
 ### Viewing Computer Details
 
@@ -59,7 +58,6 @@ Pre-creating a computer account allows you to configure a machine's domain membe
 
 3. Click **Close** to dismiss the detail panel.
 
-<!-- screenshot: computers-detail-panel -->
 
 ### Deleting a Computer
 

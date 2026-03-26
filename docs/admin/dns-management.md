@@ -2,7 +2,7 @@
 
 Manage Active Directory DNS zones and records directly from the web interface.
 
-<!-- screenshot: dns-management-overview -->
+![DNS Management](../screenshots/admin-dns.png)
 
 ## Accessing This Page
 
@@ -14,7 +14,6 @@ The left panel displays all DNS zones registered in your Samba Active Directory 
 
 Click on a zone to load its records in the right panel.
 
-<!-- screenshot: dns-zone-list -->
 
 ## Viewing Records
 
@@ -30,7 +29,6 @@ After selecting a zone, the records panel shows a table with the following colum
 
 If the zone has no records, a "No records found" message is displayed.
 
-<!-- screenshot: dns-records-table -->
 
 ## Adding a Record
 
@@ -54,7 +52,6 @@ If the zone has no records, a "No records found" message is displayed.
 
 4. Click **Add Record** to save. A confirmation message appears and the records list refreshes automatically.
 
-<!-- screenshot: dns-add-record-modal -->
 
 ## Deleting a Record
 

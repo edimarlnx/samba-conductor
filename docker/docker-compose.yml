@@ -22,8 +22,8 @@ services:
       - SAMBA_ADMIN_PASSWORD=P@ssw0rd123!
       - SAMBA_DNS_FORWARDER=8.8.8.8
     ports:
-      - "53:53/tcp"
-      - "53:53/udp"
+      - "172.20.0.1:53:53/tcp"
+      - "172.20.0.1:53:53/udp"
       - "88:88/tcp"
       - "88:88/udp"
       - "135:135/tcp"
