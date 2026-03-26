@@ -60,7 +60,7 @@ export function DataTable({ columns, data, onRowClick, searchPlaceholder = 'Sear
                   {columns.map((col) => (
                     <td
                       key={col.accessor || col.header}
-                      className="whitespace-nowrap px-4 py-3 text-sm text-fg-secondary"
+                      className="px-4 py-3 text-sm text-fg-secondary"
                     >
                       {col.render ? col.render(row) : row[col.accessor]}
                     </td>

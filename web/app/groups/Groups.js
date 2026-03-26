@@ -47,7 +47,13 @@ export function Groups() {
 
   const columns = [
     { header: 'Name', accessor: 'name' },
-    { header: 'Description', accessor: 'description' },
+      {
+          header: 'Description',
+          accessor: 'description',
+          render(row) {
+              return <span className="block max-w-xs text-wrap break-words">{row.description}</span>;
+          },
+      },
     {
       header: 'Members',
       accessor: 'memberCount',
