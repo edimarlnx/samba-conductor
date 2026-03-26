@@ -5,20 +5,39 @@ import { useLoggedUser } from 'meteor/quave:logged-user-react';
 import { RoutePaths } from '../general/RoutePaths';
 import { ThemeToggle } from '../components/ThemeToggle';
 
-const NAV_ITEMS = [
-  { path: RoutePaths.ADMIN_DASHBOARD, label: 'Dashboard', icon: DashboardIcon },
-  { path: RoutePaths.ADMIN_USERS, label: 'Users', icon: UsersIcon },
-  { path: RoutePaths.ADMIN_GROUPS, label: 'Groups', icon: GroupsIcon },
-  {path: RoutePaths.ADMIN_OUS, label: 'OUs', icon: OUsIcon},
-  {path: RoutePaths.ADMIN_COMPUTERS, label: 'Computers', icon: ComputersIcon},
-  {path: RoutePaths.ADMIN_SERVICE_ACCOUNTS, label: 'Service Accts', icon: ServiceAccountIcon},
-  {path: RoutePaths.ADMIN_DNS, label: 'DNS', icon: DnsIcon},
-  {path: RoutePaths.ADMIN_GPOS, label: 'GPOs', icon: GpoIcon},
-  {path: RoutePaths.ADMIN_OAUTH_CLIENTS, label: 'OAuth Clients', icon: OAuthIcon},
-  {path: RoutePaths.ADMIN_OAUTH_REALMS, label: 'OAuth Realms', icon: OAuthIcon},
-  { path: RoutePaths.ADMIN_DOMAIN, label: 'Domain', icon: DomainIcon },
-  { path: RoutePaths.ADMIN_SETTINGS, label: 'Settings', icon: SettingsIcon },
-  { path: RoutePaths.ADMIN_DR, label: 'Disaster Recovery', icon: DrIcon },
+const NAV_SECTIONS = [
+  {
+    items: [
+      {path: RoutePaths.ADMIN_DASHBOARD, label: 'Dashboard', icon: DashboardIcon},
+    ],
+  },
+  {
+    title: 'Active Directory',
+    items: [
+      {path: RoutePaths.ADMIN_USERS, label: 'Users', icon: UsersIcon},
+      {path: RoutePaths.ADMIN_GROUPS, label: 'Groups', icon: GroupsIcon},
+      {path: RoutePaths.ADMIN_OUS, label: 'OUs', icon: OUsIcon},
+      {path: RoutePaths.ADMIN_COMPUTERS, label: 'Computers', icon: ComputersIcon},
+      {path: RoutePaths.ADMIN_SERVICE_ACCOUNTS, label: 'Service Accts', icon: ServiceAccountIcon},
+      {path: RoutePaths.ADMIN_DNS, label: 'DNS', icon: DnsIcon},
+      {path: RoutePaths.ADMIN_GPOS, label: 'GPOs', icon: GpoIcon},
+      {path: RoutePaths.ADMIN_DOMAIN, label: 'Domain', icon: DomainIcon},
+    ],
+  },
+  {
+    title: 'OAuth Server',
+    items: [
+      {path: RoutePaths.ADMIN_OAUTH_CLIENTS, label: 'Clients', icon: OAuthIcon},
+      {path: RoutePaths.ADMIN_OAUTH_REALMS, label: 'Realms', icon: OAuthIcon},
+    ],
+  },
+  {
+    title: 'System',
+    items: [
+      {path: RoutePaths.ADMIN_SETTINGS, label: 'Settings', icon: SettingsIcon},
+      {path: RoutePaths.ADMIN_DR, label: 'Disaster Recovery', icon: DrIcon},
+    ],
+  },
 ];
 
 export function AdminLayout({ children }) {
@@ -68,25 +87,37 @@ export function AdminLayout({ children }) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 space-y-0.5 px-2 py-3 overflow-y-auto">
-          {NAV_ITEMS.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              end={item.path === RoutePaths.ADMIN_DASHBOARD}
-              onClick={handleNavClick}
-              data-e2e={`admin-sidebar-link-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-accent text-white'
-                    : 'text-fg-secondary hover:bg-surface-hover hover:text-fg'
-                }`
-              }
-            >
-              <item.icon />
-              {item.label}
-            </NavLink>
+        <nav className="flex-1 overflow-y-auto px-2 py-3">
+          {NAV_SECTIONS.map((section, sectionIndex) => (
+              <div key={section.title || sectionIndex}>
+                {section.title && (
+                    <div
+                        className={`px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-fg-muted ${sectionIndex > 0 ? 'mt-4 pt-3 border-t border-border' : ''}`}>
+                      {section.title}
+                    </div>
+                )}
+                <div className="space-y-0.5">
+                  {section.items.map((item) => (
+                      <NavLink
+                          key={item.path}
+                          to={item.path}
+                          end={item.path === RoutePaths.ADMIN_DASHBOARD}
+                          onClick={handleNavClick}
+                          data-e2e={`admin-sidebar-link-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+                          className={({isActive}) =>
+                              `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                                  isActive
+                                      ? 'bg-accent text-white'
+                                      : 'text-fg-secondary hover:bg-surface-hover hover:text-fg'
+                              }`
+                          }
+                      >
+                        <item.icon/>
+                        {item.label}
+                      </NavLink>
+                  ))}
+                </div>
+              </div>
           ))}
         </nav>
 
