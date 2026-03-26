@@ -22,6 +22,7 @@ export function OAuthClients() {
     });
     const [creating, setCreating] = useState(false);
     const [createdSecret, setCreatedSecret] = useState(null);
+    const [realms, setRealms] = useState([]);
 
     async function fetchClients() {
         try {
@@ -36,6 +37,8 @@ export function OAuthClients() {
 
     useEffect(() => {
         fetchClients();
+        Meteor.callAsync('oauth.realms.list').then(setRealms).catch(() => {
+        });
     }, []);
 
     async function handleCreate() {
@@ -215,6 +218,22 @@ export function OAuthClients() {
                                           onChange={(e) => setCreateForm((p) => ({...p, redirectUri: e.target.value}))}
                                           placeholder="http://localhost:3001/callback" rows={3}
                                           className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"/>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-medium text-fg-secondary mb-1">Realm</label>
+                                <select
+                                    value={createForm.realm}
+                                    onChange={(e) => setCreateForm((p) => ({...p, realm: e.target.value}))}
+                                    className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                                >
+                                    {realms.length === 0 ? (
+                                        <option value="default">default</option>
+                                    ) : (
+                                        realms.map((r) => (
+                                            <option key={r.name} value={r.name}>{r.displayName} ({r.name})</option>
+                                        ))
+                                    )}
+                                </select>
                             </div>
                             <div>
                                 <label className="block text-xs font-medium text-fg-secondary mb-1">Scopes</label>
