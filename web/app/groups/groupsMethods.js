@@ -42,6 +42,16 @@ Meteor.methods({
     return { success: true };
   },
 
+    // WRITE — move group to different OU
+    'samba.groups.move': async function moveADGroup({groupName, newOuDn}) {
+        const credentials = getWriteCredentials({userId: this.userId});
+        check(groupName, String);
+        check(newOuDn, String);
+        const {moveGroup} = require('../samba/sambaGroups');
+        await moveGroup({groupName, newOuDn, credentials});
+        return {success: true};
+    },
+
   // WRITE — requires active session
   'samba.groups.addMember': async function addADGroupMember({ groupName, memberName }) {
     const credentials = getWriteCredentials({ userId: this.userId });

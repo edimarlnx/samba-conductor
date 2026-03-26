@@ -7,12 +7,15 @@ import { DataTable } from '../components/DataTable';
 import { Button } from '../components/Button';
 import { ConfirmModal } from '../components/ConfirmModal';
 import { Loading } from '../components/Loading';
+import {OUPicker} from '../components/OUPicker';
 
 export function Users() {
   const navigate = useNavigate();
   const { openAlert } = useAlert();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+    const [moveTarget, setMoveTarget] = useState(null);
+    const [moveOuDn, setMoveOuDn] = useState('');
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   async function fetchUsers() {
@@ -94,6 +97,16 @@ export function Users() {
             >
               {row.enabled ? 'Disable' : 'Enable'}
             </button>
+              <button
+                  onClick={(e) => {
+                      e.stopPropagation();
+                      setMoveTarget(row.username);
+                      setMoveOuDn('');
+                  }}
+                  className="text-xs text-fg-muted hover:text-fg-secondary"
+              >
+                  Move
+            </button>
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -130,6 +143,45 @@ export function Users() {
         data={users}
         searchPlaceholder="Search users..."
       />
+
+        {/* Move to OU modal */}
+        {moveTarget && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div className="absolute inset-0 bg-black/60" onClick={() => setMoveTarget(null)}/>
+                <div
+                    className="relative w-full max-w-md rounded-xl bg-surface-card border border-border p-6 shadow-2xl">
+                    <h3 className="text-lg font-semibold text-fg mb-2">Move User</h3>
+                    <p className="text-xs text-fg-muted mb-4">Move "{moveTarget}" to a different OU</p>
+                    <OUPicker
+                        value={moveOuDn}
+                        onChange={(value) => setMoveOuDn(value)}
+                        placeholder="Select destination OU"
+                    />
+                    <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                        <Button secondary onClick={() => setMoveTarget(null)}>Cancel</Button>
+                        <Button
+                            primary
+                            disabled={!moveOuDn}
+                            onClick={async () => {
+                                try {
+                                    await Meteor.callAsync('samba.users.move', {
+                                        username: moveTarget,
+                                        newOuDn: moveOuDn
+                                    });
+                                    openAlert('User moved successfully');
+                                    setMoveTarget(null);
+                                    await fetchUsers();
+                                } catch (error) {
+                                    openAlert(error.reason || 'Failed to move user');
+                                }
+                            }}
+                        >
+                            Move
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        )}
 
       <ConfirmModal
         isOpen={!!deleteTarget}

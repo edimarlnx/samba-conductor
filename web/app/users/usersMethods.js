@@ -86,6 +86,16 @@ Meteor.methods({
     return { success: true };
   },
 
+    // WRITE — move user to different OU
+    'samba.users.move': async function moveADUser({username, newOuDn}) {
+        const credentials = getWriteCredentials({userId: this.userId});
+        check(username, String);
+        check(newOuDn, String);
+        const {moveUser} = require('../samba/sambaUsers');
+        await moveUser({username, newOuDn, credentials});
+        return {success: true};
+    },
+
   // WRITE — requires active session
   'samba.users.resetPassword': async function resetADUserPassword({ username, newPassword }) {
     const credentials = getWriteCredentials({ userId: this.userId });

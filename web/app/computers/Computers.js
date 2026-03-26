@@ -5,6 +5,7 @@ import {Button} from '../components/Button';
 import {DataTable} from '../components/DataTable';
 import {ConfirmModal} from '../components/ConfirmModal';
 import {Loading} from '../components/Loading';
+import {OUPicker} from '../components/OUPicker';
 
 export function Computers() {
     const {openAlert} = useAlert();
@@ -224,14 +225,11 @@ export function Computers() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-medium text-fg-secondary mb-1">Organizational
-                                    Unit</label>
-                                <input
-                                    type="text"
+                              <label className="block text-xs font-medium text-fg-secondary mb-1">Organizational
+                                Unit</label>
+                              <OUPicker
                                     value={createForm.computerOu}
-                                    onChange={(e) => setCreateForm((prev) => ({...prev, computerOu: e.target.value}))}
-                                    placeholder="OU=Workstations (optional)"
-                                    className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                                    onChange={(value) => setCreateForm((prev) => ({...prev, computerOu: value}))}
                                 />
                             </div>
                         </div>
