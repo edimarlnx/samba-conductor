@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="../media/logo-dark-l.png" alt="Samba Conductor" width="200">
+  <img src="images/logo-dark.png" alt="Samba Conductor" width="200">
 </p>
 
 # Samba Conductor Documentation
