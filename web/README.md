@@ -1,22 +1,24 @@
 # Samba Conductor - Web UI
 
-Modern web interface for managing Samba 4 Active Directory Domain Controller. Built with Meteor 3, React 19, and Tailwind CSS 4.
+Modern web interface for managing Samba 4 Active Directory Domain Controller. Built with Meteor 3.4, React 19, and
+Tailwind CSS 4.
 
 ## Prerequisites
 
-- **Linux** (required — the app uses `docker exec` and `samba-tool` which are Linux-only)
+- **Linux** (required — uses `docker exec` and `samba-tool`)
 - **Node.js 20+**
-- **Meteor 3.3+**
+- **Meteor 3.4+**
 - **Docker** with the Samba container running (see [Docker setup](../docker/README.md))
 
 ### How it works
 
-In development, the Meteor app runs on the host machine while Samba runs inside a Docker container. The app communicates with Samba in two ways:
+In development, the Meteor app runs on the host while Samba runs in a Docker container:
 
-- **LDAP/LDAPS** — direct connection to `ldaps://localhost:636` for authentication and queries
-- **samba-tool** — executed inside the container via `docker exec samba-ad-dc samba-tool ...` for AD management operations (user/group CRUD)
+- **LDAPS** — `ldaps://localhost:636` for authentication and LDAP queries
+- **samba-tool** — via `docker exec samba-ad-dc samba-tool ...` for AD management
 
-This is controlled by `"dockerContainer": "samba-ad-dc"` in `settings.json`. In production, when the app runs alongside Samba (same host or container), remove this setting so `samba-tool` runs locally.
+Controlled by `"dockerContainer": "samba-ad-dc"` in `settings.json`. In production (same host/container as Samba),
+remove this setting.
 
 ## Getting Started
 
@@ -27,7 +29,7 @@ cd ../docker
 docker compose up -d
 ```
 
-See the [Docker README](../docker/README.md) for default credentials and details.
+See [Docker README](../docker/README.md) for default credentials.
 
 ### 2. Install dependencies and start
 
@@ -39,53 +41,69 @@ meteor npm start
 
 ### 3. Login
 
-Open `http://localhost:3000/login` and sign in with the AD administrator credentials:
+Open `http://localhost:4080/login`:
 
 - **Username:** `Administrator`
 - **Password:** `P@ssw0rd123!`
 
-> These are the default development credentials from `docker-compose.yml`. See [Docker README](../docker/README.md) for details.
+> Default dev credentials. See [Docker README](../docker/README.md).
 
 ## Features
 
-- **Dashboard** — Domain overview with user/group counts and quick actions
-- **User Management** — Create, edit, enable/disable, and delete AD users
-- **Group Management** — Create, delete groups and manage members
-- **LDAP Authentication** — Login against Samba AD via LDAP bind
+### Self-Service Portal (`/`)
+
+- View own profile and group memberships
+- Edit profile fields (configurable by admin)
+- Change password (including expired passwords)
+
+### Admin Panel (`/admin`)
+
+- **Dashboard** — Domain overview with stats and warnings
+- **User Management** — Full CRUD with all AD attributes, group membership
+- **Group Management** — Create/delete groups, manage members
+- **Domain Info** — Realm, DC, functional levels (Windows Server 2016)
+- **Settings** — Self-service editable fields config, sync account
+- **Disaster Recovery** — DR Key, AD sync, S3 backup, restore from snapshot
+
+### Security
+
+- **No stored admin passwords** — Credentials encrypted per-session in server memory (AES-256-GCM, 30min TTL)
+- **Read fallback** — If session expires, read operations fall back to sync account
+- **Write requires session** — Write operations require re-authentication
+- **DR Key** — Backup data encrypted with PBKDF2-derived key (admin sets passphrase)
+- **RBAC** — `Domain Admins` = admin panel, all others = self-service only
 
 ## Tech Stack
 
-- **Framework:** Meteor 3 (real-time reactivity via DDP)
+- **Framework:** Meteor 3.4 (async/await, no Fibers)
 - **Frontend:** React 19 with React Compiler
-- **Styling:** Tailwind CSS 4 (dark theme)
-- **Database:** MongoDB (Meteor sessions only — AD data is fetched on-demand)
-- **Samba Integration:** `ldapjs` for LDAP operations, `samba-tool` for AD commands
+- **Styling:** Tailwind CSS 4 — mobile-first, 3 themes (Wine, Classic, Light)
+- **Database:** MongoDB (app state only — AD data fetched on-demand)
+- **Samba:** `ldapjs` for LDAPS, `samba-tool` via `child_process.execFile`
+- **Backup:** `@aws-sdk/client-s3` for S3-compatible storage
 
 ## Project Structure
 
 ```
 app/
-├── auth/           # Login page and LDAP authentication handler
-├── components/     # Reusable UI (Button, DataTable, StatCard, ConfirmModal...)
-├── dashboard/      # Dashboard page and server methods
-├── general/        # Routing, App shell, 404
-├── groups/         # Group management (list, create, edit)
-├── infra/          # Cron jobs and migrations
-├── layouts/        # AdminLayout (sidebar), ConditionalLayout, etc.
-├── samba/          # Server-only Samba service layer (LDAP, samba-tool)
-├── status/         # Server status page
-└── users/          # User management (list, create, edit)
-
-server/
-├── main.js         # Server entry point
-├── rest.js         # REST API endpoints
-├── health.js       # Server health monitoring
-└── metrics.js      # Prometheus metrics
+├── auth/            # Login, credential store, DR key store
+├── components/      # Button, DataTable, StatCard, ThemeToggle...
+├── dashboard/       # Admin dashboard
+├── domain/          # Domain info
+├── dr/              # Disaster recovery (sync, backup, restore)
+├── general/         # Routing, App shell
+├── groups/          # Group management
+├── infra/           # Cron jobs, migrations
+├── layouts/         # AdminLayout (responsive sidebar), SelfServiceLayout
+├── samba/           # Server-only: LDAP, samba-tool, auth, config
+├── selfservice/     # Profile, change password
+├── settings/        # Admin settings, sync account
+└── users/           # User management
 ```
 
 ## Configuration
 
-App settings are in `private/env/dev/settings.json`:
+`private/env/dev/settings.json`:
 
 ```json
 {
@@ -93,9 +111,12 @@ App settings are in `private/env/dev/settings.json`:
     "appInfo": { "name": "Samba Conductor" }
   },
   "samba": {
-    "ldapUrl": "ldap://172.20.0.10:389",
+    "ldapUrl": "ldaps://localhost:636",
     "baseDn": "DC=samdom,DC=example,DC=com",
-    "realm": "SAMDOM.EXAMPLE.COM"
+    "realm": "SAMDOM.EXAMPLE.COM",
+    "tlsRejectUnauthorized": false,
+    "dockerContainer": "samba-ad-dc",
+    "sessionTtlMinutes": 30
   }
 }
 ```
@@ -103,7 +124,7 @@ App settings are in `private/env/dev/settings.json`:
 ## Development Commands
 
 ```bash
-meteor npm start              # Start dev server
+meteor npm start              # Start dev server (port 4080)
 meteor npm run quave-check    # ESLint + Prettier
 ```
 

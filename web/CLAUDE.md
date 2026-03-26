@@ -1,93 +1,107 @@
-# Meteor 3 Template - Universal Project Guidelines
-
-## Project Overview
-A modern Meteor 3 application template with React 19, Tailwind CSS 4, and MongoDB. Designed for rapid development with consistent code standards and best practices.
+# Samba Conductor — Web UI
 
 ## Tech Stack
-- **Framework**: Meteor 3
-- **Frontend**: React 19 RC with React Router
-- **Styling**: Tailwind CSS 4
-- **Database**: MongoDB
+
+- **Framework**: Meteor 3.4
+- **Frontend**: React 19 with React Compiler
+- **Styling**: Tailwind CSS 4 with semantic color tokens
+- **Database**: MongoDB (via Meteor)
 - **Schema**: SimpleSchema
-- **Build Tools**: Babel, PostCSS
+- **Build Tools**: Rspack, PostCSS
 - **Code Quality**: ESLint (@quave/eslint-config-quave), Prettier, Lefthook
 
-## Universal Code Standards
+## Code Standards
 
 ### Language & Architecture
-- **JavaScript only** - Never use TypeScript
-- **Functional programming always** - Avoid mutations and imperative patterns
-- **Named parameters** - Always use objects with named properties instead of args when defining functions
-- **Named functions** - Anonymous functions are not accepted, always give functions names
-- **ES6+ features** - Use modern JavaScript appropriately
 
-### Code Organization Principles
-- **Feature-based folders** - Group by domain (users/, components/, etc.)
-- **Single responsibility** - One component/collection per file
-- **Consistent naming** - Follow established patterns across all features
-- **Relative imports** - Don't rely on tooling to resolve imports
+- **JavaScript only** — Never use TypeScript
+- **Async/await** — Meteor 3.4 uses native async/await. NO Fibers, NO `Promise.await`, NO `Meteor.wrapAsync`
+- **Functional programming** — Avoid mutations and imperative patterns
+- **Named parameters** — Always use objects with named properties `({ param1, param2 })`
+- **Named functions** — No anonymous functions
+- **ES6+ features** — Use modern JavaScript
+
+### Code Organization
+
+- **Feature-based folders** — `app/users/`, `app/groups/`, `app/dr/`, etc.
+- **Single responsibility** — One component/collection per file
+- **Relative imports** — Don't rely on tooling to resolve imports
+- **Server-only samba code** — `app/samba/` modules are never imported client-side
 
 ### Quality Gates
-**CRITICAL**: Before finishing any task, ALWAYS run:
-1. `npm run quave-check` (ESLint + Prettier)  
-2. Fix any ESLint errors or warnings
-3. Only mark tasks complete after passing lint checks
 
-### Security & Performance
-- **User isolation** - Always filter queries by `userId`
-- **Input validation** - Use SimpleSchema and `check()` for all inputs
-- **Async patterns** - Use Meteor 3 async APIs throughout
-- **Index optimization** - Create indexes for frequently queried fields
+**CRITICAL**: Before finishing any task, ALWAYS run:
+
+1. `meteor npm run quave-check` (ESLint + Prettier)
+2. Fix any errors or warnings
+3. Only mark tasks complete after passing
+
+### Security
+
+- **Credentials per session** — `getReadCredentials()` for reads (fallback to sync account), `getWriteCredentials()` for
+  writes (requires active session)
+- **Input validation** — Use `check()` for all Meteor method inputs
+- **Admin check** — Use `requireAdmin()` in admin-only methods
+- **DR Key** — Sensitive persistent data encrypted with PBKDF2-derived key
 
 ## Project Structure
+
 ```
 app/
-├── access/           # Access control logic
-├── components/       # Reusable UI components
-├── general/          # App routing and core logic
-├── home/            # Home page and main features
-├── infra/           # Infrastructure (cron, APIs, migrations)
-├── layouts/         # Page layouts
-├── users/           # User management
-└── [other domains]  # Feature-specific modules
+├── auth/            # Login, credential store, DR key store
+├── components/      # Button, DataTable, StatCard, ConfirmModal, ThemeToggle...
+├── dashboard/       # Admin dashboard
+├── domain/          # Domain info page
+├── dr/              # Disaster recovery (sync, backup, restore)
+├── general/         # Routing, App shell, 404
+├── groups/          # Group management
+├── infra/           # Cron jobs, migrations
+├── layouts/         # AdminLayout, SelfServiceLayout, AdminGuard...
+├── samba/           # Server-only: sambaAuth, sambaUsers, sambaGroups, sambaLdap, sambaExec, sambaConfig
+├── selfservice/     # Self-service portal (profile, change password)
+├── settings/        # Admin settings (editable fields, sync account)
+├── status/          # Server status
+└── users/           # User management
+
+server/
+├── main.js          # Server entry point (all method imports)
+├── rest.js          # REST API endpoints
+├── health.js        # Server health
+└── metrics.js       # Prometheus metrics
 ```
 
-## Core Development Principles
-- **Data ownership**: All data must be associated with userId
-- **Mobile-first**: Responsive design with Tailwind CSS
-- **Dark theme**: Default styling approach
-- **User-centric**: Design with user experience as priority
+## Theming
 
-## Development Workflow
+Uses CSS custom properties via Tailwind CSS 4 `@theme`. Three themes: Wine (default), Classic, Light.
 
-> Always prefix npm commands with meteor
-> 
+**Semantic tokens** (use these, NOT raw colors):
+
+- `bg-surface`, `bg-surface-card`, `bg-surface-input`, `bg-surface-hover`
+- `text-fg`, `text-fg-secondary`, `text-fg-muted`
+- `border-border`, `border-border-subtle`
+- `bg-accent`, `hover:bg-accent-hover`, `text-accent`
+
+Themes switch by adding class to `<html>`: `.wine`, `.classic`, `.light`
+
+## Development
+
 ```bash
-# Start development
-meteor npm start
-
-# Code quality (run before every commit)
-meteor npm run quave-check
-
-# Package management
+meteor npm start              # Start dev server (port 4080)
+meteor npm run quave-check    # ESLint + Prettier
 meteor npm install [package]  # Always prefix with meteor
 ```
 
-## Database Overview
-Template includes common collections structure:
-- `users`: User account information and preferences
-- `userSettings`: User configuration data
-- Standard Meteor accounts collections for authentication
+## Routes
 
-## Specialized Agent Usage
-When working on specific aspects of the project, Claude will automatically use specialized agents:
-- **React components**: Uses react-agent for React 19 + hooks patterns
-- **Meteor APIs**: Uses meteor-agent for async method patterns
-- **Database work**: Uses data-agent for schema and validation
-- **Styling**: Uses tailwind-agent for utility-first CSS
-- **Code quality**: Uses code-style-agent for linting standards
-- **Version control**: Uses git-agent for commit conventions
-- **UI/UX**: Uses ui-design-agent for responsive design
-- **JavaScript**: Uses javascript-agent for file organization
-
-This ensures consistent application of domain-specific best practices while maintaining universal project standards.
+| Route              | Area         | Access             |
+|--------------------|--------------|--------------------|
+| `/login`           | Auth         | Anonymous only     |
+| `/`                | Self-Service | Any logged user    |
+| `/profile`         | Self-Service | Any logged user    |
+| `/change-password` | Self-Service | Any logged user    |
+| `/admin`           | Admin        | Domain Admins only |
+| `/admin/users`     | Admin        | Domain Admins only |
+| `/admin/groups`    | Admin        | Domain Admins only |
+| `/admin/domain`    | Admin        | Domain Admins only |
+| `/admin/settings`  | Admin        | Domain Admins only |
+| `/admin/dr`        | Admin        | Domain Admins only |
