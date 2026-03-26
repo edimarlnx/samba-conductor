@@ -21,6 +21,8 @@ export const RoutePaths = {
   ADMIN_DNS: '/admin/dns',
   ADMIN_GPOS: '/admin/gpos',
   ADMIN_DOMAIN: '/admin/domain',
+    ADMIN_OAUTH_CLIENTS: '/admin/oauth/clients',
+    ADMIN_OAUTH_REALMS: '/admin/oauth/realms',
   ADMIN_SETTINGS: '/admin/settings',
   ADMIN_DR: '/admin/dr',
 };

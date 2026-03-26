@@ -24,6 +24,10 @@ import '../app/settings/settingsMethods';
 // Disaster Recovery
 import '../app/dr/drMethods';
 
+// OAuth2 Server
+import './oauth2';
+import '../app/oauth/oauthMethods';
+
 import './rest';
 
 Meteor.startup(() => {});

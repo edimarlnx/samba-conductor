@@ -26,6 +26,8 @@ import {GPOs} from '../gpo/GPOs';
 import { Domain } from '../domain/Domain';
 import { Settings } from '../settings/Settings';
 import { DrPage } from '../dr/DrPage';
+import {OAuthClients} from '../oauth/OAuthClients';
+import {OAuthRealms} from '../oauth/OAuthRealms';
 
 // Layouts
 import { AnonymousLayout } from '../layouts/AnonymousLayout';
@@ -130,6 +132,14 @@ export function Router() {
         path={RoutePaths.ADMIN_DOMAIN}
         element={<AdminPage><Domain /></AdminPage>}
       />
+        <Route
+            path={RoutePaths.ADMIN_OAUTH_CLIENTS}
+            element={<AdminPage><OAuthClients/></AdminPage>}
+        />
+        <Route
+            path={RoutePaths.ADMIN_OAUTH_REALMS}
+            element={<AdminPage><OAuthRealms/></AdminPage>}
+        />
       <Route
         path={RoutePaths.ADMIN_SETTINGS}
         element={<AdminPage><Settings /></AdminPage>}

@@ -26,6 +26,7 @@ quave:alert-react-tailwind
 quave:synced-cron
 quave:migrations
 quave:collections
+leaonline:oauth2-server
 zodern:types
 
 rspack
