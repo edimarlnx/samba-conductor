@@ -45,8 +45,8 @@ export function Dashboard() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-        <p className="mt-1 text-sm text-gray-400">
+        <h1 className="text-2xl font-bold text-fg">Dashboard</h1>
+        <p className="mt-1 text-sm text-fg-secondary">
           {summary?.domain?.realm || 'Active Directory overview'}
         </p>
       </div>
@@ -120,16 +120,16 @@ export function Dashboard() {
 
       {/* Quick Actions */}
       <div className="mb-8">
-        <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
+        <h2 className="text-lg font-semibold text-fg mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {quickActions.map((action) => (
             <button
               key={action.path}
               onClick={() => navigate(action.path)}
-              className="rounded-xl bg-gray-900 border border-gray-800 p-5 text-left transition-colors hover:bg-gray-800 hover:border-gray-700"
+              className="rounded-xl bg-surface-card border border-border p-5 text-left transition-colors hover:bg-surface-hover hover:border-border"
             >
-              <h3 className="text-sm font-semibold text-white">{action.label}</h3>
-              <p className="mt-1 text-xs text-gray-400">{action.description}</p>
+              <h3 className="text-sm font-semibold text-fg">{action.label}</h3>
+              <p className="mt-1 text-xs text-fg-secondary">{action.description}</p>
             </button>
           ))}
         </div>
@@ -137,8 +137,8 @@ export function Dashboard() {
 
       {/* Domain Info */}
       {summary?.domain && !summary.domain.error && (
-        <div className="rounded-xl bg-gray-900 border border-gray-800 p-6">
-          <h2 className="text-lg font-semibold text-white mb-4">Domain Information</h2>
+        <div className="rounded-xl bg-surface-card border border-border p-6">
+          <h2 className="text-lg font-semibold text-fg mb-4">Domain Information</h2>
           <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <DomainField label="Realm" value={summary.domain.realm} />
             <DomainField label="Base DN" value={summary.domain.baseDn} />
@@ -155,8 +155,8 @@ export function Dashboard() {
 function DomainField({ label, value }) {
   return (
     <div>
-      <dt className="text-xs font-medium text-gray-500">{label}</dt>
-      <dd className="mt-0.5 text-sm text-gray-300">{value}</dd>
+      <dt className="text-xs font-medium text-fg-muted">{label}</dt>
+      <dd className="mt-0.5 text-sm text-fg-secondary">{value}</dd>
     </div>
   );
 }

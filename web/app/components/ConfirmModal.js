@@ -5,16 +5,16 @@ export function ConfirmModal({ isOpen, title, message, onConfirm, onCancel, conf
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/60" onClick={onCancel} />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md rounded-xl bg-gray-900 border border-gray-800 p-6 shadow-2xl">
-        <h3 className="text-lg font-semibold text-white">{title}</h3>
-        <p className="mt-2 text-sm text-gray-400">{message}</p>
+      <div className="relative w-full max-w-md rounded-xl bg-surface-card border border-border p-6 shadow-2xl">
+        <h3 className="text-lg font-semibold text-fg">{title}</h3>
+        <p className="mt-2 text-sm text-fg-secondary">{message}</p>
 
-        <div className="mt-6 flex justify-end gap-3">
+        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Button secondary onClick={onCancel}>
             Cancel
           </Button>

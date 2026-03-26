@@ -40,19 +40,19 @@ export function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-950 px-4">
+    <div className="flex min-h-dvh items-center justify-center bg-surface px-4">
       <div className="w-full max-w-md">
-        <div className="rounded-xl bg-gray-900 p-8 shadow-2xl border border-gray-800">
+        <div className="rounded-xl bg-surface-card p-8 shadow-2xl border border-border">
           <div className="mb-8 text-center">
-            <h1 className="text-2xl font-bold text-white">Samba Conductor</h1>
-            <p className="mt-2 text-sm text-gray-400">
+            <h1 className="text-2xl font-bold text-fg">Samba Conductor</h1>
+            <p className="mt-2 text-sm text-fg-secondary">
               Sign in to your account
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-1">
+              <label htmlFor="username" className="block text-sm font-medium text-fg-secondary mb-1">
                 Username
               </label>
               <input
@@ -63,12 +63,12 @@ export function Login() {
                 placeholder="username"
                 required
                 autoFocus
-                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-border bg-surface-input px-4 py-2.5 text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
+              <label htmlFor="password" className="block text-sm font-medium text-fg-secondary mb-1">
                 Password
               </label>
               <input
@@ -77,7 +77,7 @@ export function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-border bg-surface-input px-4 py-2.5 text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               />
             </div>
 
@@ -93,7 +93,7 @@ export function Login() {
           </form>
         </div>
 
-        <p className="mt-6 text-center text-xs text-gray-600">
+        <p className="mt-6 text-center text-xs text-fg-muted">
           Samba 4 Active Directory Domain Controller
         </p>
       </div>

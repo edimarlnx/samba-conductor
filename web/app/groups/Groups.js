@@ -49,7 +49,7 @@ export function Groups() {
       header: 'Members',
       accessor: 'memberCount',
       render(row) {
-        return <span className="text-gray-400">{row.memberCount}</span>;
+        return <span className="text-fg-secondary">{row.memberCount}</span>;
       },
     },
     {
@@ -62,7 +62,7 @@ export function Groups() {
                 e.stopPropagation();
                 navigate(RoutePaths.ADMIN_GROUP_EDIT.replace(':groupName', row.name));
               }}
-              className="text-xs text-blue-400 hover:text-blue-300"
+              className="text-xs text-accent hover:text-accent-hover"
             >
               Edit
             </button>
@@ -87,10 +87,10 @@ export function Groups() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Groups</h1>
-          <p className="mt-1 text-sm text-gray-400">Manage Active Directory groups</p>
+          <h1 className="text-2xl font-bold text-fg">Groups</h1>
+          <p className="mt-1 text-sm text-fg-secondary">Manage Active Directory groups</p>
         </div>
         <Button primary onClick={() => navigate(RoutePaths.ADMIN_GROUP_CREATE)}>
           New Group

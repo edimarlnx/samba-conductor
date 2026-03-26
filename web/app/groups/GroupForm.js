@@ -104,17 +104,17 @@ export function GroupForm() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white">
+        <h1 className="text-2xl font-bold text-fg">
           {isEditing ? `Edit Group: ${editGroupName}` : 'New Group'}
         </h1>
-        <p className="mt-1 text-sm text-gray-400">
+        <p className="mt-1 text-sm text-fg-secondary">
           {isEditing ? 'Manage group properties and members' : 'Create a new Active Directory group'}
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="max-w-lg space-y-5">
+      <form onSubmit={handleSubmit} className="w-full max-w-lg space-y-5">
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-fg-secondary mb-1">
             Group Name
           </label>
           <input
@@ -124,12 +124,12 @@ export function GroupForm() {
             required
             disabled={isEditing}
             placeholder="developers"
-            className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+            className="w-full rounded-lg border border-border bg-surface-input px-4 py-2.5 text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-fg-secondary mb-1">
             Description
           </label>
           <input
@@ -137,7 +137,7 @@ export function GroupForm() {
             value={form.description}
             onChange={(e) => handleChange({ field: 'description', value: e.target.value })}
             placeholder="Group description"
-            className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full rounded-lg border border-border bg-surface-input px-4 py-2.5 text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
           />
         </div>
 
@@ -155,8 +155,8 @@ export function GroupForm() {
 
       {/* Members section - only when editing */}
       {isEditing && (
-        <div className="mt-8 max-w-lg">
-          <h2 className="text-lg font-semibold text-white mb-4">
+        <div className="mt-8 w-full max-w-lg">
+          <h2 className="text-lg font-semibold text-fg mb-4">
             Members ({members.length})
           </h2>
 
@@ -167,7 +167,7 @@ export function GroupForm() {
               value={newMember}
               onChange={(e) => setNewMember(e.target.value)}
               placeholder="Username to add"
-              className="flex-1 rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="flex-1 rounded-lg border border-border bg-surface-input px-4 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
@@ -181,13 +181,13 @@ export function GroupForm() {
           </div>
 
           {/* Members list */}
-          <div className="rounded-xl border border-gray-800 divide-y divide-gray-800">
+          <div className="rounded-xl border border-border divide-y divide-border">
             {members.length === 0 ? (
-              <p className="p-4 text-sm text-gray-500">No members</p>
+              <p className="p-4 text-sm text-fg-muted">No members</p>
             ) : (
               members.map((member) => (
                 <div key={member} className="flex items-center justify-between px-4 py-3">
-                  <span className="text-sm text-gray-300">{member}</span>
+                  <span className="text-sm text-fg-secondary">{member}</span>
                   <button
                     onClick={() => handleRemoveMember({ memberName: member })}
                     className="text-xs text-red-400 hover:text-red-300"

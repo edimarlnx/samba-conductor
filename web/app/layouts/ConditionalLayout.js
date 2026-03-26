@@ -11,7 +11,7 @@ function InnerLayout({ children, onlyLogged, onlyAnonymous }) {
 
   if (isLoadingLoggedUser) {
     return (
-      <div className="flex h-screen items-center justify-center bg-gray-950">
+      <div className="flex h-dvh items-center justify-center bg-surface">
         <Loading />
       </div>
     );

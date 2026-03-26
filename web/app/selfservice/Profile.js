@@ -85,15 +85,15 @@ export function Profile() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white">Edit Profile</h1>
-        <p className="mt-1 text-sm text-gray-400">Update your personal information</p>
+        <h1 className="text-2xl font-bold text-fg">Edit Profile</h1>
+        <p className="mt-1 text-sm text-fg-secondary">Update your personal information</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="max-w-lg">
-        <div className="rounded-xl bg-gray-900 border border-gray-800 p-5 space-y-4">
+      <form onSubmit={handleSubmit} className="w-full max-w-lg">
+        <div className="rounded-xl bg-surface-card border border-border p-5 space-y-4">
           {fieldList.map((field) => (
             <div key={field.key}>
-              <label className="block text-xs font-medium text-gray-400 mb-1">
+              <label className="block text-xs font-medium text-fg-secondary mb-1">
                 {field.label}
               </label>
               <input
@@ -101,10 +101,10 @@ export function Profile() {
                 value={fields[field.key] || ''}
                 onChange={(e) => handleChange({ field: field.key, value: e.target.value })}
                 disabled={!field.enabled}
-                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50 disabled:cursor-not-allowed"
               />
               {!field.enabled && (
-                <p className="mt-0.5 text-xs text-gray-600">This field cannot be edited</p>
+                <p className="mt-0.5 text-xs text-fg-muted">This field cannot be edited</p>
               )}
             </div>
           ))}

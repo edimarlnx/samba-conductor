@@ -2,21 +2,21 @@ import React from 'react';
 
 const buttonStyles = {
   primary: {
-    bg: 'bg-blue-600',
-    hover: 'hover:bg-blue-700',
+    bg: 'bg-accent',
+    hover: 'hover:bg-accent-hover',
     text: 'text-white',
     border: 'border-transparent',
   },
   secondary: {
-    bg: 'bg-gray-800',
-    hover: 'hover:bg-gray-700',
-    text: 'text-gray-200',
-    border: 'border-gray-600',
+    bg: 'bg-surface-input',
+    hover: 'hover:bg-surface-hover',
+    text: 'text-fg-secondary',
+    border: 'border-border',
   },
   tertiary: {
     bg: 'bg-transparent',
-    hover: 'hover:bg-gray-800',
-    text: 'text-gray-400',
+    hover: 'hover:bg-surface-hover',
+    text: 'text-fg-muted',
     border: 'border-transparent',
   },
   danger: {
@@ -48,7 +48,7 @@ export function Button({
 
   return (
     <button
-      className={`inline-flex items-center justify-center rounded-lg border ${style.border} ${style.bg} ${style.hover} ${style.text} px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      className={`inline-flex items-center justify-center rounded-lg border ${style.border} ${style.bg} ${style.hover} ${style.text} min-h-[44px] px-4 py-3 text-sm font-medium sm:min-h-0 sm:py-2.5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
       {...rest}
     >
       {children}

@@ -138,15 +138,15 @@ export function UserForm() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white">
+        <h1 className="text-2xl font-bold text-fg">
           {isEditing ? `Edit User: ${editUsername}` : 'New User'}
         </h1>
-        <p className="mt-1 text-sm text-gray-400">
+        <p className="mt-1 text-sm text-fg-secondary">
           {isEditing ? 'Update user properties' : 'Create a new Active Directory user'}
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="max-w-2xl space-y-8">
+      <form onSubmit={handleSubmit} className="w-full max-w-2xl space-y-8">
         {/* Account */}
         <FormSection title="Account">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -168,12 +168,12 @@ export function UserForm() {
           </div>
           {!isEditing && (
             <div className="mt-3">
-              <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+              <label className="flex items-center gap-2 text-sm text-fg-secondary cursor-pointer">
                 <input
                   type="checkbox"
                   checked={form.mustChangeAtNextLogin}
                   onChange={(e) => handleChange({ field: 'mustChangeAtNextLogin', value: e.target.checked })}
-                  className="rounded border-gray-600 bg-gray-800 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-border bg-surface-input text-accent focus:ring-accent"
                 />
                 Must change password at next login
               </label>
@@ -349,9 +349,9 @@ function UserGroupsSection({ username, groups, allGroups, selectedGroup, onSelec
   }
 
   return (
-    <div className="mt-8 max-w-2xl">
-      <div className="rounded-xl bg-gray-900 border border-gray-800 p-5">
-        <h3 className="text-sm font-semibold text-white mb-4">
+    <div className="mt-8 w-full max-w-2xl">
+      <div className="rounded-xl bg-surface-card border border-border p-5">
+        <h3 className="text-sm font-semibold text-fg mb-4">
           Group Membership ({groups.length})
         </h3>
 
@@ -360,7 +360,7 @@ function UserGroupsSection({ username, groups, allGroups, selectedGroup, onSelec
           <select
             value={selectedGroup}
             onChange={(e) => onSelectGroup(e.target.value)}
-            className="flex-1 rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="flex-1 rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
           >
             <option value="">Select a group to add...</option>
             {availableGroups.map((g) => (
@@ -373,13 +373,13 @@ function UserGroupsSection({ username, groups, allGroups, selectedGroup, onSelec
         </div>
 
         {/* Current groups */}
-        <div className="rounded-lg border border-gray-800 divide-y divide-gray-800">
+        <div className="rounded-lg border border-border divide-y divide-border">
           {groups.length === 0 ? (
-            <p className="p-4 text-sm text-gray-500">Not a member of any group</p>
+            <p className="p-4 text-sm text-fg-muted">Not a member of any group</p>
           ) : (
             groups.map((groupName) => (
               <div key={groupName} className="flex items-center justify-between px-4 py-2.5">
-                <span className="text-sm text-gray-300">{groupName}</span>
+                <span className="text-sm text-fg-secondary">{groupName}</span>
                 <button
                   type="button"
                   onClick={() => handleRemoveGroup({ groupName })}
@@ -400,15 +400,15 @@ function FormSection({ title, children, collapsible = false }) {
   const [open, setOpen] = useState(!collapsible);
 
   return (
-    <div className="rounded-xl bg-gray-900 border border-gray-800 p-5">
+    <div className="rounded-xl bg-surface-card border border-border p-5">
       <button
         type="button"
         onClick={() => collapsible && setOpen((prev) => !prev)}
-        className={`text-sm font-semibold text-white mb-4 w-full text-left flex items-center justify-between ${collapsible ? 'cursor-pointer' : 'cursor-default'}`}
+        className={`text-sm font-semibold text-fg mb-4 w-full text-left flex items-center justify-between ${collapsible ? 'cursor-pointer' : 'cursor-default'}`}
       >
         {title}
         {collapsible && (
-          <span className="text-gray-500 text-xs">{open ? 'Hide' : 'Show'}</span>
+          <span className="text-fg-muted text-xs">{open ? 'Hide' : 'Show'}</span>
         )}
       </button>
       {open && children}
@@ -419,7 +419,7 @@ function FormSection({ title, children, collapsible = false }) {
 function FormField({ label, value, onChange, type = 'text', required = false, disabled = false, placeholder = '' }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-400 mb-1">
+      <label className="block text-xs font-medium text-fg-secondary mb-1">
         {label}
       </label>
       <input
@@ -429,7 +429,7 @@ function FormField({ label, value, onChange, type = 'text', required = false, di
         required={required}
         disabled={disabled}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+        className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50"
       />
     </div>
   );

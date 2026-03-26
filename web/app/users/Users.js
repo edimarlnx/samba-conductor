@@ -81,7 +81,7 @@ export function Users() {
                 e.stopPropagation();
                 navigate(RoutePaths.ADMIN_USER_EDIT.replace(':username', row.username));
               }}
-              className="text-xs text-blue-400 hover:text-blue-300"
+              className="text-xs text-accent hover:text-accent-hover"
             >
               Edit
             </button>
@@ -115,10 +115,10 @@ export function Users() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Users</h1>
-          <p className="mt-1 text-sm text-gray-400">Manage Active Directory users</p>
+          <h1 className="text-2xl font-bold text-fg">Users</h1>
+          <p className="mt-1 text-sm text-fg-secondary">Manage Active Directory users</p>
         </div>
         <Button primary onClick={() => navigate(RoutePaths.ADMIN_USER_CREATE)}>
           New User

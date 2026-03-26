@@ -30,11 +30,11 @@ export function DrPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Disaster Recovery</h1>
-        <p className="mt-1 text-sm text-gray-400">Backup, sync, and restore Active Directory data</p>
+        <h1 className="text-2xl font-bold text-fg">Disaster Recovery</h1>
+        <p className="mt-1 text-sm text-fg-secondary">Backup, sync, and restore Active Directory data</p>
       </div>
 
-      <div className="max-w-3xl space-y-8">
+      <div className="w-full max-w-3xl space-y-8">
         <DrKeySection status={status} onUpdate={fetchStatus} openAlert={openAlert} />
         <SyncSection status={status} onUpdate={fetchStatus} openAlert={openAlert} />
         <BackupS3Section status={status} onUpdate={fetchStatus} openAlert={openAlert} />
@@ -100,8 +100,8 @@ function DrKeySection({ status, onUpdate, openAlert }) {
   }
 
   return (
-    <div className="rounded-xl bg-gray-900 border border-gray-800 p-6">
-      <h2 className="text-lg font-semibold text-white mb-2">DR Encryption Key</h2>
+    <div className="rounded-xl bg-surface-card border border-border p-6">
+      <h2 className="text-lg font-semibold text-fg mb-2">DR Encryption Key</h2>
 
       {/* Status badge */}
       {configured && unlocked && (
@@ -118,9 +118,9 @@ function DrKeySection({ status, onUpdate, openAlert }) {
 
       {!configured && !mode && (
         <div>
-          <p className="text-sm text-gray-400 mb-4">
+          <p className="text-sm text-fg-secondary mb-4">
             The DR key encrypts all backup data stored in MongoDB (password hashes, sync account credentials).
-            Without this key, backup data <strong className="text-gray-200">cannot be recovered</strong>.
+            Without this key, backup data <strong className="text-fg">cannot be recovered</strong>.
           </p>
 
           <div className="flex gap-3">
@@ -133,13 +133,13 @@ function DrKeySection({ status, onUpdate, openAlert }) {
       {/* Provide existing key */}
       {mode === 'provide' && !configured && (
         <div className="space-y-3 mt-4">
-          <p className="text-sm text-gray-400">Enter your DR key (hex string, at least 32 characters):</p>
+          <p className="text-sm text-fg-secondary">Enter your DR key (hex string, at least 32 characters):</p>
           <input
             type="text"
             value={key}
             onChange={(e) => setKey(e.target.value)}
             placeholder="Enter your DR key..."
-            className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm font-mono text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm font-mono text-fg focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
           />
           <div className="flex gap-3">
             <Button primary onClick={() => handleConfigure({ keyToUse: key })} disabled={submitting || key.length < 16}>
@@ -150,7 +150,7 @@ function DrKeySection({ status, onUpdate, openAlert }) {
         </div>
       )}
 
-      {/* Generated key — show once */}
+      {/* Generated key -- show once */}
       {mode === 'generate' && !configured && generatedKey && (
         <div className="space-y-4 mt-4">
           <div className="rounded-lg bg-red-900/20 border border-red-800 px-4 py-3">
@@ -162,18 +162,18 @@ function DrKeySection({ status, onUpdate, openAlert }) {
           </div>
 
           <div className="flex items-center gap-2">
-            <code className="flex-1 rounded-lg bg-gray-800 border border-gray-700 px-4 py-3 text-sm font-mono text-green-400 break-all select-all">
+            <code className="flex-1 rounded-lg bg-surface-input border border-border px-4 py-3 text-sm font-mono text-green-400 break-all select-all">
               {generatedKey}
             </code>
             <Button secondary onClick={handleCopyKey}>Copy</Button>
           </div>
 
-          <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+          <label className="flex items-center gap-2 text-sm text-fg-secondary cursor-pointer">
             <input
               type="checkbox"
               checked={savedConfirm}
               onChange={(e) => setSavedConfirm(e.target.checked)}
-              className="rounded border-gray-600 bg-gray-800 text-blue-600 focus:ring-blue-500"
+              className="rounded border-border bg-surface-input text-accent focus:ring-accent"
             />
             I have saved this key in a secure location
           </label>
@@ -201,12 +201,12 @@ function DrKeySection({ status, onUpdate, openAlert }) {
             value={key}
             onChange={(e) => setKey(e.target.value)}
             placeholder="Enter your DR key to unlock..."
-            className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm font-mono text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm font-mono text-fg focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
           />
           <Button primary onClick={handleUnlock} disabled={submitting || !key}>
             {submitting ? 'Unlocking...' : 'Unlock'}
           </Button>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-fg-muted">
             Tip: Set the <code>DR_KEY</code> environment variable to auto-unlock on startup.
           </p>
         </div>
@@ -252,8 +252,8 @@ function SyncSection({ status, onUpdate, openAlert }) {
   }
 
   return (
-    <div className="rounded-xl bg-gray-900 border border-gray-800 p-6">
-      <h2 className="text-lg font-semibold text-white mb-4">Sync Status</h2>
+    <div className="rounded-xl bg-surface-card border border-border p-6">
+      <h2 className="text-lg font-semibold text-fg mb-4">Sync Status</h2>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 mb-6">
         <SyncItem label="Users" count={status?.counts?.users} lastSync={status?.lastSync?.users} formatDate={formatDate} />
@@ -276,7 +276,7 @@ function SyncSection({ status, onUpdate, openAlert }) {
         </Button>
       </div>
 
-      <p className="mt-3 text-xs text-gray-500">
+      <p className="mt-3 text-xs text-fg-muted">
         Metadata syncs automatically every 15 minutes. Hashes sync every 6 hours (requires DR Key unlocked).
       </p>
     </div>
@@ -285,12 +285,12 @@ function SyncSection({ status, onUpdate, openAlert }) {
 
 function SyncItem({ label, count, lastSync, formatDate }) {
   return (
-    <div className="rounded-lg bg-gray-800/50 px-4 py-3">
+    <div className="rounded-lg bg-surface-input/50 px-4 py-3">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-gray-300">{label}</span>
-        {count !== undefined && <span className="text-sm text-gray-500">{count} items</span>}
+        <span className="text-sm font-medium text-fg-secondary">{label}</span>
+        {count !== undefined && <span className="text-sm text-fg-muted">{count} items</span>}
       </div>
-      <p className="text-xs text-gray-500 mt-1">Last sync: {formatDate(lastSync)}</p>
+      <p className="text-xs text-fg-muted mt-1">Last sync: {formatDate(lastSync)}</p>
     </div>
   );
 }
@@ -377,9 +377,9 @@ function BackupS3Section({ status, onUpdate, openAlert }) {
   const lastRun = status?.backup?.lastRun;
 
   return (
-    <div className="rounded-xl bg-gray-900 border border-gray-800 p-6">
-      <h2 className="text-lg font-semibold text-white mb-2">S3 Backup</h2>
-      <p className="text-sm text-gray-400 mb-4">
+    <div className="rounded-xl bg-surface-card border border-border p-6">
+      <h2 className="text-lg font-semibold text-fg mb-2">S3 Backup</h2>
+      <p className="text-sm text-fg-secondary mb-4">
         Upload MongoDB dumps and Samba domain backups to S3-compatible storage.
       </p>
 
@@ -397,110 +397,110 @@ function BackupS3Section({ status, onUpdate, openAlert }) {
       <div className="space-y-3">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1">S3 Endpoint (blank for AWS)</label>
+            <label className="block text-xs font-medium text-fg-secondary mb-1">S3 Endpoint (blank for AWS)</label>
             <input
               type="text"
               value={form.endpoint}
               onChange={(e) => handleChange({ field: 'endpoint', value: e.target.value })}
               placeholder="https://s3.example.com"
-              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1">Bucket</label>
+            <label className="block text-xs font-medium text-fg-secondary mb-1">Bucket</label>
             <input
               type="text"
               value={form.bucket}
               onChange={(e) => handleChange({ field: 'bucket', value: e.target.value })}
               placeholder="my-backups"
-              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1">Access Key ID</label>
+            <label className="block text-xs font-medium text-fg-secondary mb-1">Access Key ID</label>
             <input
               type="text"
               value={form.accessKeyId}
               onChange={(e) => handleChange({ field: 'accessKeyId', value: e.target.value })}
-              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1">Secret Access Key</label>
+            <label className="block text-xs font-medium text-fg-secondary mb-1">Secret Access Key</label>
             <input
               type="password"
               value={form.secretAccessKey}
               onChange={(e) => handleChange({ field: 'secretAccessKey', value: e.target.value })}
               placeholder={config?.configured ? '(unchanged)' : ''}
-              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1">Region</label>
+            <label className="block text-xs font-medium text-fg-secondary mb-1">Region</label>
             <input
               type="text"
               value={form.region}
               onChange={(e) => handleChange({ field: 'region', value: e.target.value })}
-              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1">Prefix</label>
+            <label className="block text-xs font-medium text-fg-secondary mb-1">Prefix</label>
             <input
               type="text"
               value={form.prefix}
               onChange={(e) => handleChange({ field: 'prefix', value: e.target.value })}
-              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1">Retention (days)</label>
+            <label className="block text-xs font-medium text-fg-secondary mb-1">Retention (days)</label>
             <input
               type="number"
               value={form.retentionDays}
               onChange={(e) => handleChange({ field: 'retentionDays', value: parseInt(e.target.value, 10) || 30 })}
-              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1">Schedule (every N hours)</label>
+            <label className="block text-xs font-medium text-fg-secondary mb-1">Schedule (every N hours)</label>
             <input
               type="number"
               value={form.scheduleHours}
               onChange={(e) => handleChange({ field: 'scheduleHours', value: parseInt(e.target.value, 10) || 6 })}
-              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
         </div>
 
         <div className="flex flex-wrap gap-4 pt-1">
-          <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+          <label className="flex items-center gap-2 text-sm text-fg-secondary cursor-pointer">
             <input
               type="checkbox"
               checked={form.includeMongoDump}
               onChange={(e) => handleChange({ field: 'includeMongoDump', value: e.target.checked })}
-              className="rounded border-gray-600 bg-gray-800 text-blue-600 focus:ring-blue-500"
+              className="rounded border-border bg-surface-input text-accent focus:ring-accent"
             />
             Include MongoDB dump
           </label>
-          <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+          <label className="flex items-center gap-2 text-sm text-fg-secondary cursor-pointer">
             <input
               type="checkbox"
               checked={form.includeSambaBackup}
               onChange={(e) => handleChange({ field: 'includeSambaBackup', value: e.target.checked })}
-              className="rounded border-gray-600 bg-gray-800 text-blue-600 focus:ring-blue-500"
+              className="rounded border-border bg-surface-input text-accent focus:ring-accent"
             />
             Include Samba domain backup
           </label>
-          <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+          <label className="flex items-center gap-2 text-sm text-fg-secondary cursor-pointer">
             <input
               type="checkbox"
               checked={form.enabled}
               onChange={(e) => handleChange({ field: 'enabled', value: e.target.checked })}
-              className="rounded border-gray-600 bg-gray-800 text-blue-600 focus:ring-blue-500"
+              className="rounded border-border bg-surface-input text-accent focus:ring-accent"
             />
             Enable scheduled backups
           </label>
@@ -565,9 +565,9 @@ function RestoreSection({ status, openAlert }) {
   }
 
   return (
-    <div className="rounded-xl bg-gray-900 border border-gray-800 p-6">
-      <h2 className="text-lg font-semibold text-white mb-2">Restore from Snapshot</h2>
-      <p className="text-sm text-gray-400 mb-4">
+    <div className="rounded-xl bg-surface-card border border-border p-6">
+      <h2 className="text-lg font-semibold text-fg mb-2">Restore from Snapshot</h2>
+      <p className="text-sm text-fg-secondary mb-4">
         Recreate AD users and groups from the latest MongoDB snapshot.
         Use this after provisioning a new empty domain.
       </p>
@@ -581,20 +581,20 @@ function RestoreSection({ status, openAlert }) {
       {preview && (
         <div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 mb-4">
-            <div className="rounded-lg bg-gray-800/50 px-4 py-3">
-              <p className="text-sm font-medium text-gray-300">Users</p>
-              <p className="text-2xl font-bold text-white">{preview.users.count}</p>
-              <p className="text-xs text-gray-500">{formatDate(preview.users.snapshotAt)}</p>
+            <div className="rounded-lg bg-surface-input/50 px-4 py-3">
+              <p className="text-sm font-medium text-fg-secondary">Users</p>
+              <p className="text-2xl font-bold text-fg">{preview.users.count}</p>
+              <p className="text-xs text-fg-muted">{formatDate(preview.users.snapshotAt)}</p>
             </div>
-            <div className="rounded-lg bg-gray-800/50 px-4 py-3">
-              <p className="text-sm font-medium text-gray-300">Groups</p>
-              <p className="text-2xl font-bold text-white">{preview.groups.count}</p>
-              <p className="text-xs text-gray-500">{formatDate(preview.groups.snapshotAt)}</p>
+            <div className="rounded-lg bg-surface-input/50 px-4 py-3">
+              <p className="text-sm font-medium text-fg-secondary">Groups</p>
+              <p className="text-2xl font-bold text-fg">{preview.groups.count}</p>
+              <p className="text-xs text-fg-muted">{formatDate(preview.groups.snapshotAt)}</p>
             </div>
-            <div className="rounded-lg bg-gray-800/50 px-4 py-3">
-              <p className="text-sm font-medium text-gray-300">Password Hashes</p>
-              <p className="text-2xl font-bold text-white">{preview.hashes.count}</p>
-              <p className="text-xs text-gray-500">
+            <div className="rounded-lg bg-surface-input/50 px-4 py-3">
+              <p className="text-sm font-medium text-fg-secondary">Password Hashes</p>
+              <p className="text-2xl font-bold text-fg">{preview.hashes.count}</p>
+              <p className="text-xs text-fg-muted">
                 {preview.hashes.available ? 'Available' : 'Not available'}
               </p>
             </div>
@@ -607,12 +607,12 @@ function RestoreSection({ status, openAlert }) {
       )}
 
       {results && (
-        <div className="mt-4 rounded-lg bg-gray-800/50 px-4 py-3 text-sm">
-          <p className="font-medium text-white mb-2">Restore Results</p>
-          <p className="text-gray-400">
+        <div className="mt-4 rounded-lg bg-surface-input/50 px-4 py-3 text-sm">
+          <p className="font-medium text-fg mb-2">Restore Results</p>
+          <p className="text-fg-secondary">
             Users: {results.users.created} created, {results.users.skipped} skipped, {results.users.failed} failed
           </p>
-          <p className="text-gray-400">
+          <p className="text-fg-secondary">
             Groups: {results.groups.created} created, {results.groups.skipped} skipped, {results.groups.membershipsRestored} memberships
           </p>
         </div>

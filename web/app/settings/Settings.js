@@ -103,40 +103,42 @@ export function Settings() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Settings</h1>
-        <p className="mt-1 text-sm text-gray-400">Admin configuration</p>
+        <h1 className="text-2xl font-bold text-fg">Settings</h1>
+        <p className="mt-1 text-sm text-fg-secondary">Admin configuration</p>
       </div>
 
-      <div className="max-w-2xl space-y-8">
+      <div className="w-full max-w-2xl space-y-8">
         {/* Self-Service Editable Fields */}
-        <div className="rounded-xl bg-gray-900 border border-gray-800 p-6">
-          <h2 className="text-lg font-semibold text-white mb-2">Self-Service Editable Fields</h2>
-          <p className="text-sm text-gray-400 mb-6">
+        <div className="rounded-xl bg-surface-card border border-border p-6">
+          <h2 className="text-lg font-semibold text-fg mb-2">Self-Service Editable Fields</h2>
+          <p className="text-sm text-fg-secondary mb-6">
             Choose which profile fields users can edit in the self-service portal.
           </p>
 
           <div className="space-y-3">
             {Object.entries(fields).map(([key, config]) => (
-              <div key={key} className="flex items-center gap-4 rounded-lg bg-gray-800/50 px-4 py-3">
-                <button
-                  type="button"
-                  onClick={() => handleToggle({ fieldKey: key })}
-                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${
-                    config.enabled ? 'bg-blue-600' : 'bg-gray-700'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-5 w-5 rounded-full bg-white transition-transform ${
-                      config.enabled ? 'translate-x-5' : 'translate-x-0'
+              <div key={key} className="rounded-lg bg-surface-input/50 px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => handleToggle({ fieldKey: key })}
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${
+                      config.enabled ? 'bg-accent' : 'bg-surface-hover'
                     }`}
-                  />
-                </button>
-                <span className="text-xs font-mono text-gray-500 w-40">{key}</span>
+                  >
+                    <span
+                      className={`inline-block h-5 w-5 rounded-full bg-white transition-transform ${
+                        config.enabled ? 'translate-x-5' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                  <span className="text-xs font-mono text-fg-muted truncate">{key}</span>
+                </div>
                 <input
                   type="text"
                   value={config.label || ''}
                   onChange={(e) => handleLabelChange({ fieldKey: key, label: e.target.value })}
-                  className="flex-1 rounded-lg border border-gray-700 bg-gray-800 px-3 py-1.5 text-sm text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="mt-2 w-full rounded-lg border border-border bg-surface-input px-3 py-1.5 text-sm text-fg focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   placeholder="Display label"
                 />
               </div>
@@ -151,9 +153,9 @@ export function Settings() {
         </div>
 
         {/* Sync Account */}
-        <div className="rounded-xl bg-gray-900 border border-gray-800 p-6">
-          <h2 className="text-lg font-semibold text-white mb-2">Sync Account</h2>
-          <p className="text-sm text-gray-400 mb-4">
+        <div className="rounded-xl bg-surface-card border border-border p-6">
+          <h2 className="text-lg font-semibold text-fg mb-2">Sync Account</h2>
+          <p className="text-sm text-fg-secondary mb-4">
             Dedicated AD account for automated synchronization.
             A strong password is generated automatically and stored encrypted — no one sees it.
           </p>
@@ -170,13 +172,13 @@ export function Settings() {
           ) : (
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1">Username</label>
+                <label className="block text-xs font-medium text-fg-secondary mb-1">Username</label>
                 <input
                   type="text"
                   value={syncUsername}
                   onChange={(e) => setSyncUsername(e.target.value)}
                   placeholder="svc-conductor"
-                  className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               </div>
               <Button primary onClick={handleCreateSync} disabled={savingSync}>

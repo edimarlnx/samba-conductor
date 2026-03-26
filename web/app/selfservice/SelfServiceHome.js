@@ -37,8 +37,8 @@ export function SelfServiceHome() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">My Account</h1>
-        <p className="mt-1 text-sm text-gray-400">
+        <h1 className="text-2xl font-bold text-fg">My Account</h1>
+        <p className="mt-1 text-sm text-fg-secondary">
           Welcome, {loggedUser?.profile?.displayName || loggedUser?.username}
         </p>
       </div>
@@ -47,24 +47,24 @@ export function SelfServiceHome() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mb-8">
         <button
           onClick={() => navigate(RoutePaths.PROFILE)}
-          className="rounded-xl bg-gray-900 border border-gray-800 p-5 text-left transition-colors hover:bg-gray-800 hover:border-gray-700"
+          className="rounded-xl bg-surface-card border border-border p-5 text-left transition-colors hover:bg-surface-hover hover:border-border"
         >
-          <h3 className="text-sm font-semibold text-white">Edit Profile</h3>
-          <p className="mt-1 text-xs text-gray-400">Update your personal information</p>
+          <h3 className="text-sm font-semibold text-fg">Edit Profile</h3>
+          <p className="mt-1 text-xs text-fg-secondary">Update your personal information</p>
         </button>
         <button
           onClick={() => navigate(RoutePaths.CHANGE_PASSWORD)}
-          className="rounded-xl bg-gray-900 border border-gray-800 p-5 text-left transition-colors hover:bg-gray-800 hover:border-gray-700"
+          className="rounded-xl bg-surface-card border border-border p-5 text-left transition-colors hover:bg-surface-hover hover:border-border"
         >
-          <h3 className="text-sm font-semibold text-white">Change Password</h3>
-          <p className="mt-1 text-xs text-gray-400">Update your account password</p>
+          <h3 className="text-sm font-semibold text-fg">Change Password</h3>
+          <p className="mt-1 text-xs text-fg-secondary">Update your account password</p>
         </button>
       </div>
 
       {/* Profile Info */}
       {profile && (
-        <div className="rounded-xl bg-gray-900 border border-gray-800 p-6 mb-6">
-          <h2 className="text-lg font-semibold text-white mb-4">Profile</h2>
+        <div className="rounded-xl bg-surface-card border border-border p-6 mb-6">
+          <h2 className="text-lg font-semibold text-fg mb-4">Profile</h2>
           <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <InfoField label="Username" value={profile.username} />
             <InfoField label="Display Name" value={profile.displayName} />
@@ -81,13 +81,13 @@ export function SelfServiceHome() {
 
       {/* Groups */}
       {groups.length > 0 && (
-        <div className="rounded-xl bg-gray-900 border border-gray-800 p-6">
-          <h2 className="text-lg font-semibold text-white mb-4">Groups</h2>
+        <div className="rounded-xl bg-surface-card border border-border p-6">
+          <h2 className="text-lg font-semibold text-fg mb-4">Groups</h2>
           <div className="flex flex-wrap gap-2">
             {groups.map((group) => (
               <span
                 key={group}
-                className="rounded-full bg-gray-800 px-3 py-1 text-xs font-medium text-gray-300"
+                className="rounded-full bg-surface-input px-3 py-1 text-xs font-medium text-fg-secondary"
               >
                 {group}
               </span>
@@ -101,7 +101,7 @@ export function SelfServiceHome() {
         <div className="mt-6">
           <button
             onClick={() => navigate(RoutePaths.ADMIN_DASHBOARD)}
-            className="text-sm text-blue-400 hover:text-blue-300"
+            className="text-sm text-accent hover:text-accent-hover"
           >
             Go to Admin Panel &rarr;
           </button>
@@ -116,8 +116,8 @@ function InfoField({ label, value }) {
 
   return (
     <div>
-      <dt className="text-xs font-medium text-gray-500">{label}</dt>
-      <dd className="mt-0.5 text-sm text-gray-300">{value}</dd>
+      <dt className="text-xs font-medium text-fg-muted">{label}</dt>
+      <dd className="mt-0.5 text-sm text-fg-secondary">{value}</dd>
     </div>
   );
 }

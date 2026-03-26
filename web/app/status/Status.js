@@ -8,8 +8,8 @@ export function Status() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-white mb-4">Server Status</h1>
-      <p className="text-gray-400">Service monitoring coming soon.</p>
+      <h1 className="text-2xl font-bold text-fg mb-4">Server Status</h1>
+      <p className="text-fg-secondary">Service monitoring coming soon.</p>
       <Button
         secondary
         onClick={() => navigate(RoutePaths.ADMIN_DASHBOARD)}

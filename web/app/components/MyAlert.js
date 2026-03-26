@@ -15,14 +15,14 @@ export function MyAlert({ message, isOpen, clear, autoCloseIn = 3_000 }) {
   if (!message || !isOpen) return null;
 
   return (
-    <div className="fixed right-4 top-4 z-50">
-      <div className="max-w-sm rounded-lg bg-gray-800 border border-gray-700 p-4 shadow-lg">
-        <div className="flex items-center justify-between">
-          <p className="text-gray-200">{message}</p>
+    <div className="fixed inset-x-4 top-4 z-50 sm:left-auto sm:right-4 sm:max-w-sm">
+      <div className="rounded-lg bg-surface-card border border-border p-3 sm:p-4 shadow-lg">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-sm text-fg-secondary">{message}</p>
           <button
             onClick={clear}
             aria-label="Clear message"
-            className="focus:outline-hidden ml-4 text-gray-400 hover:text-gray-200"
+            className="focus:outline-hidden ml-2 shrink-0 text-fg-muted hover:text-fg"
           >
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
               <path

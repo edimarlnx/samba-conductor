@@ -27,8 +27,8 @@ export function Domain() {
   if (!info) {
     return (
       <div>
-        <h1 className="text-2xl font-bold text-white mb-4">Domain</h1>
-        <p className="text-gray-400">Unable to retrieve domain information.</p>
+        <h1 className="text-2xl font-bold text-fg mb-4">Domain</h1>
+        <p className="text-fg-secondary">Unable to retrieve domain information.</p>
       </div>
     );
   }
@@ -60,21 +60,21 @@ export function Domain() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Domain</h1>
-        <p className="mt-1 text-sm text-gray-400">Active Directory domain configuration and status</p>
+        <h1 className="text-2xl font-bold text-fg">Domain</h1>
+        <p className="mt-1 text-sm text-fg-secondary">Active Directory domain configuration and status</p>
       </div>
 
       <div className="space-y-6">
         {sections.map((section) => (
-          <div key={section.title} className="rounded-xl bg-gray-900 border border-gray-800 p-6">
-            <h2 className="text-lg font-semibold text-white mb-4">{section.title}</h2>
+          <div key={section.title} className="rounded-xl bg-surface-card border border-border p-6">
+            <h2 className="text-lg font-semibold text-fg mb-4">{section.title}</h2>
             <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {section.fields
                 .filter((field) => field.value)
                 .map((field) => (
                   <div key={field.label}>
-                    <dt className="text-xs font-medium text-gray-500">{field.label}</dt>
-                    <dd className="mt-0.5 text-sm text-gray-300">{field.value}</dd>
+                    <dt className="text-xs font-medium text-fg-muted">{field.label}</dt>
+                    <dd className="mt-0.5 text-sm text-fg-secondary">{field.value}</dd>
                   </div>
                 ))}
             </dl>

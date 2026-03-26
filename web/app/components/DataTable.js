@@ -19,31 +19,31 @@ export function DataTable({ columns, data, onRowClick, searchPlaceholder = 'Sear
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={searchPlaceholder}
-          className="w-full max-w-sm rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="w-full sm:max-w-sm rounded-lg border border-border bg-surface-input px-4 py-2.5 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
         />
       </div>
 
-      {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-gray-800">
+      {/* Desktop table */}
+      <div className="hidden sm:block overflow-x-auto rounded-xl border border-border">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-800 bg-gray-900">
+            <tr className="border-b border-border bg-surface-card">
               {columns.map((col) => (
                 <th
                   key={col.accessor || col.header}
-                  className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-400"
+                  className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-fg-muted"
                 >
                   {col.header}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-800">
+          <tbody className="divide-y divide-border-subtle">
             {filteredData.length === 0 ? (
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="px-4 py-8 text-center text-sm text-gray-500"
+                  className="px-4 py-8 text-center text-sm text-fg-muted"
                 >
                   No results found
                 </td>
@@ -53,14 +53,14 @@ export function DataTable({ columns, data, onRowClick, searchPlaceholder = 'Sear
                 <tr
                   key={row.id || row.username || row.name || index}
                   onClick={() => onRowClick && onRowClick(row)}
-                  className={`bg-gray-900/50 transition-colors hover:bg-gray-800 ${
+                  className={`bg-surface-card/50 transition-colors hover:bg-surface-hover ${
                     onRowClick ? 'cursor-pointer' : ''
                   }`}
                 >
                   {columns.map((col) => (
                     <td
                       key={col.accessor || col.header}
-                      className="whitespace-nowrap px-4 py-3 text-sm text-gray-300"
+                      className="whitespace-nowrap px-4 py-3 text-sm text-fg-secondary"
                     >
                       {col.render ? col.render(row) : row[col.accessor]}
                     </td>
@@ -72,8 +72,39 @@ export function DataTable({ columns, data, onRowClick, searchPlaceholder = 'Sear
         </table>
       </div>
 
+      {/* Mobile card layout */}
+      <div className="sm:hidden space-y-3">
+        {filteredData.length === 0 ? (
+          <div className="rounded-xl border border-border bg-surface-card p-6 text-center text-sm text-fg-muted">
+            No results found
+          </div>
+        ) : (
+          filteredData.map((row, index) => (
+            <div
+              key={row.id || row.username || row.name || index}
+              onClick={() => onRowClick && onRowClick(row)}
+              className={`rounded-xl border border-border bg-surface-card p-4 space-y-2 ${
+                onRowClick ? 'cursor-pointer active:bg-surface-hover' : ''
+              }`}
+            >
+              {columns.map((col) => {
+                const value = col.render ? col.render(row) : row[col.accessor];
+                if (!value && value !== 0) return null;
+
+                return (
+                  <div key={col.accessor || col.header} className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-medium text-fg-muted">{col.header}</span>
+                    <span className="text-sm text-fg-secondary text-right">{value}</span>
+                  </div>
+                );
+              })}
+            </div>
+          ))
+        )}
+      </div>
+
       {/* Count */}
-      <p className="mt-2 text-xs text-gray-500">
+      <p className="mt-2 text-xs text-fg-muted">
         {filteredData.length} of {data.length} items
       </p>
     </div>
