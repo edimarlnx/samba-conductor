@@ -1,6 +1,79 @@
 @import 'tailwindcss';
 
-/* Base styles - dark theme */
+/* Custom color palette */
+@theme {
+  --color-wine-950: #1a0a14;
+  --color-wine-900: #2d1520;
+  --color-wine-800: #3d1f2e;
+  --color-wine-700: #4a2838;
+  --color-wine-600: #6b3a50;
+  --color-wine-500: #8a5068;
+  --color-wine-400: #c9a0b0;
+  --color-wine-300: #dfc5d0;
+  --color-wine-200: #efdde4;
+  --color-wine-100: #f5eff1;
+  --color-wine-50: #faf5f7;
+
+  /* Semantic tokens — components use these */
+  --color-surface: var(--theme-surface);
+  --color-surface-card: var(--theme-surface-card);
+  --color-surface-input: var(--theme-surface-input);
+  --color-surface-hover: var(--theme-surface-hover);
+  --color-border: var(--theme-border);
+  --color-border-subtle: var(--theme-border-subtle);
+  --color-fg: var(--theme-fg);
+  --color-fg-secondary: var(--theme-fg-secondary);
+  --color-fg-muted: var(--theme-fg-muted);
+  --color-accent: var(--theme-accent);
+  --color-accent-hover: var(--theme-accent-hover);
+}
+
+/* === THEME: Wine (default) === */
+:root, .wine {
+  --theme-surface: #1a0a14;
+  --theme-surface-card: #2d1520;
+  --theme-surface-input: #3d1f2e;
+  --theme-surface-hover: #4a2838;
+  --theme-border: #4a2838;
+  --theme-border-subtle: #3d1f2e;
+  --theme-fg: #f5eff1;
+  --theme-fg-secondary: #c9a0b0;
+  --theme-fg-muted: #8a5068;
+  --theme-accent: #c45b7c;
+  --theme-accent-hover: #d4708f;
+}
+
+/* === THEME: Classic (original gray) === */
+.classic {
+  --theme-surface: #030712;
+  --theme-surface-card: #111827;
+  --theme-surface-input: #1f2937;
+  --theme-surface-hover: #374151;
+  --theme-border: #374151;
+  --theme-border-subtle: #1f2937;
+  --theme-fg: #f3f4f6;
+  --theme-fg-secondary: #9ca3af;
+  --theme-fg-muted: #6b7280;
+  --theme-accent: #2563eb;
+  --theme-accent-hover: #1d4ed8;
+}
+
+/* === THEME: Light === */
+.light {
+  --theme-surface: #faf5f7;
+  --theme-surface-card: #ffffff;
+  --theme-surface-input: #f5eff1;
+  --theme-surface-hover: #efdde4;
+  --theme-border: #dfc5d0;
+  --theme-border-subtle: #efdde4;
+  --theme-fg: #1a0a14;
+  --theme-fg-secondary: #6b3a50;
+  --theme-fg-muted: #8a5068;
+  --theme-accent: #9b2d50;
+  --theme-accent-hover: #7a1f3d;
+}
+
+/* Base styles */
 html, body, #app {
-  @apply min-h-screen bg-gray-950 text-gray-100;
+  @apply min-h-dvh bg-surface text-fg;
 }

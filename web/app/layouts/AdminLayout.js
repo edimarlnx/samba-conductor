@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Meteor } from 'meteor/meteor';
 import { useLoggedUser } from 'meteor/quave:logged-user-react';
 import { RoutePaths } from '../general/RoutePaths';
+import { ThemeToggle } from '../components/ThemeToggle';
 
 const NAV_ITEMS = [
   { path: RoutePaths.ADMIN_DASHBOARD, label: 'Dashboard', icon: DashboardIcon },
@@ -16,6 +17,7 @@ const NAV_ITEMS = [
 export function AdminLayout({ children }) {
   const { loggedUser } = useLoggedUser();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   function handleLogout() {
     Meteor.callAsync('auth.logout').catch(() => {});
@@ -24,29 +26,52 @@ export function AdminLayout({ children }) {
     });
   }
 
+  function handleNavClick() {
+    setSidebarOpen(false);
+  }
+
   const displayName = loggedUser?.profile?.displayName || loggedUser?.username || '';
 
   return (
-    <div className="flex h-screen bg-gray-950">
-      {/* Sidebar */}
-      <aside className="flex w-64 flex-col bg-gray-900 border-r border-gray-800">
+    <div className="flex h-dvh bg-surface">
+      {/* Mobile backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar — drawer on mobile, static on desktop */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-surface-card border-r border-border transition-transform duration-200 lg:static lg:translate-x-0 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
         {/* Logo */}
-        <div className="flex h-16 items-center px-6 border-b border-gray-800">
-          <h1 className="text-lg font-bold text-white">Samba Conductor</h1>
+        <div className="flex h-14 items-center justify-between px-4 border-b border-border">
+          <h1 className="text-base font-bold text-fg">Samba Conductor</h1>
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="rounded-lg p-1.5 text-fg-muted hover:bg-surface-hover lg:hidden"
+          >
+            <CloseIcon />
+          </button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 space-y-1 px-3 py-4">
+        <nav className="flex-1 space-y-0.5 px-2 py-3 overflow-y-auto">
           {NAV_ITEMS.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
               end={item.path === RoutePaths.ADMIN_DASHBOARD}
+              onClick={handleNavClick}
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                    ? 'bg-accent text-white'
+                    : 'text-fg-secondary hover:bg-surface-hover hover:text-fg'
                 }`
               }
             >
@@ -56,37 +81,69 @@ export function AdminLayout({ children }) {
           ))}
         </nav>
 
-        {/* User / Logout */}
-        <div className="border-t border-gray-800 p-4">
+        {/* User / Theme / Logout */}
+        <div className="border-t border-border p-3">
           <div className="flex items-center justify-between">
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-white">{displayName}</p>
-              <p className="text-xs text-gray-500">
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-fg">{displayName}</p>
+              <p className="text-xs text-fg-muted">
                 {loggedUser?.profile?.isAdmin ? 'Administrator' : 'User'}
               </p>
             </div>
-            <button
-              onClick={handleLogout}
-              className="rounded-lg p-2 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
-              title="Sign out"
-            >
-              <LogoutIcon />
-            </button>
+            <div className="flex items-center">
+              <ThemeToggle />
+              <button
+                onClick={handleLogout}
+                className="rounded-lg p-2 text-fg-muted hover:bg-surface-hover hover:text-fg transition-colors"
+                title="Sign out"
+              >
+                <LogoutIcon />
+              </button>
+            </div>
           </div>
         </div>
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-auto">
-        <div className="p-6 lg:p-8">
-          {children}
-        </div>
-      </main>
+      <div className="flex flex-1 flex-col overflow-hidden">
+        {/* Mobile top bar */}
+        <header className="flex h-14 items-center gap-3 border-b border-border bg-surface-card px-4 lg:hidden">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="rounded-lg p-2 text-fg-muted hover:bg-surface-hover"
+          >
+            <HamburgerIcon />
+          </button>
+          <h1 className="text-base font-bold text-fg">Samba Conductor</h1>
+        </header>
+
+        <main className="flex-1 overflow-auto">
+          <div className="p-4 sm:p-6 lg:p-8">
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
 
-// SVG Icons as simple components
+// Icons
+
+function HamburgerIcon() {
+  return (
+    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  );
+}
 
 function DashboardIcon() {
   return (
