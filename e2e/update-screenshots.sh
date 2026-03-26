@@ -129,28 +129,38 @@ else
   echo "  Meteor ready at $BASE_URL."
 fi
 
-# --- Step 4: Install Playwright if needed ---
+# --- Step 4 & 5: Run Playwright via Docker container ---
 echo ""
-echo "==> Checking Playwright..."
+echo "==> Capturing screenshots via Playwright container..."
+echo ""
 cd "$SCRIPT_DIR"
 
+# Install npm deps locally (for the capture script's require('playwright'))
 if [ ! -d "node_modules/playwright" ]; then
   echo "  Installing dependencies..."
   npm install --silent 2>&1 | tail -1
 fi
 
-if [ ! -d "$HOME/.cache/ms-playwright" ]; then
-  echo "  Installing Chromium..."
-  npx playwright install chromium 2>&1 | tail -3
+# Detect if running natively or needs container
+if npx playwright install --dry-run chromium &>/dev/null 2>&1 && [ -d "$HOME/.cache/ms-playwright" ]; then
+  echo "  Using local Playwright."
+  node screenshots/capture-all.js "${CAPTURE_ARGS[@]}"
+else
+  echo "  Using Playwright Docker container (Fedora/unsupported OS detected)."
+
+  # Run capture script inside the official Playwright container
+  # --network host: access localhost:4080 (Meteor) and localhost:636 (Samba)
+  # Mount e2e/ for scripts and docs/screenshots/ for output
+  docker run --rm \
+    --network host \
+    -v "$SCRIPT_DIR:/work/e2e" \
+    -v "$PROJECT_DIR/docs/screenshots:/work/docs/screenshots" \
+    -w /work/e2e \
+    -e "BASE_URL=${BASE_URL}" \
+    -e "SCREENSHOT_DIR=/work/docs/screenshots" \
+    mcr.microsoft.com/playwright:v1.52.0-noble \
+    sh -c "npm install --silent 2>/dev/null; node screenshots/capture-all.js ${CAPTURE_ARGS[*]}"
 fi
-echo "  Playwright ready."
-
-# --- Step 5: Capture screenshots ---
-echo ""
-echo "==> Capturing screenshots..."
-echo ""
-
-node screenshots/capture-all.js "${CAPTURE_ARGS[@]}"
 
 echo ""
 echo "Done. Screenshots in docs/screenshots/"
