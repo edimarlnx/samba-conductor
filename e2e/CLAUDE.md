@@ -40,7 +40,7 @@ Screenshots are saved to `docs/screenshots/`. Only files that actually changed a
 
 ## Prerequisites
 
-- Samba DC running: `cd docker && docker compose up -d`
+- Samba DC + replica running: `cd docker && docker compose --profile replica up -d`
 - Meteor app running: `cd web && meteor npm start`
 - Default: `http://localhost:4080` (override with `BASE_URL` env var)
 

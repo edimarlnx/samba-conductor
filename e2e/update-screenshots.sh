@@ -1,6 +1,13 @@
 #!/bin/bash
 # Update documentation screenshots
 #
+# This script handles the full lifecycle:
+#   1. Starts Samba DC + replica (docker compose)
+#   2. Starts Meteor app
+#   3. Installs Playwright dependencies if needed
+#   4. Captures screenshots (only updates changed files)
+#   5. Stops Meteor app
+#
 # Usage:
 #   ./update-screenshots.sh              # Capture all, update only changed
 #   ./update-screenshots.sh admin        # Only admin pages
@@ -8,40 +15,142 @@
 #   ./update-screenshots.sh auth         # Only login pages
 #   ./update-screenshots.sh dashboard    # Only screenshots matching "dashboard"
 #   ./update-screenshots.sh --force      # Force update all (ignore diff)
-#
-# Prerequisites:
-#   - Samba DC running:  cd docker && docker compose up -d
-#   - Meteor running:    cd web && meteor npm start
-#   - Playwright installed: cd e2e && npm install && npx playwright install chromium
+#   ./update-screenshots.sh --no-cleanup # Don't stop services after capture
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-cd "$SCRIPT_DIR"
+PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+BASE_URL="${BASE_URL:-http://localhost:4080}"
+METEOR_PID=""
+NO_CLEANUP=false
 
-# Ensure node is available (try system, then meteor's bundled node)
-if ! command -v node &>/dev/null; then
-  METEOR_NODE="$HOME/.meteor/packages/meteor-tool/3.4.0/mt-os.linux.x86_64/dev_bundle/bin/node"
-  if [ -f "$METEOR_NODE" ]; then
-    export PATH="$(dirname "$METEOR_NODE"):$PATH"
+# Parse --no-cleanup flag
+CAPTURE_ARGS=()
+for arg in "$@"; do
+  if [ "$arg" = "--no-cleanup" ]; then
+    NO_CLEANUP=true
   else
-    echo "Error: node not found. Install Node.js or ensure Meteor is installed."
-    exit 1
+    CAPTURE_ARGS+=("$arg")
+  fi
+done
+
+function cleanup() {
+  if [ "$NO_CLEANUP" = true ]; then
+    echo ""
+    echo "Services left running (--no-cleanup)."
+    return
+  fi
+
+  echo ""
+  echo "Cleaning up..."
+
+  # Stop Meteor
+  if [ -n "$METEOR_PID" ] && kill -0 "$METEOR_PID" 2>/dev/null; then
+    echo "  Stopping Meteor (PID $METEOR_PID)..."
+    kill "$METEOR_PID" 2>/dev/null || true
+    wait "$METEOR_PID" 2>/dev/null || true
+  fi
+
+  echo "  Done. Docker services left running."
+}
+
+trap cleanup EXIT
+
+# --- Step 1: Ensure node is available ---
+echo "==> Checking Node.js..."
+if ! command -v node &>/dev/null; then
+  # Try nvm
+  export NVM_DIR="$HOME/.nvm"
+  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+  if ! command -v node &>/dev/null; then
+    # Fallback to Meteor's bundled node
+    METEOR_NODE=$(find "$HOME/.meteor/packages/meteor-tool" -name node -path "*/bin/node" 2>/dev/null | head -1)
+    if [ -n "$METEOR_NODE" ]; then
+      export PATH="$(dirname "$METEOR_NODE"):$PATH"
+    else
+      echo "Error: node not found. Install Node.js (nvm) or Meteor."
+      exit 1
+    fi
   fi
 fi
+echo "  Node $(node --version)"
 
-# Check app is running
-BASE_URL="${BASE_URL:-http://localhost:4080}"
-if ! curl -s --max-time 3 "$BASE_URL" >/dev/null 2>&1; then
-  echo "Error: App not reachable at $BASE_URL"
-  echo "Start it first: cd web && meteor npm start"
-  exit 1
+# --- Step 2: Start Samba DC + replica ---
+echo ""
+echo "==> Starting Samba DC + replica..."
+cd "$PROJECT_DIR/docker"
+
+if docker ps --format '{{.Names}}' 2>/dev/null | grep -q 'samba-ad-dc'; then
+  echo "  Samba DC already running."
+else
+  docker compose --profile replica up -d --build 2>&1 | tail -5
+  echo "  Waiting for Samba provisioning..."
+  # Wait for samba to be ready (check LDAP port)
+  for i in $(seq 1 60); do
+    if docker exec samba-ad-dc samba-tool domain info 127.0.0.1 &>/dev/null; then
+      break
+    fi
+    sleep 2
+  done
+  echo "  Samba DC ready."
 fi
 
-echo "Updating screenshots from $BASE_URL..."
+# --- Step 3: Start Meteor app ---
+echo ""
+echo "==> Starting Meteor app..."
+cd "$PROJECT_DIR/web"
+
+if curl -s --max-time 3 "$BASE_URL" >/dev/null 2>&1; then
+  echo "  Meteor already running at $BASE_URL."
+else
+  meteor npm install --silent 2>&1 | tail -1
+  meteor npm start > /tmp/meteor-screenshots.log 2>&1 &
+  METEOR_PID=$!
+  echo "  Meteor starting (PID $METEOR_PID)..."
+
+  # Wait for Meteor to be ready
+  for i in $(seq 1 120); do
+    if curl -s --max-time 2 "$BASE_URL" >/dev/null 2>&1; then
+      break
+    fi
+    if ! kill -0 "$METEOR_PID" 2>/dev/null; then
+      echo "  Error: Meteor exited unexpectedly. Check /tmp/meteor-screenshots.log"
+      exit 1
+    fi
+    sleep 2
+  done
+
+  if ! curl -s --max-time 3 "$BASE_URL" >/dev/null 2>&1; then
+    echo "  Error: Meteor failed to start within 4 minutes."
+    exit 1
+  fi
+  echo "  Meteor ready at $BASE_URL."
+fi
+
+# --- Step 4: Install Playwright if needed ---
+echo ""
+echo "==> Checking Playwright..."
+cd "$SCRIPT_DIR"
+
+if [ ! -d "node_modules/playwright" ]; then
+  echo "  Installing dependencies..."
+  npm install --silent 2>&1 | tail -1
+fi
+
+if [ ! -d "$HOME/.cache/ms-playwright" ]; then
+  echo "  Installing Chromium..."
+  npx playwright install chromium 2>&1 | tail -3
+fi
+echo "  Playwright ready."
+
+# --- Step 5: Capture screenshots ---
+echo ""
+echo "==> Capturing screenshots..."
 echo ""
 
-node screenshots/capture-all.js "$@"
+node screenshots/capture-all.js "${CAPTURE_ARGS[@]}"
 
 echo ""
 echo "Done. Screenshots in docs/screenshots/"
