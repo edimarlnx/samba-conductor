@@ -145,6 +145,11 @@ export async function deleteUser({ username, credentials }) {
   return runSambaTool({ args: ['user', 'delete', username], credentials });
 }
 
+// Moves a user to a different OU
+export async function moveUser({username, newOuDn, credentials}) {
+    return runSambaTool({args: ['user', 'move', username, newOuDn], credentials});
+}
+
 // Enables an AD user
 export async function enableUser({ username, credentials }) {
   return runSambaTool({ args: ['user', 'enable', username], credentials });

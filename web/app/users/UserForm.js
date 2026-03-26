@@ -5,6 +5,7 @@ import { useAlert } from 'meteor/quave:alert-react-tailwind';
 import { RoutePaths } from '../general/RoutePaths';
 import { Button } from '../components/Button';
 import { Loading } from '../components/Loading';
+import {OUPicker} from '../components/OUPicker';
 
 const INITIAL_FORM = {
   username: '',
@@ -250,12 +251,15 @@ export function UserForm() {
               placeholder="Building A, Room 101"
             />
             {!isEditing && (
-              <FormField
-                label="Organizational Unit"
-                value={form.userou}
-                onChange={(value) => handleChange({ field: 'userou', value })}
-                placeholder="OU=Engineering"
-              />
+                <div>
+                  <label className="block text-xs font-medium text-fg-secondary mb-1">
+                    Organizational Unit
+                  </label>
+                  <OUPicker
+                      value={form.userou}
+                      onChange={(value) => handleChange({field: 'userou', value})}
+                  />
+                </div>
             )}
           </div>
         </FormSection>

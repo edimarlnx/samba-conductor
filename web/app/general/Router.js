@@ -19,6 +19,10 @@ import { UserForm } from '../users/UserForm';
 import { Groups } from '../groups/Groups';
 import { GroupForm } from '../groups/GroupForm';
 import {OUs} from '../ous/OUs';
+import {Computers} from '../computers/Computers';
+import {ServiceAccounts} from '../serviceaccounts/ServiceAccounts';
+import {Dns} from '../dns/Dns';
+import {GPOs} from '../gpo/GPOs';
 import { Domain } from '../domain/Domain';
 import { Settings } from '../settings/Settings';
 import { DrPage } from '../dr/DrPage';
@@ -105,6 +109,22 @@ export function Router() {
         <Route
             path={RoutePaths.ADMIN_OUS}
             element={<AdminPage><OUs/></AdminPage>}
+        />
+        <Route
+            path={RoutePaths.ADMIN_COMPUTERS}
+            element={<AdminPage><Computers/></AdminPage>}
+        />
+        <Route
+            path={RoutePaths.ADMIN_SERVICE_ACCOUNTS}
+            element={<AdminPage><ServiceAccounts/></AdminPage>}
+        />
+        <Route
+            path={RoutePaths.ADMIN_DNS}
+            element={<AdminPage><Dns/></AdminPage>}
+        />
+        <Route
+            path={RoutePaths.ADMIN_GPOS}
+            element={<AdminPage><GPOs/></AdminPage>}
         />
       <Route
         path={RoutePaths.ADMIN_DOMAIN}

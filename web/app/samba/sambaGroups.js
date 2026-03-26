@@ -99,6 +99,11 @@ export async function createGroup({ groupName, description, credentials }) {
   return runSambaTool({ args, credentials });
 }
 
+// Moves a group to a different OU
+export async function moveGroup({groupName, newOuDn, credentials}) {
+    return runSambaTool({args: ['group', 'move', groupName, newOuDn], credentials});
+}
+
 // Deletes an AD group
 export async function deleteGroup({ groupName, credentials }) {
   return runSambaTool({ args: ['group', 'delete', groupName], credentials });
