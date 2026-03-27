@@ -46,9 +46,9 @@ services:
       - ROOT_URL=http://localhost:4080
       - PORT=4080
       - USE_INTERNAL_MONGODB=1
-      - METEOR_SETTINGS={"public":{"appInfo":{"name":"Samba Conductor"}},"samba":{"ldapUrl":"ldaps://samba:636","baseDn":"DC=samdom,DC=example,DC=com","realm":"SAMDOM.EXAMPLE.COM","tlsRejectUnauthorized":false,"sessionTtlMinutes":30}}
-    # Restart on crash (SyncedCron ldapjs bug causes uncaughtException)
-    restart: on-failure:5
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+      - METEOR_SETTINGS={"public":{"appInfo":{"name":"Samba Conductor"}},"samba":{"ldapUrl":"ldaps://samba:636","baseDn":"DC=samdom,DC=example,DC=com","realm":"SAMDOM.EXAMPLE.COM","tlsRejectUnauthorized":false,"sessionTtlMinutes":30},"cron":{"enabled":false}}
+    restart: on-failure:3
     networks:
       e2e-net:
         ipv4_address: 172.21.0.20

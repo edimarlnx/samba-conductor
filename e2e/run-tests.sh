@@ -8,17 +8,20 @@
 #   ./run-tests.sh users              # Run only users suite
 #   ./run-tests.sh --compose          # Full stack via Docker Compose (no host dependencies)
 #   ./run-tests.sh --compose users    # Docker Compose + filter by suite
+#   ./run-tests.sh --compose --no-cache  # Rebuild images without Docker cache
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 FILTER=""
 USE_COMPOSE=false
+NO_CACHE=""
 
 # Parse arguments
 for arg in "$@"; do
   case "$arg" in
     --compose) USE_COMPOSE=true ;;
+    --no-cache) NO_CACHE="--no-cache" ;;
     *) FILTER="$arg" ;;
   esac
 done
@@ -45,6 +48,10 @@ if [ "$USE_COMPOSE" = true ]; then
   echo "  (this may take a few minutes on first run)"
   echo "  ========================================="
   echo ""
+
+  if [ -n "$NO_CACHE" ]; then
+    docker compose build --no-cache 2>&1
+  fi
 
   docker compose up --build --exit-code-from tests 2>&1
   EXIT_CODE=$?

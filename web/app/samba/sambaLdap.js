@@ -18,7 +18,14 @@ export function createLdapClient() {
     };
   }
 
-  return ldap.createClient(options);
+  const client = ldap.createClient(options);
+
+  // Prevent unhandled 'error' events from crashing the process
+  client.on('error', (err) => {
+    console.error(`[LDAP] Client error: ${err.message}`);
+  });
+
+  return client;
 }
 
 // Binds to LDAP with given credentials
