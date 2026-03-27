@@ -7,7 +7,12 @@
     "screenshots:force": "node screenshots/capture-all.js --force",
     "screenshots:admin": "node screenshots/capture-all.js admin",
     "screenshots:selfservice": "node screenshots/capture-all.js selfservice",
-    "screenshots:auth": "node screenshots/capture-all.js auth"
+    "screenshots:auth": "node screenshots/capture-all.js auth",
+    "test": "node tests/run-all.js",
+    "test:auth": "FILTER=auth node tests/run-all.js",
+    "test:users": "FILTER=users node tests/run-all.js",
+    "test:groups": "FILTER=groups node tests/run-all.js",
+    "test:oauth": "FILTER=oauth node tests/run-all.js"
   },
   "dependencies": {
     "playwright": "^1.52.0"

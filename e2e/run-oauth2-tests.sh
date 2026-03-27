@@ -39,5 +39,5 @@ docker run --rm \
   -v "$SCRIPT_DIR:/work/e2e" \
   -w /work/e2e \
   -e "BASE_URL=${BASE_URL}" \
-  mcr.microsoft.com/playwright:v1.52.0-noble \
+  mcr.microsoft.com/playwright:v1.58.2-noble \
   sh -c "npm install --silent 2>/dev/null; node tests/oauth2.spec.js"

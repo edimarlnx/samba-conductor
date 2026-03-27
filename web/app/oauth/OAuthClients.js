@@ -112,12 +112,12 @@ export function OAuthClients() {
             render(row) {
                 return (
                     <div className="flex gap-2">
-                        <button onClick={(e) => {
+                        <button data-e2e="oauth-clients-btn-reset-secret" onClick={(e) => {
                             e.stopPropagation();
                             handleResetSecret({clientId: row.clientId});
                         }} className="text-xs text-accent hover:text-accent-hover">Reset Secret
                         </button>
-                        <button onClick={(e) => {
+                        <button data-e2e="oauth-clients-btn-delete" onClick={(e) => {
                             e.stopPropagation();
                             setDeleteTarget(row.clientId);
                         }} className="text-xs text-red-400 hover:text-red-300">Delete
@@ -137,13 +137,13 @@ export function OAuthClients() {
                     <h1 className="text-2xl font-bold text-fg">OAuth Clients</h1>
                     <p className="mt-1 text-sm text-fg-secondary">Manage OAuth2 client applications</p>
                 </div>
-                <Button primary onClick={() => {
+                <Button primary data-e2e="oauth-clients-btn-new" onClick={() => {
                     setShowCreate(true);
                     setCreatedSecret(null);
                 }}>New Client</Button>
             </div>
 
-            <DataTable columns={columns} data={clients} searchPlaceholder="Search clients..."/>
+            <DataTable columns={columns} data={clients} searchPlaceholder="Search clients..." data-e2e="oauth-clients-table"/>
 
             {/* Created/Reset Secret Modal */}
             {createdSecret && (
@@ -167,12 +167,12 @@ export function OAuthClients() {
                                 <div className="flex gap-2">
                                     <code
                                         className="flex-1 rounded-lg bg-surface-input border border-border px-3 py-2 text-sm text-green-400 font-mono break-all select-all">{createdSecret.clientSecret}</code>
-                                    <Button secondary onClick={handleCopySecret}>Copy</Button>
+                                    <Button secondary data-e2e="oauth-clients-btn-copy-secret" onClick={handleCopySecret}>Copy</Button>
                                 </div>
                             </div>
                         </div>
                         <div className="mt-6 flex justify-end">
-                            <Button primary onClick={() => {
+                            <Button primary data-e2e="oauth-clients-btn-done" onClick={() => {
                                 setCreatedSecret(null);
                                 setShowCreate(false);
                                 setCreateForm({
@@ -199,14 +199,14 @@ export function OAuthClients() {
                         <div className="space-y-3">
                             <div>
                                 <label className="block text-xs font-medium text-fg-secondary mb-1">Client Name</label>
-                                <input type="text" value={createForm.clientName}
+                                <input type="text" data-e2e="oauth-client-form-input-name" value={createForm.clientName}
                                        onChange={(e) => setCreateForm((p) => ({...p, clientName: e.target.value}))}
                                        placeholder="Grafana" autoFocus
                                        className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"/>
                             </div>
                             <div>
                                 <label className="block text-xs font-medium text-fg-secondary mb-1">Description</label>
-                                <input type="text" value={createForm.description}
+                                <input type="text" data-e2e="oauth-client-form-input-description" value={createForm.description}
                                        onChange={(e) => setCreateForm((p) => ({...p, description: e.target.value}))}
                                        placeholder="Optional"
                                        className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"/>
@@ -214,7 +214,7 @@ export function OAuthClients() {
                             <div>
                                 <label className="block text-xs font-medium text-fg-secondary mb-1">Redirect URIs (one
                                     per line)</label>
-                                <textarea value={createForm.redirectUri}
+                                <textarea data-e2e="oauth-client-form-input-redirect" value={createForm.redirectUri}
                                           onChange={(e) => setCreateForm((p) => ({...p, redirectUri: e.target.value}))}
                                           placeholder="http://localhost:3001/callback" rows={3}
                                           className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"/>
@@ -222,6 +222,7 @@ export function OAuthClients() {
                             <div>
                                 <label className="block text-xs font-medium text-fg-secondary mb-1">Realm</label>
                                 <select
+                                    data-e2e="oauth-client-form-select-realm"
                                     value={createForm.realm}
                                     onChange={(e) => setCreateForm((p) => ({...p, realm: e.target.value}))}
                                     className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
@@ -262,8 +263,8 @@ export function OAuthClients() {
                             </label>
                         </div>
                         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                            <Button secondary onClick={() => setShowCreate(false)}>Cancel</Button>
-                            <Button primary onClick={handleCreate}
+                            <Button secondary data-e2e="oauth-client-form-btn-cancel" onClick={() => setShowCreate(false)}>Cancel</Button>
+                            <Button primary data-e2e="oauth-client-form-btn-submit" onClick={handleCreate}
                                     disabled={creating || !createForm.clientName.trim() || !createForm.redirectUri.trim()}>{creating ? 'Creating...' : 'Create Client'}</Button>
                         </div>
                     </div>

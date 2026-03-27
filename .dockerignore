@@ -1,0 +1,9 @@
+.git
+.github
+.claude
+docs
+media
+e2e/results
+e2e/node_modules
+web/.meteor/local
+workspace
