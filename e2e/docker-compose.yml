@@ -1,18 +1,20 @@
-# E2E Tests: Full stack in Docker
+# E2E Tests: Full stack in Docker (all-in-one image)
 #
 # Usage:
 #   cd e2e
-#   docker compose up --build --abort-on-container-exit --exit-code-from tests
+#   ./run-tests.sh --compose
+#   ./run-tests.sh --compose --no-cache
+#   ./run-tests.sh --compose users
 #
 # Results (HTML report + screenshots) are saved to ./results/
 
 services:
-  # Samba AD DC
-  samba:
+  # All-in-one: Samba AD DC + MongoDB + Meteor webapp
+  app:
     build:
-      context: ../docker
-      dockerfile: samba-ad-dc/Dockerfile
-    container_name: e2e-samba
+      context: ..
+      dockerfile: docker/all-in-one/Dockerfile
+    container_name: e2e-app
     hostname: dc1
     domainname: samdom.example.com
     privileged: true
@@ -21,53 +23,29 @@ services:
       - SAMBA_DOMAIN=SAMDOM
       - SAMBA_ADMIN_PASSWORD=P@ssw0rd123!
       - SAMBA_DNS_FORWARDER=8.8.8.8
+      - ROOT_URL=http://localhost:3000
+      - METEOR_SETTINGS={"samba":{"ldapUrl":"ldaps://127.0.0.1:636","baseDn":"DC=samdom,DC=example,DC=com","realm":"SAMDOM.EXAMPLE.COM","tlsRejectUnauthorized":false,"sessionTtlMinutes":30},"cron":{"enabled":false},"public":{"appInfo":{"name":"Samba Conductor"}}}
     dns:
       - 127.0.0.1
     networks:
       e2e-net:
         ipv4_address: 172.21.0.10
     healthcheck:
-      test: ["CMD", "samba-tool", "domain", "info", "127.0.0.1", "-U", "Administrator%P@ssw0rd123!"]
-      interval: 10s
-      timeout: 10s
-      retries: 30
-      start_period: 30s
-
-  # Meteor app (production build + internal MongoDB)
-  meteor:
-    build:
-      context: ..
-      dockerfile: e2e/Dockerfile.meteor
-    container_name: e2e-meteor
-    depends_on:
-      samba:
-        condition: service_healthy
-    environment:
-      - ROOT_URL=http://localhost:4080
-      - PORT=4080
-      - USE_INTERNAL_MONGODB=1
-      - NODE_TLS_REJECT_UNAUTHORIZED=0
-      - METEOR_SETTINGS={"public":{"appInfo":{"name":"Samba Conductor"}},"samba":{"ldapUrl":"ldaps://samba:636","baseDn":"DC=samdom,DC=example,DC=com","realm":"SAMDOM.EXAMPLE.COM","tlsRejectUnauthorized":false,"sessionTtlMinutes":30},"cron":{"enabled":false}}
-    restart: on-failure:3
-    networks:
-      e2e-net:
-        ipv4_address: 172.21.0.20
-    healthcheck:
-      test: ["CMD", "curl", "-sf", "http://localhost:4080"]
+      test: [ "CMD", "curl", "-sf", "http://localhost:3000" ]
       interval: 10s
       timeout: 5s
       retries: 30
-      start_period: 30s
+      start_period: 60s
 
   # Playwright test runner
   tests:
     image: mcr.microsoft.com/playwright:v1.58.2-noble
     container_name: e2e-tests
     depends_on:
-      meteor:
+      app:
         condition: service_healthy
     environment:
-      - BASE_URL=http://meteor:4080
+      - BASE_URL=http://app:3000
       - FILTER=${FILTER:---all}
     volumes:
       - ./tests:/work/e2e/tests:ro

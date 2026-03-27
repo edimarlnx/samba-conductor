@@ -17,6 +17,7 @@ export function getSambaConfig() {
     realm: settings.realm,
     tlsRejectUnauthorized: settings.tlsRejectUnauthorized !== false,
     dockerContainer: settings.dockerContainer || null,
+    sambaToolUrl: settings.sambaToolUrl || null,
     sessionTtlMinutes: settings.sessionTtlMinutes || 30,
   };
 }

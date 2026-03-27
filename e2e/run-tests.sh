@@ -44,7 +44,7 @@ if [ "$USE_COMPOSE" = true ]; then
   # Export filter for the tests container
   export FILTER
 
-  echo "  Starting Samba DC + Meteor + Playwright..."
+  echo "  Starting all-in-one (Samba + Meteor + MongoDB) + Playwright..."
   echo "  (this may take a few minutes on first run)"
   echo "  ========================================="
   echo ""

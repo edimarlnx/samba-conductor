@@ -48,7 +48,7 @@ function getSwcRule() {
 
 // eslint-disable-next-line import/no-default-export
 export default defineConfig((Meteor) => ({
-  externals: [/^react-router-dom/],
+  externals: [/^react-router-dom/, /^ldapjs/],
   ...(Meteor.isClient && {
     module: {
       rules: [
