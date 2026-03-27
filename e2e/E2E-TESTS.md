@@ -16,23 +16,23 @@ Comprehensive end-to-end test suite covering all features of the Samba Conductor
 
 ### Docker Compose (recommended for CI)
 
-Zero host dependencies — builds and runs Samba DC, Meteor (production build), and Playwright.
-Requires ~15GB free disk space for Docker images.
-
-> **Note:** There is a known SyncedCron/ldapjs bug that causes an `uncaughtException` on first cron
-> tick when the sync account is not configured. This crashes the Meteor process in Docker. A fix for
-> this is tracked separately. Until resolved, use **host mode** for reliable E2E runs.
+Zero host dependencies — builds all-in-one image (Samba DC + MongoDB + Meteor) and runs Playwright.
 
 ```bash
 cd e2e
 ./run-tests.sh --compose              # Run all tests
 ./run-tests.sh --compose users        # Filter by suite
+./run-tests.sh --compose --no-cache   # Rebuild without Docker cache
 ```
 
-This builds three containers:
-- **samba** — Samba 4 AD DC (`docker/samba-ad-dc`)
-- **meteor** — Meteor dev server with samba-tool (`e2e/Dockerfile.meteor`), source mounted as volume
+This builds two containers:
+
+- **app** — All-in-one image (`docker/all-in-one/Dockerfile`): Samba 4 AD DC + MongoDB + Meteor webapp, managed by
+  Supervisor
 - **tests** — Playwright runner (`mcr.microsoft.com/playwright:v1.58.2-noble`)
+
+> **Note:** Cron jobs are disabled in E2E via `METEOR_SETTINGS` (`cron.enabled = false`) to prevent background tasks
+> from interfering with tests.
 
 ### Host mode (for development)
 
@@ -224,7 +224,7 @@ results/
 
 - **Runner:** `tests/run-all.js` — orchestrates all suites, collects results, generates report
 - **Helpers:** `tests/helpers.js` — login, navigation, screenshot capture, TestReporter class
-- **Docker:** Tests run inside `mcr.microsoft.com/playwright:v1.58.2-noble` with `--network host`
+- **Docker:** All-in-one image for Samba+MongoDB+Meteor; Playwright in `mcr.microsoft.com/playwright:v1.58.2-noble`
 - **Timeouts:** LDAP operations use 60s timeout, LDAP writes use 45s, UI interactions use 10s
 - **Screenshots:** Captured after each test (success or failure) in `results/screenshots/`
 

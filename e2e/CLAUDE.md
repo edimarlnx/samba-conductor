@@ -10,7 +10,13 @@ Playwright-based scripts to capture UI screenshots for documentation and run E2E
 e2e/
 ├── package.json             # Dependencies (playwright)
 ├── playwright.config.js     # Base URL, screenshot dir, credentials, viewport
+├── run-tests.sh             # Run E2E tests (host or Docker Compose mode)
+├── docker-compose.yml       # All-in-one + Playwright test runner
 ├── update-screenshots.sh    # Shell script to update screenshots (with change detection)
+├── tests/
+│   ├── helpers.js           # Login, navigation, screenshot capture, TestReporter
+│   ├── run-all.js           # Orchestrates all suites, generates HTML report
+│   └── *.spec.js            # Test suites (auth, users, groups, etc.)
 ├── screenshots/
 │   └── capture-all.js       # Captures all pages, compares with existing, updates only changed
 └── CLAUDE.md                # This file
@@ -38,9 +44,24 @@ npx playwright install chromium
 
 Screenshots are saved to `docs/screenshots/`. Only files that actually changed are overwritten.
 
-## Prerequisites
+## Running E2E Tests
 
-- Samba DC + replica running: `cd docker && docker compose --profile replica up -d`
+```bash
+# Docker Compose — all-in-one image, zero host dependencies
+./run-tests.sh --compose
+./run-tests.sh --compose users          # Filter by suite
+./run-tests.sh --compose --no-cache     # Rebuild without Docker cache
+
+# Host mode — requires Meteor + Samba running on host
+./run-tests.sh                          # Run all tests
+./run-tests.sh auth                     # Filter by suite
+```
+
+Docker Compose mode uses the all-in-one image (Samba + MongoDB + Meteor in a single container).
+
+## Prerequisites (host mode)
+
+- Samba DC running: `cd docker && docker compose up -d`
 - Meteor app running: `cd web && meteor npm start`
 - Default: `http://localhost:4080` (override with `BASE_URL` env var)
 

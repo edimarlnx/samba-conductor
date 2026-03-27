@@ -18,7 +18,10 @@ samba-conductor/
 │   └── screenshots/  # UI screenshots for documentation (generated via Playwright)
 ├── e2e/              # Playwright E2E tests and screenshot capture
 │   ├── screenshots/  # Capture scripts (use data-e2e selectors)
+│   ├── tests/        # E2E test suites and helpers
+│   ├── run-tests.sh  # Run E2E tests (host or Docker Compose mode)
 │   └── update-screenshots.sh  # Run to update docs screenshots (change detection)
+├── .github/workflows/ # CI pipelines (E2E tests on PR)
 └── CLAUDE.md         # This file
 ```
 
@@ -37,7 +40,9 @@ Each subdirectory has its own `CLAUDE.md` with specific instructions.
 - **Web UI:** Meteor 3.4 + React 19 + Tailwind CSS 4 (mobile-first, 3 themes: Wine/Classic/Light)
 - **Primary Data Source:** Samba 4 AD DC (LDAPS + samba-tool)
 - **Database:** MongoDB (app state, settings, DR snapshots — AD data is NOT stored here except for DR)
-- **Deployment:** Docker (3 image variants, single `/data` volume)
+- **Deployment:** Docker (all-in-one single container, standalone DC, or web + external DC)
+- **Build:** Rspack + Babel (with `REMOVE_E2E_ATTRS=true` to strip test selectors in production)
+- **CI:** GitHub Actions E2E workflow (`.github/workflows/e2e-tests.yml`)
 
 ## Architecture
 
@@ -46,6 +51,7 @@ Each subdirectory has its own `CLAUDE.md` with specific instructions.
 - **Credential Store:** AES-256-GCM, random key per boot (session), PBKDF2-derived key (DR data)
 - **Sync Account:** Auto-created AD service account for background sync jobs
 - **S3 Backup:** Configurable mongodump + samba-tool domain backup → S3-compatible storage
+- **Cron:** Background sync/backup jobs, disableable via `Meteor.settings.cron.enabled = false`
 
 ## Development Constraints
 
