@@ -1,0 +1,39 @@
+# Meteor production build for E2E tests
+# Uses the same build process as web/Dockerfile
+FROM zcloudws/meteor-build:3.4 AS builder
+
+WORKDIR /app-source/source
+USER root
+RUN chown zcloud:zcloud -R /app-source
+
+USER zcloud
+COPY --chown=zcloud:zcloud web /app-source/source
+
+ENV METEOR_DISABLE_OPTIMISTIC_CACHING=1
+RUN meteor npm i --no-audit --legacy-peer-deps \
+    && meteor build --platforms web.browser --directory ../app-build
+
+# Runtime stage with MongoDB + samba-tool
+FROM zcloudws/meteor-node-mongodb-runtime:3.4-with-tools
+
+USER root
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    samba-common-bin \
+    samba-dsdb-modules \
+    samba-vfs-modules \
+    ldap-utils \
+    krb5-user \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+USER zcloud
+
+COPY --from=builder /app-source/app-build/bundle /home/zcloud/app
+RUN cd /home/zcloud/app/programs/server && npm i --no-audit --legacy-peer-deps
+
+WORKDIR /home/zcloud/app
+EXPOSE 4080
+
+ENTRYPOINT ["/scripts/startup.sh"]

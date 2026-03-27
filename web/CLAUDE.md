@@ -7,7 +7,7 @@
 - **Styling**: Tailwind CSS 4 with semantic color tokens
 - **Database**: MongoDB (via Meteor)
 - **Schema**: SimpleSchema
-- **Build Tools**: Rspack, PostCSS
+- **Build Tools**: Rspack, Babel (babel.config.js), PostCSS
 - **Code Quality**: ESLint (@quave/eslint-config-quave), Prettier, Lefthook
 
 ## Code Standards
@@ -87,6 +87,13 @@ Uses CSS custom properties via Tailwind CSS 4 `@theme`. Three themes: Wine (defa
 - `bg-accent`, `hover:bg-accent-hover`, `text-accent`
 
 Themes switch by adding class to `<html>`: `.wine`, `.classic`, `.light`
+
+## Build Configuration
+
+- **`babel.config.js`** — React Compiler plugin + conditional `data-e2e` attribute removal
+- **`rspack.config.js`** — CSS PostCSS loader, externals (`react-router-dom`, `ldapjs`)
+- **`REMOVE_E2E_ATTRS=true`** — strips `data-e2e` attributes from production builds (via Babel plugin)
+- **`ldapjs` as external** — prevents rspack from bundling ldapjs (fixes parser bugs in production builds)
 
 ## Development
 

@@ -12,12 +12,18 @@ const DEFAULT_TIMEOUT = 30000;
 // Executes samba-tool commands safely using execFile (no shell injection)
 // credentials: { username, password } — if provided, adds -U username%password
 export async function runSambaTool({ args, credentials, timeout = DEFAULT_TIMEOUT }) {
-  const { dockerContainer } = getSambaConfig();
+  const { dockerContainer, sambaToolUrl } = getSambaConfig();
 
   // Add authentication if credentials provided
   const authArgs = credentials
     ? [...args, '-U', `${credentials.username}%${credentials.password}`]
     : args;
+
+  // Add remote host connection if sambaToolUrl is configured.
+  // Some subcommands (e.g. "domain info") don't support -H, so skip for those.
+  if (sambaToolUrl && !isCommandWithoutHostFlag({ args })) {
+    authArgs.push('-H', sambaToolUrl, '--option=tls verify peer = no_check');
+  }
 
   try {
     let stdout, stderr;
@@ -48,6 +54,17 @@ export async function runSambaTool({ args, credentials, timeout = DEFAULT_TIMEOU
         `samba-tool error: ${sanitizedMessage}`,
     );
   }
+}
+
+// Subcommands that don't support the -H flag
+const COMMANDS_WITHOUT_HOST_FLAG = [
+  'domain info',
+  'domain level',
+];
+
+function isCommandWithoutHostFlag({ args }) {
+  const subcommand = args.slice(0, 2).join(' ');
+  return COMMANDS_WITHOUT_HOST_FLAG.includes(subcommand);
 }
 
 // Parses samba-tool list output into an array of strings

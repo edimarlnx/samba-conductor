@@ -82,7 +82,7 @@ export function OAuthRealms() {
                     <h1 className="text-2xl font-bold text-fg">OAuth Realms</h1>
                     <p className="mt-1 text-sm text-fg-secondary">Logical grouping for OAuth clients</p>
                 </div>
-                <Button primary onClick={() => setShowCreate(true)}>New Realm</Button>
+                <Button primary data-e2e="oauth-realms-btn-new" onClick={() => setShowCreate(true)}>New Realm</Button>
             </div>
 
             <div className="space-y-3">
@@ -91,7 +91,7 @@ export function OAuthRealms() {
                         className="rounded-xl bg-surface-card border border-border p-6 text-center text-sm text-fg-muted">No
                         realms configured</div>
                 ) : realms.map((realm) => (
-                    <div key={realm.name} className="rounded-xl bg-surface-card border border-border p-4">
+                    <div key={realm.name} data-e2e="oauth-realms-card" className="rounded-xl bg-surface-card border border-border p-4">
                         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <h3 className="text-sm font-semibold text-fg">{realm.displayName}</h3>
@@ -99,7 +99,7 @@ export function OAuthRealms() {
                             </div>
                             <div className="flex gap-2 shrink-0">
                                 {realm.name !== 'default' && (
-                                    <button onClick={() => setDeleteTarget(realm.name)}
+                                    <button data-e2e="oauth-realms-btn-delete" onClick={() => setDeleteTarget(realm.name)}
                                             className="text-xs text-red-400 hover:text-red-300">Delete</button>
                                 )}
                             </div>
@@ -126,14 +126,14 @@ export function OAuthRealms() {
                             <div>
                                 <label className="block text-xs font-medium text-fg-secondary mb-1">Name
                                     (identifier)</label>
-                                <input type="text" value={form.name}
+                                <input type="text" data-e2e="oauth-realm-form-input-name" value={form.name}
                                        onChange={(e) => setForm((p) => ({...p, name: e.target.value}))}
                                        placeholder="production"
                                        className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"/>
                             </div>
                             <div>
                                 <label className="block text-xs font-medium text-fg-secondary mb-1">Display Name</label>
-                                <input type="text" value={form.displayName}
+                                <input type="text" data-e2e="oauth-realm-form-input-display-name" value={form.displayName}
                                        onChange={(e) => setForm((p) => ({...p, displayName: e.target.value}))}
                                        placeholder="Production Apps"
                                        className="w-full rounded-lg border border-border bg-surface-input px-3 py-2 text-sm text-fg placeholder-fg-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"/>
@@ -166,8 +166,8 @@ export function OAuthRealms() {
                             </div>
                         </div>
                         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                            <Button secondary onClick={() => setShowCreate(false)}>Cancel</Button>
-                            <Button primary onClick={handleCreate}
+                            <Button secondary data-e2e="oauth-realm-form-btn-cancel" onClick={() => setShowCreate(false)}>Cancel</Button>
+                            <Button primary data-e2e="oauth-realm-form-btn-submit" onClick={handleCreate}
                                     disabled={saving || !form.name.trim() || !form.displayName.trim()}>{saving ? 'Creating...' : 'Create'}</Button>
                         </div>
                     </div>
