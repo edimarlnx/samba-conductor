@@ -1,4 +1,4 @@
-FROM zcloudws/meteor-build:3.4 as builder
+FROM zcloudws/meteor-build:3.4 AS builder
 
 WORKDIR /app-source/source
 USER root
@@ -11,12 +11,13 @@ COPY --chown=zcloud:zcloud . /app-source/source
 ENV METEOR_DISABLE_OPTIMISTIC_CACHING=1
 
 #  --legacy-peer-deps because of react-error-boundary
-RUN meteor npm i --no-audit --legacy-peer-deps && meteor build --platforms web.browser,web.cordova --directory ../app-build
+RUN meteor npm i --no-audit --legacy-peer-deps && meteor build --directory ../app-build
 
 FROM zcloudws/meteor-node-mongodb-runtime:3.4-with-tools
 
 # Install Samba tools needed at runtime for AD management (samba-tool, ldap-utils)
 USER root
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
     samba-common-bin \
     samba-dsdb-modules \
