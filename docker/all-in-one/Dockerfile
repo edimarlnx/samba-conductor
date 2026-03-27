@@ -62,7 +62,7 @@ EXPOSE 3000/tcp
 EXPOSE 27017/tcp
 EXPOSE 49152-65535/tcp
 
-# Non-root user for MongoDB and webapp
+# Non-root user for MongoDB
 RUN useradd -r -s /sbin/nologin -d /opt/app conductor
 
 # Shared samba scripts
