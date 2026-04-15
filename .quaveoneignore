@@ -1,0 +1,11 @@
+.run
+.idea
+.git
+.github
+.claude
+docs
+media
+e2e
+web/.meteor/local
+workspace
+node_modules
